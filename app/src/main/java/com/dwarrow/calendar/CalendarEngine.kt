@@ -2,6 +2,7 @@ package com.dwarrow.calendar
 
 import android.content.Context
 import org.json.JSONObject
+import org.json.JSONArray
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.temporal.ChronoUnit
@@ -10,6 +11,7 @@ import java.time.temporal.ChronoUnit
 object CalendarEngine {
  data class Day(val drYear:Int,val month:Int,val monthName:String,val meaning:String,val day:Int,val weekday:String,val intercalary:Boolean,val length:Int)
  private var root:JSONObject?=null
+ private var seasons:JSONArray?=null
  private fun core(ctx:Context):JSONObject {
   if(root==null) root=JSONObject(ctx.assets.open("core.json").bufferedReader().use{it.readText()})
   return root!!
@@ -33,6 +35,25 @@ object CalendarEngine {
   return null
  }
  fun season(ctx:Context,d:Day):String {
-  return "" // Kept separate until boundary semantics have been validated.
+  if(seasons==null) seasons=JSONArray(ctx.assets.open("seasons.json").bufferedReader().use{it.readText()})
+  val entries=seasons!!
+  fun ordinal(month:Int,day:Int):Int = month*100+day
+  for(i in 0 until entries.length()){
+   val entry=entries.getJSONObject(i)
+   val start=entry.getJSONArray("start")
+   val end=entry.getJSONArray("end")
+   val startMonth=start.getInt(0)
+   val endMonth=end.getInt(0)
+   val startDay=start.getInt(1)
+   val endDay=if(end.getInt(1)==-1) {
+    if(d.month==endMonth) d.length else 99
+   } else end.getInt(1)
+   val current=ordinal(d.month,d.day)
+   val first=ordinal(startMonth,startDay)
+   val last=ordinal(endMonth,endDay)
+   val matches=if(first<=last) current in first..last else current>=first || current<=last
+   if(matches) return "${entry.getString("name")} · ${entry.getString("pt")}"
+  }
+  return "Estação não identificada"
  }
 }
