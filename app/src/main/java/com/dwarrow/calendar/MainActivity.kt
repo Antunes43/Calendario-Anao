@@ -65,7 +65,7 @@ class MainActivity : Activity() {
   fun nav(label:String,weight:Float,action:()->Unit){
    val b=TextView(this).apply {
     text=label;textSize=15f;setTextColor(inks[t]);gravity=Gravity.CENTER
-    setPadding(4,18,4,18);background=if(t==0)getDrawable(R.drawable.khazad_stone_panel) else shape(surfaces[t],golds[t],1,8f)
+    setPadding(4,18,4,18);background=shape(surfaces[t],golds[t],1,8f)
     setOnClickListener{action();draw()}
    }
    navigation.addView(b,LinearLayout.LayoutParams(0,-2,weight).apply{marginEnd=6})
@@ -82,7 +82,7 @@ class MainActivity : Activity() {
    val button=TextView(this).apply {
     text=(if(index==t)"◆  " else "◇  ")+name;textSize=17f;gravity=Gravity.CENTER
     setTextColor(inks[t]);setPadding(12,17,12,17)
-    background=if(t==0)getDrawable(R.drawable.khazad_stone_panel) else shape(if(index==t)golds[t] and 0x22ffffff else surfaces[t],golds[t],if(index==t)3 else 1,9f)
+    background=shape(if(index==t)golds[t] and 0x22ffffff else surfaces[t],golds[t],if(index==t)2 else 1,9f)
     setOnClickListener{selected=index;getPreferences(MODE_PRIVATE).edit().putInt("theme",index).apply();draw()}
    }
    choices.addView(button,LinearLayout.LayoutParams(-1,-2).apply{bottomMargin=10})
