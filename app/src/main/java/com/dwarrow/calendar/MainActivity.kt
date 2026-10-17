@@ -1,8 +1,6 @@
 package com.dwarrow.calendar
 
 import android.app.Activity
-import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.graphics.Typeface
 import android.graphics.drawable.GradientDrawable
@@ -91,6 +89,7 @@ class MainActivity : Activity() {
    choices.addView(button,LinearLayout.LayoutParams(-1,-2).apply{bottomMargin=10})
   }
   if(tab==3) {
+   text(root,"CATÁLOGO DE OBSERVÂNCIAS · DATAS A VALIDAR",13f,golds[t],true)
    val events=org.json.JSONArray(assets.open("observances.json").bufferedReader().use{it.readText()})
    for(i in 0 until events.length()){
     val e=events.getJSONObject(i)
