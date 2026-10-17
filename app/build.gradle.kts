@@ -12,6 +12,24 @@ android {
         versionCode = 4
         versionName = "0.4-dev"
     }
+    signingConfigs {
+        create("persistent") {
+            val storePath = System.getenv("CALENDAR_KEYSTORE_PATH")
+            val password = System.getenv("CALENDAR_KEYSTORE_PASSWORD")
+            if (!storePath.isNullOrBlank() && !password.isNullOrBlank()) {
+                storeFile = file(storePath)
+                storePassword = password
+                keyAlias = "calendario-anao"
+                keyPassword = password
+            }
+        }
+    }
+    buildTypes {
+        getByName("release") {
+            isMinifyEnabled = false
+            signingConfig = signingConfigs.getByName("persistent")
+        }
+    }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
