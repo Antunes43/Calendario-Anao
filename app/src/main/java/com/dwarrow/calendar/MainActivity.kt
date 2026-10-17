@@ -52,7 +52,6 @@ class MainActivity : Activity() {
   }
   panel("▦  DATA GREGORIANA",today.format(DateTimeFormatter.ofPattern("d 'de' MMMM 'de' yyyy",Locale("pt","BR"))))
   panel("◷  FUSO HORÁRIO",zone.id)
-  panel("✦  LUA E OBSERVÂNCIAS","Informações em validação com o calendário Dwarrow Scholar. Não exibimos fases, traduções ou eventos não confirmados.")
   text(root,"ESCOLHA A APARÊNCIA",15f,golds[t],true,18)
   val choices=LinearLayout(this).apply{orientation=LinearLayout.VERTICAL}
   root.addView(choices)
