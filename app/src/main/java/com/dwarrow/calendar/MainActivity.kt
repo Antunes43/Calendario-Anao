@@ -26,7 +26,7 @@ class MainActivity : Activity() {
  private fun shape(bg:Int,border:Int,thickness:Int=2,radius:Float=14f):GradientDrawable = GradientDrawable().apply { setColor(bg); cornerRadius=radius;setStroke(thickness,border) }
  private fun draw(){
   val t=selected; val zone=ZoneId.systemDefault();val today=LocalDate.now(zone);val day=CalendarEngine.lookup(this,today)
-  val scroll=ScrollView(this).apply { setBackgroundColor(backs[t]);fillViewport=true }
+  val scroll=ScrollView(this).apply { setBackgroundColor(backs[t]);isFillViewport = true }
   val root=LinearLayout(this).apply { orientation=LinearLayout.VERTICAL;setPadding(22,32,22,40) }
   scroll.addView(root)
   fun text(parent:LinearLayout,value:String,size:Float,color:Int=inks[t],bold:Boolean=false,pad:Int=8):TextView = TextView(this).apply {
