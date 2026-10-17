@@ -50,7 +50,6 @@ class MainActivity : Activity() {
    root.addView(card,LinearLayout.LayoutParams(-1,-2).apply{bottomMargin=12})
    text(card,title,17f,golds[t],true,5);text(card,description,15f,inks[t],false,5)
   }
-  panel("☾  MÊS ATUAL",if(day==null)"—" else "${day.monthName} — ${day.meaning}\nDia ${day.day} de ${day.length} · Mês ${day.month} do ano D.R. ${day.drYear}")
   panel("▦  DATA GREGORIANA",today.format(DateTimeFormatter.ofPattern("d 'de' MMMM 'de' yyyy",Locale("pt","BR"))))
   panel("◷  FUSO HORÁRIO",zone.id)
   panel("✦  LUA E OBSERVÂNCIAS","Informações em validação com o calendário Dwarrow Scholar. Não exibimos fases, traduções ou eventos não confirmados.")
