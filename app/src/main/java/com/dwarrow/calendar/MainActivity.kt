@@ -69,7 +69,7 @@ class MainActivity:Activity(){
  private fun draw(){
   val day=CalendarEngine.lookup(this,date)
   val greg=date.format(DateTimeFormatter.ofPattern("d 'de' MMMM 'de' yyyy",Locale("pt","BR")))
-  val scroll=ScrollView(this).apply{setBackgroundColor(if(themeIndex==2)0xffd4c4aa.toInt() else 0xff0d1014.toInt());fillViewport=true}
+  val scroll=ScrollView(this).apply{setBackgroundColor(if(themeIndex==2)0xffd4c4aa.toInt() else 0xff0d1014.toInt());isFillViewport=true}
   val root=column().apply{setPadding(dp(12),dp(16),dp(12),dp(10))}
   scroll.addView(root)
   add(root,"◆  "+names[themeIndex].uppercase(Locale.ROOT)+"  ◆",19f,bronze,true)
