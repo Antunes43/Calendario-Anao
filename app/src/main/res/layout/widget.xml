@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:id="@+id/widgetRoot" android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical" android:gravity="center" android:padding="18dp" android:background="@drawable/widget_khazad">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:id="@+id/widgetRoot" android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical" android:gravity="center" android:padding="18dp" android:background="#30291F">
 <TextView android:id="@+id/widgetTitle" android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center" android:textSize="12sp" android:textStyle="bold" android:textColor="#c49a59" android:text="CALENDÁRIO ANÃO" />
 <TextView android:id="@+id/widgetDate" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:gravity="center" android:textSize="24sp" android:textStyle="bold" android:textColor="#f5e7ca" />
 <TextView android:id="@+id/widgetSub" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="6dp" android:gravity="center" android:textSize="13sp" android:textColor="#c49a59" />
