@@ -1,6 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:id="@+id/widgetRoot" android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical" android:gravity="center" android:padding="18dp" android:background="#30291F">
-<TextView android:id="@+id/widgetTitle" android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center" android:textSize="12sp" android:textStyle="bold" android:textColor="#c49a59" android:text="CALENDÁRIO ANÃO" />
-<TextView android:id="@+id/widgetDate" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:gravity="center" android:textSize="24sp" android:textStyle="bold" android:textColor="#f5e7ca" />
-<TextView android:id="@+id/widgetSub" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="6dp" android:gravity="center" android:textSize="13sp" android:textColor="#c49a59" />
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+ android:id="@+id/widgetRoot" android:layout_width="match_parent" android:layout_height="match_parent"
+ android:orientation="vertical" android:gravity="center" android:padding="16dp" android:background="#30291F">
+ <TextView android:id="@+id/widgetTitle" android:layout_width="match_parent" android:layout_height="wrap_content"
+ android:gravity="center" android:textSize="13sp" android:letterSpacing="0.1" android:textStyle="bold" android:textColor="#C49A59" android:text="◆ KHAZAD-DÛM ◆"/>
+ <View android:layout_width="match_parent" android:layout_height="1dp" android:layout_marginTop="9dp" android:background="#967344"/>
+ <TextView android:id="@+id/widgetDate" android:layout_width="match_parent" android:layout_height="wrap_content"
+ android:layout_marginTop="8dp" android:gravity="center" android:textSize="25sp" android:textStyle="bold" android:textColor="#F5E7CA"/>
+ <TextView android:id="@+id/widgetSub" android:layout_width="match_parent" android:layout_height="wrap_content"
+ android:layout_marginTop="6dp" android:gravity="center" android:textSize="12sp" android:textColor="#C49A59"/>
+ <View android:layout_width="match_parent" android:layout_height="1dp" android:layout_marginTop="9dp" android:background="#967344"/>
 </LinearLayout>
