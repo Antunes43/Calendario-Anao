@@ -1,1 +1,20 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"><application android:label="Calendário Anão" android:theme="@android:style/Theme.Material.NoActionBar" android:usesCleartextTraffic="false"><activity android:name=".MainActivity" android:exported="true"><intent-filter><action android:name="android.intent.action.MAIN"/><category android:name="android.intent.category.LAUNCHER"/></intent-filter></activity><receiver android:name=".CalendarWidget" android:exported="true"><intent-filter><action android:name="android.appwidget.action.APPWIDGET_UPDATE"/><action android:name="android.intent.action.DATE_CHANGED"/><action android:name="android.intent.action.TIMEZONE_CHANGED"/><action android:name="android.intent.action.TIME_SET"/></intent-filter><meta-data android:name="android.appwidget.provider" android:resource="@xml/widget_info"/></receiver></application></manifest>
+plugins {
+    id("com.android.application")
+    id("org.jetbrains.kotlin.android")
+}
+android {
+    namespace = "com.dwarrow.calendar"
+    compileSdk = 35
+    defaultConfig {
+        applicationId = "com.dwarrow.calendar"
+        minSdk = 26
+        targetSdk = 35
+        versionCode = 3
+        versionName = "0.3"
+    }
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+    kotlinOptions { jvmTarget = "17" }
+}
