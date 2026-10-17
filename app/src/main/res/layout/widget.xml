@@ -1,13 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
  android:id="@+id/widgetRoot" android:layout_width="match_parent" android:layout_height="match_parent"
- android:orientation="vertical" android:gravity="center" android:padding="16dp" android:background="#30291F">
- <TextView android:id="@+id/widgetTitle" android:layout_width="match_parent" android:layout_height="wrap_content"
- android:gravity="center" android:textSize="13sp" android:letterSpacing="0.1" android:textStyle="bold" android:textColor="#C49A59" android:text="◆ KHAZAD-DÛM ◆"/>
- <TextView android:layout_width="match_parent" android:layout_height="1dp" android:layout_marginTop="9dp" android:background="#967344"/>
- <TextView android:id="@+id/widgetDate" android:layout_width="match_parent" android:layout_height="wrap_content"
- android:layout_marginTop="8dp" android:gravity="center" android:textSize="25sp" android:textStyle="bold" android:textColor="#F5E7CA"/>
- <TextView android:id="@+id/widgetSub" android:layout_width="match_parent" android:layout_height="wrap_content"
- android:layout_marginTop="6dp" android:gravity="center" android:textSize="12sp" android:textColor="#C49A59"/>
- <TextView android:layout_width="match_parent" android:layout_height="1dp" android:layout_marginTop="9dp" android:background="#967344"/>
+ android:orientation="horizontal" android:gravity="center_vertical" android:padding="14dp" android:background="@drawable/khazad_widget_bg">
+ <LinearLayout android:layout_width="60dp" android:layout_height="match_parent" android:orientation="vertical" android:gravity="center">
+  <TextView android:id="@+id/widgetMoon" android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center" android:text="☾" android:textSize="42sp" android:textColor="#D9D0BD"/>
+  <TextView android:id="@+id/widgetMoonLabel" android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center" android:text="Mês lunar" android:textSize="10sp" android:textColor="#C49A59"/>
+ </LinearLayout>
+ <LinearLayout android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:orientation="vertical" android:gravity="center">
+  <TextView android:id="@+id/widgetTitle" android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center" android:textSize="13sp" android:textStyle="bold" android:textColor="#C49A59" android:text="◆ KHAZAD-DÛM ◆"/>
+  <TextView android:id="@+id/widgetDate" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="5dp" android:gravity="center" android:textSize="21sp" android:textStyle="bold" android:textColor="#F5E7CA"/>
+  <TextView android:id="@+id/widgetSub" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="4dp" android:gravity="center" android:textSize="12sp" android:textColor="#C49A59"/>
+ </LinearLayout>
+ <LinearLayout android:layout_width="65dp" android:layout_height="wrap_content" android:orientation="vertical" android:gravity="center">
+  <TextView android:id="@+id/widgetYear" android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center" android:textSize="11sp" android:textColor="#C49A59"/>
+  <TextView android:id="@+id/widgetGregorian" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:gravity="center" android:textSize="10sp" android:textColor="#F5E7CA"/>
+ </LinearLayout>
 </LinearLayout>
