@@ -11,7 +11,8 @@ import java.time.LocalDate
 import java.time.ZoneId
 
 abstract class BaseCalendarWidget(private val style:Int):AppWidgetProvider(){
- override fun onUpdate(context:Context,manager:AppWidgetManager,ids:IntArray){update(context,manager,ids)}
+ override fun onUpdate(context:Context,manager:AppWidgetManager,ids:IntArray){super.onUpdate(context,manager,ids);update(context,manager,ids)}
+ override fun onEnabled(context:Context){super.onEnabled(context);val manager=AppWidgetManager.getInstance(context);update(context,manager,manager.getAppWidgetIds(ComponentName(context,javaClass)))}
  override fun onReceive(context:Context,intent:Intent){super.onReceive(context,intent)
   if(intent.action in arrayOf(Intent.ACTION_DATE_CHANGED,Intent.ACTION_TIMEZONE_CHANGED,Intent.ACTION_TIME_CHANGED)){
    val mgr=AppWidgetManager.getInstance(context)
