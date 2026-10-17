@@ -24,10 +24,11 @@ class MainActivity : Activity() {
  private val golds = intArrayOf(0xffc49a59.toInt(),0xffd7a34e.toInt(),0xff805b32.toInt())
  private val inks = intArrayOf(0xfff5e7ca.toInt(),0xfff5e8d0.toInt(),0xff322c26.toInt())
  private var selected = 0
+ private var viewedDate:LocalDate = LocalDate.now()
  override fun onCreate(savedInstanceState:Bundle?) { super.onCreate(savedInstanceState); selected=getPreferences(MODE_PRIVATE).getInt("theme",0).coerceIn(0,2); draw() }
  private fun shape(bg:Int,border:Int,thickness:Int=2,radius:Float=14f):GradientDrawable = GradientDrawable().apply { setColor(bg); cornerRadius=radius;setStroke(thickness,border) }
  private fun draw(){
-  val t=selected; val zone=ZoneId.systemDefault();val today=LocalDate.now(zone);val day=CalendarEngine.lookup(this,today)
+  val t=selected; val zone=ZoneId.systemDefault();val today=LocalDate.now(zone);val day=CalendarEngine.lookup(this,viewedDate)
   val scroll=ScrollView(this).apply { setBackgroundColor(backs[t]);isFillViewport = true }
   val root=LinearLayout(this).apply { orientation=LinearLayout.VERTICAL;setPadding(22,32,22,40) }
   scroll.addView(root)
@@ -50,7 +51,21 @@ class MainActivity : Activity() {
    root.addView(card,LinearLayout.LayoutParams(-1,-2).apply{bottomMargin=12})
    text(card,title,17f,golds[t],true,5);text(card,description,15f,inks[t],false,5)
   }
-  panel("▦  DATA GREGORIANA",today.format(DateTimeFormatter.ofPattern("d 'de' MMMM 'de' yyyy",Locale("pt","BR"))))
+  panel("▦  DATA GREGORIANA",viewedDate.format(DateTimeFormatter.ofPattern("d 'de' MMMM 'de' yyyy",Locale("pt","BR"))))
+  val navigation=LinearLayout(this).apply { orientation=LinearLayout.HORIZONTAL;gravity=Gravity.CENTER }
+  root.addView(navigation,LinearLayout.LayoutParams(-1,-2).apply{bottomMargin=12})
+  fun nav(label:String,weight:Float,action:()->Unit){
+   val b=TextView(this).apply {
+    text=label;textSize=15f;setTextColor(inks[t]);gravity=Gravity.CENTER
+    setPadding(4,18,4,18);background=shape(surfaces[t],golds[t],1,8f)
+    setOnClickListener{action();draw()}
+   }
+   navigation.addView(b,LinearLayout.LayoutParams(0,-2,weight).apply{marginEnd=6})
+  }
+  nav("◀  Anterior",1f){viewedDate=viewedDate.minusDays(1)}
+  nav("Hoje",0.65f){viewedDate=LocalDate.now(ZoneId.systemDefault())}
+  nav("Próximo  ▶",1f){viewedDate=viewedDate.plusDays(1)}
+  text(root,"CONSULTA DE DATAS · ${viewedDate.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))}",13f,golds[t],false,5)
   panel("◷  FUSO HORÁRIO",zone.id)
   text(root,"ESCOLHA A APARÊNCIA",15f,golds[t],true,18)
   val choices=LinearLayout(this).apply{orientation=LinearLayout.VERTICAL}
