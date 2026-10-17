@@ -1,6 +1,8 @@
 package com.dwarrow.calendar
 
 import android.app.Activity
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.graphics.Typeface
 import android.graphics.drawable.GradientDrawable
@@ -22,6 +24,7 @@ class MainActivity : Activity() {
  private val inks = intArrayOf(0xfff5e7ca.toInt(),0xfff5e8d0.toInt(),0xff322c26.toInt())
  private var selected = 0
  private var viewedDate:LocalDate = LocalDate.now()
+ private var tab:Int = 0
  private fun dp(value:Int):Int=(value*resources.displayMetrics.density+0.5f).toInt()
  override fun onCreate(savedInstanceState:Bundle?) { super.onCreate(savedInstanceState); selected=getPreferences(MODE_PRIVATE).getInt("theme",0).coerceIn(0,2); draw() }
  private fun shape(bg:Int,border:Int,thickness:Int=2,radius:Float=14f):GradientDrawable = GradientDrawable().apply { setColor(bg); cornerRadius=radius;setStroke(thickness,border) }
@@ -74,10 +77,10 @@ class MainActivity : Activity() {
   nav("Hoje",0.65f){viewedDate=LocalDate.now(ZoneId.systemDefault())}
   nav("Próximo  ▶",1f){viewedDate=viewedDate.plusDays(1)}
   text(root,"CONSULTA DE DATAS · ${viewedDate.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))}",13f,golds[t],false,5)
-  panel("◷  FUSO HORÁRIO",zone.id)
-  text(root,"ESCOLHA A APARÊNCIA",15f,golds[t],true,18)
+  if(tab==4) panel("◷  FUSO HORÁRIO",zone.id)
+  if(tab==4) text(root,"ESCOLHA A APARÊNCIA",15f,golds[t],true,18)
   val choices=LinearLayout(this).apply{orientation=LinearLayout.VERTICAL}
-  root.addView(choices)
+  if(tab==4) root.addView(choices)
   themes.forEachIndexed{index,name->
    val button=TextView(this).apply {
     text=(if(index==t)"◆  " else "◇  ")+name;textSize=17f;gravity=Gravity.CENTER
@@ -87,7 +90,27 @@ class MainActivity : Activity() {
    }
    choices.addView(button,LinearLayout.LayoutParams(-1,-2).apply{bottomMargin=10})
   }
-  text(root,"Widgets independentes: escolha Khazad-dûm, Dornogal ou Dwarrow Scholar na lista de widgets do Android.",13f,inks[t],false,14)
+  if(tab==3) {
+   val events=org.json.JSONArray(assets.open("observances.json").bufferedReader().use{it.readText()})
+   for(i in 0 until events.length()){
+    val e=events.getJSONObject(i)
+    panel("✦  ${e.getString("name")}",e.getString("pt"))
+   }
+  }
+  if(tab==2) panel("☾  CICLOS LUNARES","A data do mês lunar vem do calendário offline. A fase e a iluminação ainda exigem validação antes de serem exibidas.")
+  if(tab==4) text(root,"Widgets independentes: escolha Khazad-dûm, Dornogal ou Dwarrow Scholar na lista de widgets do Android.",13f,inks[t],false,14)
+  val tabs=LinearLayout(this).apply{orientation=LinearLayout.HORIZONTAL;gravity=Gravity.CENTER}
+  root.addView(tabs,LinearLayout.LayoutParams(-1,-2).apply{topMargin=dp(16)})
+  val tabNames=arrayOf("⌂ Hoje","▦ Datas","☾ Luas","✦ Eventos","⋯ Mais")
+  tabNames.forEachIndexed{index,label->
+   val b=TextView(this).apply{
+    text=label;textSize=11f;gravity=Gravity.CENTER;setTextColor(if(tab==index)golds[t] else inks[t])
+    setPadding(dp(1),dp(13),dp(1),dp(13))
+    background=shape(surfaces[t],if(tab==index)golds[t] else surfaces[t],if(tab==index)2 else 1,4f)
+    setOnClickListener{tab=index;draw()}
+   }
+   tabs.addView(b,LinearLayout.LayoutParams(0,-2,1f).apply{marginEnd=dp(2)})
+  }
   setContentView(scroll)
  }
 }
