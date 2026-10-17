@@ -2,7 +2,7 @@ name: Gerar APK Android
 on:
   workflow_dispatch:
   push:
-    branches: [main, master]
+    branches: [main, master, 'feat/calendar-information-v04']
 jobs:
   build:
     runs-on: ubuntu-latest
