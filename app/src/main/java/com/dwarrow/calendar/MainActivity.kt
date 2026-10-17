@@ -51,6 +51,7 @@ class MainActivity : Activity() {
    root.addView(card,LinearLayout.LayoutParams(-1,-2).apply{bottomMargin=12})
    text(card,title,17f,golds[t],true,5);text(card,description,15f,inks[t],false,5)
   }
+  if(day!=null) panel("❖  ESTAÇÃO ANÃ",CalendarEngine.season(this,day))
   panel("▦  DATA GREGORIANA",viewedDate.format(DateTimeFormatter.ofPattern("d 'de' MMMM 'de' yyyy",Locale("pt","BR"))))
   val navigation=LinearLayout(this).apply { orientation=LinearLayout.HORIZONTAL;gravity=Gravity.CENTER }
   root.addView(navigation,LinearLayout.LayoutParams(-1,-2).apply{bottomMargin=12})
