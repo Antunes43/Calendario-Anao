@@ -20,11 +20,11 @@ abstract class BaseCalendarWidget(private val style:Int):AppWidgetProvider(){
  }
  private fun update(context:Context,manager:AppWidgetManager,ids:IntArray){
   val d=CalendarEngine.lookup(context,LocalDate.now(ZoneId.systemDefault()))
-  val bg=intArrayOf(R.drawable.widget_khazad,R.drawable.widget_dornogal,R.drawable.widget_scholar)[style]
+  val bg=intArrayOf(0xff30291f.toInt(),0xff28313b.toInt(),0xfff3eee3.toInt())[style]
   val accent=intArrayOf(0xffc49a59.toInt(),0xffd7a34e.toInt(),0xff805b32.toInt())[style]
   val ink=if(style==2)0xff322c26.toInt() else 0xfff5e7ca.toInt()
   for(id in ids){val v=RemoteViews(context.packageName,R.layout.widget)
-   v.setInt(R.id.widgetRoot,"setBackgroundResource",bg)
+   v.setInt(R.id.widgetRoot,"setBackgroundColor",bg)
    v.setTextViewText(R.id.widgetTitle,arrayOf("◆ KHAZAD-DÛM ◆","◆ DORNOGAL ◆","✦ DWARROW SCHOLAR ✦")[style])
    v.setTextColor(R.id.widgetTitle,accent);v.setTextColor(R.id.widgetDate,ink);v.setTextColor(R.id.widgetSub,accent)
    v.setTextViewText(R.id.widgetDate,if(d==null)"Fora do período" else "${d.day} de ${d.monthName}")
