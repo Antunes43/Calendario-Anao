@@ -28,7 +28,7 @@ abstract class BaseCalendarWidget(private val style:Int):AppWidgetProvider(){
    v.setTextViewText(R.id.widgetTitle,arrayOf("◆ KHAZAD-DÛM ◆","◆ DORNOGAL ◆","✦ DWARROW SCHOLAR ✦")[style])
    v.setTextColor(R.id.widgetTitle,accent);v.setTextColor(R.id.widgetDate,ink);v.setTextColor(R.id.widgetSub,accent)
    v.setTextViewText(R.id.widgetDate,if(d==null)"Fora do período" else "${d.day} de ${d.monthName}")
-   v.setTextViewText(R.id.widgetSub,if(d==null)"" else "D.R. ${d.drYear}  ·  ${d.weekday}")
+   v.setTextViewText(R.id.widgetSub,if(d==null)"" else "${d.weekday} · Dia ${d.day}/${d.length} · D.R. ${d.drYear}")
    val open=PendingIntent.getActivity(context,0,Intent(context,MainActivity::class.java),PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
    v.setOnClickPendingIntent(R.id.widgetRoot,open)
    manager.updateAppWidget(id,v)
