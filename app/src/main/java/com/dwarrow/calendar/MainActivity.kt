@@ -3,6 +3,8 @@ package com.dwarrow.calendar
 import android.app.Activity
 import android.os.Bundle
 import android.graphics.Color
+import android.graphics.drawable.Drawable
+import android.widget.ImageView
 import android.graphics.Typeface
 import android.graphics.drawable.GradientDrawable
 import android.view.Gravity
@@ -36,20 +38,22 @@ class MainActivity : Activity() {
   }
   text(root,when(t){0->"◆  KHAZAD-DÛM  ◆";1->"◆  DORNOGAL  ◆";else->"✦  DWARROW SCHOLAR  ✦"},16f,golds[t],true,14)
   text(root,"CALENDÁRIO ANÃO",22f,inks[t],true,12)
+  text(root,when(t){0->"◆  PEDRA · FORJA · MEMÓRIA  ◆";1->"◆  PEDRA · HONRA · TRADIÇÃO  ◆";else->"✦  REGISTROS DE DURIN  ✦"},12f,golds[t],false,4)
   val main=LinearLayout(this).apply {orientation=LinearLayout.VERTICAL;background=shape(surfaces[t],golds[t],3,if(t==2)8f else 18f);setPadding(10,22,10,22)}
   root.addView(main,LinearLayout.LayoutParams(-1,-2).apply{topMargin=18;bottomMargin=14})
-  text(main,"✦  ━━━━━━━━━  ✦",14f,golds[t])
+  text(main,"◆  ══════  ◈  ══════  ◆",14f,golds[t])
   text(main,if(day==null)"Data fora da cobertura" else "${day.day} de ${day.monthName}",32f,inks[t],true,14)
   if(day!=null){text(main,"D.R. ${day.drYear}",24f,golds[t],true);text(main,day.weekday,19f);text(main,"${day.meaning}  ·  Dia ${day.day} de ${day.length}",14f)}
-  text(main,"✦  ━━━━━━━━━  ✦",14f,golds[t])
+  text(main,"◆  ══════  ◈  ══════  ◆",14f,golds[t])
   fun panel(title:String,description:String){
    val card=LinearLayout(this).apply {orientation=LinearLayout.VERTICAL;background=shape(surfaces[t],golds[t],1,10f);setPadding(12,10,12,10)}
    root.addView(card,LinearLayout.LayoutParams(-1,-2).apply{bottomMargin=12})
    text(card,title,17f,golds[t],true,5);text(card,description,15f,inks[t],false,5)
   }
-  panel("◈  MÊS ATUAL",if(day==null)"—" else "${day.monthName} — ${day.meaning}\nDia ${day.day} de ${day.length} · Mês ${day.month} do ano D.R. ${day.drYear}")
-  panel("◈  DATA GREGORIANA",today.format(DateTimeFormatter.ofPattern("d 'de' MMMM 'de' yyyy",Locale("pt","BR"))))
-  panel("◈  FUSO HORÁRIO",zone.id)
+  panel("☾  MÊS ATUAL",if(day==null)"—" else "${day.monthName} — ${day.meaning}\nDia ${day.day} de ${day.length} · Mês ${day.month} do ano D.R. ${day.drYear}")
+  panel("▦  DATA GREGORIANA",today.format(DateTimeFormatter.ofPattern("d 'de' MMMM 'de' yyyy",Locale("pt","BR"))))
+  panel("◷  FUSO HORÁRIO",zone.id)
+  panel("✦  LUA E OBSERVÂNCIAS","Informações em validação com o calendário Dwarrow Scholar. Não exibimos fases, traduções ou eventos não confirmados.")
   text(root,"ESCOLHA A APARÊNCIA",15f,golds[t],true,18)
   val choices=LinearLayout(this).apply{orientation=LinearLayout.VERTICAL}
   root.addView(choices)
