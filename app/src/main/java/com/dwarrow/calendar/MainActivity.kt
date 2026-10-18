@@ -61,6 +61,24 @@ private class ForgedFrame(private val mode:Int=0):Drawable(){
  @Deprecated("Deprecated in Java") override fun getOpacity():Int=PixelFormat.OPAQUE
 }
 
+// Preserve the original artwork aspect ratio rather than stretching ornaments.
+private class ProportionalArt(private val bitmap:Bitmap):Drawable(){
+ private val paint=Paint(Paint.ANTI_ALIAS_FLAG or Paint.FILTER_BITMAP_FLAG)
+ override fun draw(canvas:Canvas){
+  val b=bounds
+  if(b.isEmpty)return
+  canvas.drawColor(0xff090b0f.toInt())
+  val scale=kotlin.math.min(b.width().toFloat()/bitmap.width,b.height().toFloat()/bitmap.height)
+  val width=bitmap.width*scale
+  val height=bitmap.height*scale
+  val left=b.left+(b.width()-width)/2f
+  val top=b.top+(b.height()-height)/2f
+  canvas.drawBitmap(bitmap,null,RectF(left,top,left+width,top+height),paint)
+ }
+ override fun setAlpha(alpha:Int){paint.alpha=alpha}
+ override fun setColorFilter(filter:android.graphics.ColorFilter?){paint.colorFilter=filter}
+ @Deprecated("Deprecated in Java") override fun getOpacity():Int=PixelFormat.OPAQUE
+}
 class MainActivity:Activity(){
  private val names=arrayOf("Khazad-dûm","Dornogal","Dwarrow Scholar")
  private val bronze=0xffd8a35f.toInt()
@@ -93,7 +111,7 @@ class MainActivity:Activity(){
  private fun column():LinearLayout=LinearLayout(this).apply{orientation=LinearLayout.VERTICAL;gravity=Gravity.CENTER_HORIZONTAL}
  private fun horizontal():LinearLayout=LinearLayout(this).apply{orientation=LinearLayout.HORIZONTAL;gravity=Gravity.CENTER_VERTICAL}
  private fun title(root:LinearLayout,heading:String){add(root,"✦  $heading  ✦",13f,bronze,true)}
- private fun artBackground(name:String):Drawable? { val id=resources.getIdentifier(name,"drawable",packageName);if(id==0)return null;return resources.getDrawable(id,theme).apply{if(this is BitmapDrawable)gravity=Gravity.FILL} }
+ private fun artBackground(name:String):Drawable? { val id=resources.getIdentifier(name,"drawable",packageName);if(id==0)return null;val bitmap=android.graphics.BitmapFactory.decodeResource(resources,id) ?: return null;return ProportionalArt(bitmap) }
  private fun panel(root:LinearLayout,space:Int=12,art:String?=null,build:(LinearLayout)->Unit){
   val c=column().apply{background=(if(themeIndex==0) art?.let{artBackground(it)} else null) ?: ForgedFrame(themeIndex);setPadding(dp(13),dp(14),dp(13),dp(14))}
   root.addView(c,LinearLayout.LayoutParams(-1,-2).apply{bottomMargin=dp(space)})
