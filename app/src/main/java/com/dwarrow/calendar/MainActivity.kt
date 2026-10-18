@@ -23,10 +23,21 @@ private class ForgedFrame(private val mode:Int=0):Drawable(){
   p.shader=LinearGradient(0f,0f,w,h,intArrayOf(if(mode==2)0xfff9f0df.toInt() else 0xff30353b.toInt(),dark,if(mode==2)0xffd9c7a9.toInt() else 0xff16191d.toInt()),null,Shader.TileMode.CLAMP)
   c.drawRect(0f,0f,w,h,p);p.shader=null
   p.color=if(mode==2)0x1c806040 else 0x305d6265
-  for(i in 0..18){val yy=((i*73)%997)/997f*h;val xx=((i*173)%991)/991f*w;c.drawLine(xx,yy,(xx+25f).coerceAtMost(w),(yy-3f).coerceAtLeast(0f),p)}
+  for(i in 0..110){val yy=((i*73)%997)/997f*h;val xx=((i*173)%991)/991f*w;c.drawLine(xx,yy,(xx+25f).coerceAtMost(w),(yy-3f).coerceAtLeast(0f),p)}
   fun border(inset:Float,color:Int,sw:Float){
    p.color=color;p.style=Paint.Style.STROKE;p.strokeWidth=sw
    c.drawRect(inset,inset,w-inset,h-inset,p);p.style=Paint.Style.FILL
+  }
+  if(mode!=2){
+   p.shader=LinearGradient(0f,0f,22f,0f,intArrayOf(0xff12171c.toInt(),0xff80542e.toInt(),0xff222831.toInt(),0xff080a0d.toInt()),null,Shader.TileMode.CLAMP)
+   c.drawRect(0f,0f,17f,h,p);c.drawRect(w-17f,0f,w,h,p);p.shader=null
+   p.color=0xffb87c41.toInt();p.style=Paint.Style.STROKE;p.strokeWidth=2f
+   for(y in 35..(h.toInt()-35) step 58){
+    val d=Path().apply{moveTo(8f,y-10f);lineTo(14f,y.toFloat());lineTo(8f,y+10f);lineTo(2f,y.toFloat());close()}
+    c.drawPath(d,p)
+    c.save();c.translate(w-16f,0f);c.drawPath(d,p);c.restore()
+   }
+   p.style=Paint.Style.FILL
   }
   val gold=if(mode==1)0xffd2a15a.toInt() else 0xffa87743.toInt()
   border(2f,0xff493c32.toInt(),6f);border(5f,gold,2f);border(9f,0xff3e3227.toInt(),3f);border(13f,0xff785637.toInt(),1f)
@@ -83,6 +94,10 @@ class MainActivity:Activity(){
   scroll.addView(root)
   outer.addView(scroll,LinearLayout.LayoutParams(-1,0,1f))
   panel(root,10){h->
+   if(themeIndex==0){
+    val emblem=ImageView(this).apply{setImageResource(R.drawable.khazad_dum_icon_final);scaleType=ImageView.ScaleType.FIT_CENTER}
+    h.addView(emblem,LinearLayout.LayoutParams(dp(74),dp(74)))
+   }
    add(h,"◈ ━━━━━ ◈ ━━━━━ ◈",13f,bronze)
    add(h,names[themeIndex].uppercase(Locale.ROOT),22f,bronze,true)
    add(h,"C A L E N D Á R I O   A N Ã O",11f,cream,true)
@@ -92,7 +107,7 @@ class MainActivity:Activity(){
    panel(root,10){p->
     val line=horizontal()
     p.addView(line,LinearLayout.LayoutParams(-1,-2))
-    val moon=text("☾",84f,0xffc2bcb1.toInt()).apply{gravity=Gravity.CENTER;setPadding(0,0,0,0)}
+    val moon=ImageView(this).apply{setImageDrawable(KhazadMoon());scaleType=ImageView.ScaleType.FIT_CENTER}
     line.addView(moon,LinearLayout.LayoutParams(0,dp(154),0.46f))
     val details=column().apply{gravity=Gravity.CENTER_VERTICAL}
     line.addView(details,LinearLayout.LayoutParams(0,-2,0.54f))
@@ -158,16 +173,18 @@ class MainActivity:Activity(){
    }
    panel(root){title(it,"FUSO HORÁRIO");add(it,ZoneId.systemDefault().id,15f)}
   }
-  val tabs=horizontal().apply{background=ForgedFrame(themeIndex);setPadding(dp(3),dp(5),dp(3),dp(5))}
-  val labels=arrayOf("⌂\\nHoje","▦\\nCalendário","☾\\nLuas","✧\\nEventos","◉\\nMais")
+  val tabs=horizontal().apply{background=ForgedFrame(themeIndex);setPadding(dp(4),dp(7),dp(4),dp(7))}
+  val labels=arrayOf("Hoje","Calendário","Luas","Eventos","Mais")
   labels.forEachIndexed{i,label->
-   val b=text(label.replace("\\n","\n"),11f,if(tab==i)bronze else cream,tab==i).apply{
+   val item=column().apply{
     gravity=Gravity.CENTER
-    setPadding(0,dp(9),0,dp(9))
     if(tab==i)background=ForgedFrame(themeIndex)
     setOnClickListener{tab=i;draw()}
    }
-   tabs.addView(b,LinearLayout.LayoutParams(0,dp(64),1f))
+   val symbol=KhazadNavIcon(this,i,tab==i)
+   item.addView(symbol,LinearLayout.LayoutParams(dp(38),dp(38)))
+   item.addView(text(label,10f,if(tab==i)bronze else cream,tab==i).apply{setPadding(0,0,0,0)})
+   tabs.addView(item,LinearLayout.LayoutParams(0,dp(68),1f))
   }
   outer.addView(tabs,LinearLayout.LayoutParams(-1,-2))
   setContentView(outer)
