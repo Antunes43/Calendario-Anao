@@ -20,21 +20,41 @@ abstract class BaseCalendarWidget(private val style:Int):AppWidgetProvider(){
   }
  }
  private fun update(context:Context,manager:AppWidgetManager,ids:IntArray){
-  val d=CalendarEngine.lookup(context,LocalDate.now(ZoneId.systemDefault()))
-  val bg=intArrayOf(0xff30291f.toInt(),0xff28313b.toInt(),0xfff3eee3.toInt())[style]
-  val accent=intArrayOf(0xffc49a59.toInt(),0xffd7a34e.toInt(),0xff805b32.toInt())[style]
-  val ink=if(style==2)0xff322c26.toInt() else 0xfff5e7ca.toInt()
-  for(id in ids){val v=RemoteViews(context.packageName,R.layout.widget)
-   if(style!=0) v.setInt(R.id.widgetRoot,"setBackgroundColor",bg)
-   v.setTextViewText(R.id.widgetTitle,arrayOf("◆ KHAZAD-DÛM ◆","◆ DORNOGAL ◆","✦ DWARROW SCHOLAR ✦")[style])
-   v.setTextColor(R.id.widgetTitle,accent);v.setTextColor(R.id.widgetDate,ink);v.setTextColor(R.id.widgetSub,accent)
-   v.setTextViewText(R.id.widgetDate,if(d==null)"Fora do período" else "${d.day} de ${d.monthName}")
-   v.setTextViewText(R.id.widgetSub,if(d==null)"" else "${d.weekday} · ${d.meaning}")
-   v.setTextViewText(R.id.widgetYear,if(d==null)"" else "D.R. ${d.drYear}")
-   v.setTextViewText(R.id.widgetGregorian,LocalDate.now(ZoneId.systemDefault()).toString())
-   v.setTextViewText(R.id.widgetMoonLabel,if(d==null)"" else d.monthName)
-   v.setTextColor(R.id.widgetYear,accent);v.setTextColor(R.id.widgetGregorian,ink)
-   v.setTextColor(R.id.widgetMoonLabel,accent)
+  val today=LocalDate.now(ZoneId.systemDefault())
+  val day=CalendarEngine.lookup(context,today)
+  val season=day?.let{CalendarEngine.season(context,it)}?.split(" · ",limit=2) ?: emptyList()
+  val seasonName=season.getOrNull(0) ?: ""
+  val icon=when(seasonName){
+   "Iklaladrân"->R.drawable.estacao_iklaladran
+   "Shulukadrân"->R.drawable.estacao_shulukadran
+   "Kêlithadrân"->R.drawable.estacao_kelithadran
+   "’Arsadrân"->R.drawable.estacao_arsadran
+   "Dabladrân"->R.drawable.estacao_dabladran
+   else->R.drawable.estacao_injamadran
+  }
+  val names=arrayOf("Lua nova","Lua crescente","Quarto crescente","Gibosa crescente","Lua cheia","Gibosa minguante","Quarto minguante","Lua minguante")
+  val images=intArrayOf(R.drawable.lua_nova,R.drawable.lua_crescente,R.drawable.quarto_crescente,R.drawable.gibosa_crescente,R.drawable.lua_cheia,R.drawable.gibosa_minguante,R.drawable.quarto_minguante,R.drawable.lua_minguante)
+  val elapsed=java.time.temporal.ChronoUnit.SECONDS.between(java.time.Instant.parse("2000-01-06T18:14:00Z"),today.atTime(12,0).atZone(ZoneId.systemDefault()).toInstant())/86400.0
+  val age=((elapsed%29.530588853)+29.530588853)%29.530588853
+  val phase=kotlin.math.floor(age/29.530588853*8+0.5).toInt()%8
+  val weekday=when(day?.weekday){
+   "Izgilnurt"->"segunda-feira";"Akhlathnurt"->"terça-feira";"Adadnurt"->"quarta-feira"
+   "Thanbnurt"->"quinta-feira";"Abkân-nurt"->"sexta-feira";"Thatrnurt"->"sábado"
+   "Ibriznurt"->"domingo";else->""
+  }
+  for(id in ids){
+   val v=RemoteViews(context.packageName,R.layout.widget)
+   v.setImageViewResource(R.id.widgetMoon,images[phase])
+   v.setTextViewText(R.id.widgetMoonLabel,names[phase])
+   v.setTextViewText(R.id.widgetMoonKh,"")
+   v.setTextViewText(R.id.widgetDate,if(day==null)"Fora do período" else "${day.day} de ${day.monthName}")
+   v.setTextViewText(R.id.widgetMonthMeaning,day?.meaning ?: "")
+   v.setTextViewText(R.id.widgetWeekKh,day?.weekday ?: "")
+   v.setTextViewText(R.id.widgetWeekPt,weekday)
+   v.setTextViewText(R.id.widgetGregorian,today.format(java.time.format.DateTimeFormatter.ofPattern("d 'de' MMMM 'de' yyyy",java.util.Locale("pt","BR"))))
+   v.setImageViewResource(R.id.widgetSeasonIcon,icon)
+   v.setTextViewText(R.id.widgetSeasonPt,season.getOrNull(1) ?: "")
+   v.setTextViewText(R.id.widgetSeasonKh,seasonName)
    val open=PendingIntent.getActivity(context,0,Intent(context,MainActivity::class.java),PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
    v.setOnClickPendingIntent(R.id.widgetRoot,open)
    manager.updateAppWidget(id,v)
