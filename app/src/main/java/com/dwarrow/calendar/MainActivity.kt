@@ -316,14 +316,14 @@ class MainActivity:Activity(){
    }
    val heading=column().apply{
     gravity=Gravity.CENTER_HORIZONTAL or Gravity.BOTTOM
-    setPadding(dp(12),dp(8),dp(12),dp(22))
+    setPadding(dp(12),dp(8),dp(12),dp(31))
    }
    val main=text("NURTFAHANI",18f,bronze,true)
    main.gravity=Gravity.CENTER
    heading.addView(main,LinearLayout.LayoutParams(-1,-2))
    val subtitle=text("CALENDÁRIO ANÃO",10f,cream,true)
    subtitle.gravity=Gravity.CENTER
-   heading.addView(subtitle,LinearLayout.LayoutParams(-1,-2))
+   heading.addView(subtitle,LinearLayout.LayoutParams(-1,-2).apply{topMargin=dp(-2)})
    header.addView(heading,FrameLayout.LayoutParams(-1,-1,Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL))
    root.addView(header,LinearLayout.LayoutParams(-1,dp(106)).apply{bottomMargin=dp(6)})
   }else{
@@ -378,17 +378,18 @@ class MainActivity:Activity(){
   if(tab==0||tab==1){
    panel(root,6,"nurt_date"){p->
     p.setPadding(dp(14),dp(9),dp(14),dp(9))
-    title(p,"NURT KHUZDUL")
+    val khuzTitle=text("✦  NURT KHUZDUL  ✦",13f,bronze,true).apply{gravity=Gravity.CENTER}
+    p.addView(khuzTitle,LinearLayout.LayoutParams(-1,-2))
     val dateRow=horizontal().apply{gravity=Gravity.CENTER_VERTICAL}
     p.addView(dateRow,LinearLayout.LayoutParams(-1,-2).apply{topMargin=dp(8);bottomMargin=dp(4)})
     val monthColumn=column().apply{gravity=Gravity.CENTER}
-    dateRow.addView(monthColumn,LinearLayout.LayoutParams(0,-2,1.2f))
+    dateRow.addView(monthColumn,LinearLayout.LayoutParams(0,-2,1f))
     val dateLabel=text(if(day==null)"Fora da cobertura" else "${day.day} de ${day.monthName}",20f,cream,true).apply{gravity=Gravity.CENTER}
     monthColumn.addView(dateLabel)
     if(day!=null)monthColumn.addView(text(day.meaning,12f,cream).apply{gravity=Gravity.CENTER})
-    dateRow.addView(View(this).apply{setBackgroundColor(0xff956b40.toInt())},LinearLayout.LayoutParams(dp(1),dp(45)).apply{marginStart=dp(8);marginEnd=dp(8)})
+    dateRow.addView(View(this).apply{setBackgroundColor(0xff956b40.toInt())},LinearLayout.LayoutParams(dp(1),dp(45)))
     val weekdayColumn=column().apply{gravity=Gravity.CENTER}
-    dateRow.addView(weekdayColumn,LinearLayout.LayoutParams(0,-2,0.9f))
+    dateRow.addView(weekdayColumn,LinearLayout.LayoutParams(0,-2,1f))
     if(day!=null){
      weekdayColumn.addView(text(day.weekday,18f,bronze,true).apply{gravity=Gravity.CENTER})
      weekdayColumn.addView(text(weekdayPortuguese(day.weekday),12f,cream).apply{gravity=Gravity.CENTER})
@@ -401,7 +402,7 @@ class MainActivity:Activity(){
    info.addView(a,LinearLayout.LayoutParams(0,dp(70),1f).apply{marginEnd=dp(4)})
    info.addView(b,LinearLayout.LayoutParams(0,dp(70),1f))
    add(a,"ANO ANÃO",11f,bronze,true);add(a,"D.R. ${day?.drYear?:"—"}",17f,cream,true)
-   add(b,"DATA GREGORIANA",10f,bronze,true);add(b,greg,13f,cream)
+   add(b,"DATA GREGORIANA",11f,bronze,true);add(b,greg,15f,cream,true)
   }
   if(tab==1){
    val row=horizontal()
