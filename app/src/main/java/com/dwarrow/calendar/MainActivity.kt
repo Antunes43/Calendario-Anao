@@ -101,6 +101,16 @@ class MainActivity:Activity(){
   val remaining=((index+0.5)*cycle/8.0-age+cycle)%cycle
   return Triple(index,kotlin.math.ceil(remaining).toInt().coerceAtLeast(1),age)
  }
+ private fun weekdayPortuguese(name:String):String=when(name){
+  "Izgilnurt"->"segunda-feira"
+  "Akhlathnurt"->"terça-feira"
+  "Adadnurt"->"quarta-feira"
+  "Thanbnurt"->"quinta-feira"
+  "Abkân-nurt"->"sexta-feira"
+  "Thatrnurt"->"sábado"
+  "Ibriznurt"->"domingo"
+  else->""
+ }
  private fun dp(n:Int)=(n*resources.displayMetrics.density+0.5f).toInt()
  override fun onCreate(savedInstanceState:Bundle?){super.onCreate(savedInstanceState);themeIndex=getPreferences(MODE_PRIVATE).getInt("theme",0).coerceIn(0,2);draw()}
  private fun text(value:String,size:Float=16f,color:Int=cream,bold:Boolean=false):TextView=TextView(this).apply{
@@ -158,17 +168,17 @@ class MainActivity:Activity(){
     add(right,"PRÓXIMA FASE",10f,bronze,true)
     add(right,lunarNames[(index+1)%8],10f,cream)
     add(right,"≈ ${phase.second} dia(s)",10f,bronze)
-    add(p,"Fases estimadas pelo ciclo sinódico médio",10f,0xffb4a18b.toInt())
+    if(day!=null)add(p,day.meaning,12f,cream,true)
    }
   }
   if(tab==0||tab==1){
    panel(root,9,"nurt_date"){p->
-    title(p,"DATA ANÃ")
+    title(p,"NURT KHUZDUL")
     add(p,if(day==null)"Fora da cobertura" else "${day.day} de ${day.monthName}",26f,cream,true)
-    add(p,"━━━ ◈ ━━━",12f,bronze)
+    add(p,"─── ◈ ───",12f,bronze)
     if(day!=null){
      add(p,day.weekday,20f,bronze,true)
-     add(p,day.meaning,14f,cream)
+     add(p,weekdayPortuguese(day.weekday),14f,cream)
      add(p,"Dia ${day.day} de ${day.length} · Mês ${day.month}",12f,0xffc6b7a2.toInt())
     }
    }
@@ -178,8 +188,8 @@ class MainActivity:Activity(){
    val b=column().apply{background=(if(themeIndex==0)artBackground("nurt_gregorian") else null) ?: ForgedFrame(themeIndex);setPadding(dp(8),dp(12),dp(8),dp(12))}
    info.addView(a,LinearLayout.LayoutParams(0,-2,1f).apply{marginEnd=dp(4)})
    info.addView(b,LinearLayout.LayoutParams(0,-2,1f))
-   add(a,"♜  ANO ANÃO",11f,bronze,true);add(a,"D.R. ${day?.drYear?:"—"}",17f,cream,true)
-   add(b,"▦  DATA GREGORIANA",10f,bronze,true);add(b,greg,13f,cream)
+   add(a,"ANO ANÃO",11f,bronze,true);add(a,"D.R. ${day?.drYear?:"—"}",17f,cream,true)
+   add(b,"DATA GREGORIANA",10f,bronze,true);add(b,greg,13f,cream)
   }
   if(tab==1){
    val row=horizontal()
