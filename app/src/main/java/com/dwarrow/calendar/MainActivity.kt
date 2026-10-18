@@ -125,11 +125,11 @@ private class AdaptiveLunarFrame(private val art:Bitmap):Drawable(){
   // Restore the original forged ring, clipped to its actual round silhouette.
   // A feather-free oval crop removes the source's rectangular stone patch.
   val cx=b.centerX().toFloat();val cy=b.centerY().toFloat()
-  val rx0=sw*.327f;val rx1=sw*.673f
-  val ringScale=kotlin.math.min(h/sh*.94f,w/(rx1-rx0)*.39f)
+  val rx0=sw*.307f;val rx1=sw*.693f
+  val ringScale=kotlin.math.min(h/sh*.98f,w/(rx1-rx0)*.42f)
   val rw=(rx1-rx0)*ringScale;val rh=sh*ringScale
   val ringRect=RectF(cx-rw/2f,cy-rh/2f,cx+rw/2f,cy+rh/2f)
-  val radius=kotlin.math.min(rw,rh)*.49f
+  val radius=kotlin.math.min(rw,rh)*.50f
   c.save()
   val mask=Path().apply{addCircle(cx,cy,radius,Path.Direction.CW)}
   c.clipPath(mask)
@@ -141,7 +141,7 @@ private class AdaptiveLunarFrame(private val art:Bitmap):Drawable(){
    val rad=Math.toRadians(angle.toDouble())
    val x=cx+kotlin.math.cos(rad).toFloat()*(radius-3f)
    val y=cy+kotlin.math.sin(rad).toFloat()*(radius-3f)
-   val d=7f
+   val d=10f
    val diamond=Path().apply{moveTo(x,y-d);lineTo(x+d*.70f,y);lineTo(x,y+d);lineTo(x-d*.70f,y);close()}
    p.color=0xff241b16.toInt();c.drawPath(diamond,p)
    p.style=Paint.Style.STROKE;p.strokeWidth=1.5f;p.color=0xffd4a369.toInt()
@@ -154,8 +154,7 @@ private class AdaptiveLunarFrame(private val art:Bitmap):Drawable(){
   val rightStart=b.centerX()+radius+14f
   val rightEnd=b.right-dstSize-12f
   val y=b.top+h*.72f
-  if(leftEnd>leftStart)c.drawLine(leftStart,y,leftEnd,y,p)
-  if(rightEnd>rightStart)c.drawLine(rightStart,y,rightEnd,y,p)
+  // Separators are laid out between labels in the view hierarchy, not painted behind text.
  }
  override fun setAlpha(a:Int){p.alpha=a}
  override fun setColorFilter(f:android.graphics.ColorFilter?){p.colorFilter=f}
@@ -230,7 +229,7 @@ class MainActivity:Activity(){
   panel(root,6,"nurt_events"){p->
    title(p,"ESTAÇÃO ANÃ")
    val season=day?.let{CalendarEngine.season(this,it)} ?: "—"
-   val row=horizontal().apply{gravity=Gravity.CENTER;setPadding(0,0,dp(24),0)}
+   val row=horizontal().apply{gravity=Gravity.CENTER;setPadding(0,0,0,0)}
    p.addView(row,LinearLayout.LayoutParams(-1,-2))
    val iconName=seasonArt(season)
    val id=iconName?.let{resources.getIdentifier(it,"drawable",packageName)} ?: 0
@@ -240,7 +239,7 @@ class MainActivity:Activity(){
    }
    val parts=season.split(" · ",limit=2)
    val labels=column().apply{gravity=Gravity.CENTER_VERTICAL}
-   row.addView(labels,LinearLayout.LayoutParams(-2,-2))
+   row.addView(labels,LinearLayout.LayoutParams(-2,-2).apply{leftMargin=dp(17)})
    add(labels,parts[0],24f,bronze,true)
    if(parts.size>1)add(labels,parts[1],18f,cream)
   }
@@ -281,6 +280,12 @@ class MainActivity:Activity(){
   build(c)
  }
  private fun add(parent:LinearLayout,value:String,size:Float=16f,color:Int=cream,bold:Boolean=false){parent.addView(text(value,size,color,bold))}
+ private fun lunarDivider(parent:LinearLayout){
+  val line=View(this).apply{setBackgroundColor(0xff956b40.toInt())}
+  parent.addView(line,LinearLayout.LayoutParams(-1,dp(1)).apply{
+   leftMargin=dp(7);rightMargin=dp(7);topMargin=dp(3);bottomMargin=dp(4)
+  })
+ }
  private fun action(label:String,onClick:()->Unit):TextView=text(label,13f,bronze,true).apply{
   background=ForgedFrame(themeIndex);setPadding(dp(8),dp(15),dp(8),dp(15));setOnClickListener{onClick();draw()}
  }
@@ -328,6 +333,7 @@ class MainActivity:Activity(){
     val left=column().apply{gravity=Gravity.CENTER}
     line.addView(left,LinearLayout.LayoutParams(0,-2,0.30f))
     add(left,"FASE ATUAL",10f,bronze,true)
+    lunarDivider(left)
     add(left,lunarNames[index],11f,cream)
     val imageId=resources.getIdentifier(lunarImages[index],"drawable",packageName)
     val moon=ImageView(this).apply{
@@ -339,6 +345,7 @@ class MainActivity:Activity(){
     val right=column().apply{gravity=Gravity.CENTER}
     line.addView(right,LinearLayout.LayoutParams(0,-2,0.29f))
     add(right,"PRÓXIMA FASE",10f,bronze,true)
+    lunarDivider(right)
     add(right,lunarNames[(index+1)%8],10f,cream)
     add(right,"≈ ${phase.second} dia(s)",10f,bronze)
    }
