@@ -181,10 +181,16 @@ class MainActivity:Activity(){
     if(tab==i)background=ForgedFrame(themeIndex)
     setOnClickListener{tab=i;draw()}
    }
-   val symbol=KhazadNavIcon(this,i,tab==i)
-   item.addView(symbol,LinearLayout.LayoutParams(dp(38),dp(38)))
+   val artNames=arrayOf("nav_hoje","nav_calendario","nav_luas","nav_eventos","nav_mais")
+   val imageId=resources.getIdentifier(artNames[i],"drawable",packageName)
+   if(imageId!=0){
+    val symbol=ImageView(this).apply{setImageResource(imageId);scaleType=ImageView.ScaleType.FIT_CENTER}
+    item.addView(symbol,LinearLayout.LayoutParams(dp(53),dp(53)))
+   }else{
+    item.addView(KhazadNavIcon(this,i,tab==i),LinearLayout.LayoutParams(dp(38),dp(38)))
+   }
    item.addView(text(label,10f,if(tab==i)bronze else cream,tab==i).apply{setPadding(0,0,0,0)})
-   tabs.addView(item,LinearLayout.LayoutParams(0,dp(68),1f))
+   tabs.addView(item,LinearLayout.LayoutParams(0,dp(84),1f))
   }
   outer.addView(tabs,LinearLayout.LayoutParams(-1,-2))
   setContentView(outer)
