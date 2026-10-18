@@ -92,10 +92,10 @@ class MainActivity:Activity(){
  }
  private fun column():LinearLayout=LinearLayout(this).apply{orientation=LinearLayout.VERTICAL;gravity=Gravity.CENTER_HORIZONTAL}
  private fun horizontal():LinearLayout=LinearLayout(this).apply{orientation=LinearLayout.HORIZONTAL;gravity=Gravity.CENTER_VERTICAL}
- private fun title(root:LinearLayout,heading:String){add(root,"✦  $heading  ✦",14f,bronze,true)}
+ private fun title(root:LinearLayout,heading:String){add(root,"✦  $heading  ✦",13f,bronze,true)}
  private fun artBackground(name:String):Drawable? { val id=resources.getIdentifier(name,"drawable",packageName);if(id==0)return null;return resources.getDrawable(id,theme).apply{if(this is BitmapDrawable)gravity=Gravity.FILL} }
  private fun panel(root:LinearLayout,space:Int=12,art:String?=null,build:(LinearLayout)->Unit){
-  val c=column().apply{background=(if(themeIndex==0) art?.let{artBackground(it)} else null) ?: ForgedFrame(themeIndex);setPadding(dp(20),dp(17),dp(20),dp(17))}
+  val c=column().apply{background=(if(themeIndex==0) art?.let{artBackground(it)} else null) ?: ForgedFrame(themeIndex);setPadding(dp(13),dp(14),dp(13),dp(14))}
   root.addView(c,LinearLayout.LayoutParams(-1,-2).apply{bottomMargin=dp(space)})
   build(c)
  }
@@ -114,6 +114,7 @@ class MainActivity:Activity(){
   outer.addView(scroll,LinearLayout.LayoutParams(-1,0,1f))
   panel(root,10,"nurt_header"){h->
    h.minimumHeight=dp(132)
+   h.gravity=Gravity.CENTER
    add(h,if(themeIndex==0)"NURTFAHANI" else names[themeIndex].uppercase(Locale.ROOT),24f,bronze,true)
    add(h,"C A L E N D Á R I O   A N Ã O",11f,cream,true)
   }
@@ -122,22 +123,22 @@ class MainActivity:Activity(){
     val phase=lunarPhase(date)
     val index=phase.first
     val line=horizontal()
-    p.addView(line,LinearLayout.LayoutParams(-1,dp(145)))
+    p.addView(line,LinearLayout.LayoutParams(-1,dp(132)))
     val left=column().apply{gravity=Gravity.CENTER}
-    line.addView(left,LinearLayout.LayoutParams(0,-2,0.29f))
+    line.addView(left,LinearLayout.LayoutParams(0,-2,0.30f))
     add(left,"FASE ATUAL",10f,bronze,true)
-    add(left,lunarNames[index],12f,cream)
+    add(left,lunarNames[index],11f,cream)
     val imageId=resources.getIdentifier(lunarImages[index],"drawable",packageName)
     val moon=ImageView(this).apply{
      if(imageId!=0)setImageResource(imageId) else setImageDrawable(KhazadMoon())
      scaleType=ImageView.ScaleType.FIT_CENTER
      contentDescription=lunarNames[index]
     }
-    line.addView(moon,LinearLayout.LayoutParams(0,dp(135),0.42f))
+    line.addView(moon,LinearLayout.LayoutParams(0,dp(125),0.40f))
     val right=column().apply{gravity=Gravity.CENTER}
     line.addView(right,LinearLayout.LayoutParams(0,-2,0.29f))
     add(right,"PRÓXIMA FASE",10f,bronze,true)
-    add(right,lunarNames[(index+1)%8],11f,cream)
+    add(right,lunarNames[(index+1)%8],10f,cream)
     add(right,"≈ ${phase.second} dia(s)",10f,bronze)
     add(p,"Fases estimadas pelo ciclo sinódico médio",10f,0xffb4a18b.toInt())
    }
@@ -145,22 +146,22 @@ class MainActivity:Activity(){
   if(tab==0||tab==1){
    panel(root,9,"nurt_date"){p->
     title(p,"DATA ANÃ")
-    add(p,if(day==null)"Fora da cobertura" else "${day.day} de ${day.monthName}",31f,cream,true)
+    add(p,if(day==null)"Fora da cobertura" else "${day.day} de ${day.monthName}",26f,cream,true)
     add(p,"━━━ ◈ ━━━",12f,bronze)
     if(day!=null){
-     add(p,day.weekday,23f,bronze,true)
-     add(p,day.meaning,16f,cream)
+     add(p,day.weekday,20f,bronze,true)
+     add(p,day.meaning,14f,cream)
      add(p,"Dia ${day.day} de ${day.length} · Mês ${day.month}",12f,0xffc6b7a2.toInt())
     }
    }
    val info=horizontal()
    root.addView(info,LinearLayout.LayoutParams(-1,-2).apply{bottomMargin=dp(10)})
-   val a=column().apply{background=(if(themeIndex==0)artBackground("nurt_year") else null) ?: ForgedFrame(themeIndex);setPadding(dp(8),dp(12),dp(8),dp(12))}
+   val a=column().apply{background=(if(themeIndex==0)artBackground("nurt_year") else null) ?: ForgedFrame(themeIndex);setPadding(dp(5),dp(11),dp(5),dp(11))}
    val b=column().apply{background=(if(themeIndex==0)artBackground("nurt_gregorian") else null) ?: ForgedFrame(themeIndex);setPadding(dp(8),dp(12),dp(8),dp(12))}
    info.addView(a,LinearLayout.LayoutParams(0,-2,1f).apply{marginEnd=dp(4)})
    info.addView(b,LinearLayout.LayoutParams(0,-2,1f))
-   add(a,"♜  ANO ANÃO",12f,bronze,true);add(a,"D.R. ${day?.drYear?:"—"}",17f,cream,true)
-   add(b,"▦  DATA GREGORIANA",12f,bronze,true);add(b,greg,13f,cream)
+   add(a,"♜  ANO ANÃO",11f,bronze,true);add(a,"D.R. ${day?.drYear?:"—"}",17f,cream,true)
+   add(b,"▦  DATA GREGORIANA",10f,bronze,true);add(b,greg,13f,cream)
   }
   if(tab==1){
    val row=horizontal()
@@ -176,8 +177,8 @@ class MainActivity:Activity(){
     val link=horizontal().apply{setPadding(dp(10),dp(10),dp(10),dp(10))}
     link.addView(text("✧",29f,bronze),LinearLayout.LayoutParams(dp(50),-2))
     val t=column();link.addView(t,LinearLayout.LayoutParams(0,-2,1f))
-    add(t,"Consultar calendário oficial  ›",15f,cream,true)
-    add(t,"Festivais, observâncias e marcos registrados",11f,0xffc5b4a0.toInt())
+    add(t,"Consultar calendário oficial  ›",13f,cream,true)
+    add(t,"Festivais e observâncias registradas",10f,0xffc5b4a0.toInt())
     p.addView(link,LinearLayout.LayoutParams(-1,-2))
     link.setOnClickListener{tab=3;draw()}
    }
