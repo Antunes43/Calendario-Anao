@@ -343,7 +343,7 @@ class MainActivity:Activity(){
     line.addView(left,LinearLayout.LayoutParams(0,-2,0.30f))
     add(left,"FASE ATUAL",10f,bronze,true)
     lunarDivider(left)
-    add(left,lunarNames[index],11f,cream)
+    add(left,lunarNames[index],14f,cream,true)
     val imageId=resources.getIdentifier(lunarImages[index],"drawable",packageName)
     val moon=ImageView(this).apply{
      if(imageId!=0)setImageResource(imageId) else setImageDrawable(KhazadMoon())
@@ -371,20 +371,27 @@ class MainActivity:Activity(){
     line.addView(right,LinearLayout.LayoutParams(0,-2,0.29f))
     add(right,"PRÓXIMA FASE",10f,bronze,true)
     lunarDivider(right)
-    add(right,lunarNames[(index+1)%8],10f,cream)
-    add(right,"≈ ${phase.second} dia(s)",10f,bronze)
+    add(right,lunarNames[(index+1)%8],13f,cream,true)
+    add(right,"≈ ${phase.second} dia(s)",11f,bronze)
    }
   }
   if(tab==0||tab==1){
    panel(root,6,"nurt_date"){p->
     p.setPadding(dp(14),dp(9),dp(14),dp(9))
     title(p,"NURT KHUZDUL")
-    add(p,if(day==null)"Fora da cobertura" else "${day.day} de ${day.monthName}",24f,cream,true)
-    if(day!=null)add(p,day.meaning,13f,cream)
-    add(p,"── ◈ ──",10f,bronze)
+    val dateRow=horizontal().apply{gravity=Gravity.CENTER_VERTICAL}
+    p.addView(dateRow,LinearLayout.LayoutParams(-1,-2).apply{topMargin=dp(8);bottomMargin=dp(4)})
+    val monthColumn=column().apply{gravity=Gravity.CENTER}
+    dateRow.addView(monthColumn,LinearLayout.LayoutParams(0,-2,1.2f))
+    val dateLabel=text(if(day==null)"Fora da cobertura" else "${day.day} de ${day.monthName}",20f,cream,true).apply{gravity=Gravity.CENTER}
+    monthColumn.addView(dateLabel)
+    if(day!=null)monthColumn.addView(text(day.meaning,12f,cream).apply{gravity=Gravity.CENTER})
+    dateRow.addView(View(this).apply{setBackgroundColor(0xff956b40.toInt())},LinearLayout.LayoutParams(dp(1),dp(45)).apply{marginStart=dp(8);marginEnd=dp(8)})
+    val weekdayColumn=column().apply{gravity=Gravity.CENTER}
+    dateRow.addView(weekdayColumn,LinearLayout.LayoutParams(0,-2,0.9f))
     if(day!=null){
-     add(p,day.weekday,18f,bronze,true)
-     add(p,weekdayPortuguese(day.weekday),13f,cream)
+     weekdayColumn.addView(text(day.weekday,18f,bronze,true).apply{gravity=Gravity.CENTER})
+     weekdayColumn.addView(text(weekdayPortuguese(day.weekday),12f,cream).apply{gravity=Gravity.CENTER})
     }
    }
    val info=horizontal()
