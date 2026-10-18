@@ -86,6 +86,11 @@ abstract class BaseCalendarWidget(private val style:Int):AppWidgetProvider(){
   }
   for(id in ids){
    val v=RemoteViews(context.packageName,R.layout.widget)
+   val accent=when(style){1->0xffd2a47d.toInt();2->0xffdfc995.toInt();else->0xffd8a35f.toInt()}
+   v.setTextColor(R.id.widgetDate,accent)
+   v.setTextColor(R.id.widgetWeekKh,accent)
+   v.setTextColor(R.id.widgetSeasonPt,accent)
+
    val options=manager.getAppWidgetOptions(id)
    val w=options.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH,320).coerceIn(180,600)
    val h=options.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT,190).coerceIn(100,440)
