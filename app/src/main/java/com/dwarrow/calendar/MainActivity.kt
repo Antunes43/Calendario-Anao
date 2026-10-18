@@ -86,6 +86,40 @@ private class ProportionalArt(private val bitmap:Bitmap):Drawable(){
  override fun setColorFilter(f:android.graphics.ColorFilter?){p.colorFilter=f}
  @Deprecated("Deprecated in Java") override fun getOpacity():Int=PixelFormat.OPAQUE
 }
+// Content-first frame: the bitmap supplies only stone texture; borders are drawn at final view size.
+private class AdaptiveStoneFrame(private val stone:Bitmap?):Drawable(){
+ private val p=Paint(Paint.ANTI_ALIAS_FLAG or Paint.FILTER_BITMAP_FLAG)
+ private val dark=0xff0b0d11.toInt()
+ override fun draw(c:Canvas){
+  val b=bounds
+  if(b.isEmpty)return
+  val w=b.width().toFloat();val h=b.height().toFloat()
+  p.color=dark;c.drawRect(b,p)
+  if(stone!=null){
+   val sw=stone.width;val sh=stone.height
+   // Sample the undecorated central stone, never the source border or side emblems.
+   val src=Rect((sw*.36f).toInt(),(sh*.35f).toInt(),(sw*.64f).toInt(),(sh*.65f).toInt())
+   p.alpha=195
+   c.drawBitmap(stone,src,RectF(b.left+4f,b.top+4f,b.right-4f,b.bottom-4f),p)
+   p.alpha=255
+  }
+  p.style=Paint.Style.STROKE
+  p.strokeWidth=2f;p.color=0xffaa7543.toInt()
+  c.drawRoundRect(RectF(b.left+3f,b.top+3f,b.right-3f,b.bottom-3f),2f,2f,p)
+  p.strokeWidth=1f;p.color=0xff59432e.toInt()
+  c.drawRect(b.left+7f,b.top+7f,b.right-7f,b.bottom-7f,p)
+  p.style=Paint.Style.FILL
+  p.color=0xffb58a51.toInt()
+  val r=kotlin.math.min(8f,kotlin.math.min(w,h)*.08f)
+  for(x in floatArrayOf(b.left+7f,b.right-7f))for(y in floatArrayOf(b.top+7f,b.bottom-7f)){
+   val gem=Path().apply{moveTo(x,y-r);lineTo(x+r,y);lineTo(x,y+r);lineTo(x-r,y);close()}
+   c.drawPath(gem,p)
+  }
+ }
+ override fun setAlpha(a:Int){p.alpha=a}
+ override fun setColorFilter(f:android.graphics.ColorFilter?){p.colorFilter=f}
+ @Deprecated("Deprecated in Java") override fun getOpacity():Int=PixelFormat.OPAQUE
+}
 class MainActivity:Activity(){
  private val names=arrayOf("Khazad-dûm","Dornogal","Dwarrow Scholar")
  private val bronze=0xffd8a35f.toInt()
@@ -118,7 +152,7 @@ class MainActivity:Activity(){
   else->null
  }
  private fun seasonPanel(root:LinearLayout,day:CalendarEngine.Day?){
-  panel(root,6){p->
+  panel(root,6,"nurt_events"){p->
    title(p,"ESTAÇÃO ANÃ")
    val season=day?.let{CalendarEngine.season(this,it)} ?: "—"
    val row=horizontal()
@@ -156,9 +190,14 @@ class MainActivity:Activity(){
  private fun column():LinearLayout=LinearLayout(this).apply{orientation=LinearLayout.VERTICAL;gravity=Gravity.CENTER_HORIZONTAL}
  private fun horizontal():LinearLayout=LinearLayout(this).apply{orientation=LinearLayout.HORIZONTAL;gravity=Gravity.CENTER_VERTICAL}
  private fun title(root:LinearLayout,heading:String){add(root,"✦  $heading  ✦",13f,bronze,true)}
- private fun artBackground(name:String):Drawable? { val id=resources.getIdentifier(name,"drawable",packageName);if(id==0)return null;val bitmap=android.graphics.BitmapFactory.decodeResource(resources,id) ?: return null;return ProportionalArt(bitmap) }
+ private fun artBackground(name:String):Drawable? {
+  val id=resources.getIdentifier(name,"drawable",packageName)
+  if(id==0)return null
+  val bitmap=android.graphics.BitmapFactory.decodeResource(resources,id) ?: return null
+  return if(name=="nurt_header" || name=="nurt_lunar") ProportionalArt(bitmap) else AdaptiveStoneFrame(bitmap)
+ }
  private fun panel(root:LinearLayout,space:Int=12,art:String?=null,build:(LinearLayout)->Unit){
-  val c=column().apply{background=(if(themeIndex==0) art?.let{artBackground(it)} else null) ?: ForgedFrame(themeIndex);setPadding(dp(13),dp(14),dp(13),dp(14))}
+  val c=column().apply{background=(if(themeIndex==0) art?.let{artBackground(it)} else null) ?: ForgedFrame(themeIndex);setPadding(dp(18),dp(16),dp(18),dp(16))}
   root.addView(c,LinearLayout.LayoutParams(-1,-2).apply{bottomMargin=dp(space)})
   build(c)
  }
@@ -207,7 +246,7 @@ class MainActivity:Activity(){
   }
   if(tab==0||tab==1){
    panel(root,6,"nurt_date"){p->
-    p.setPadding(dp(18),dp(14),dp(18),dp(14))
+    p.setPadding(dp(18),dp(16),dp(18),dp(16))
     title(p,"NURT KHUZDUL")
     add(p,if(day==null)"Fora da cobertura" else "${day.day} de ${day.monthName}",24f,cream,true)
     if(day!=null)add(p,day.meaning,13f,cream)
@@ -219,8 +258,8 @@ class MainActivity:Activity(){
    }
    val info=horizontal()
    root.addView(info,LinearLayout.LayoutParams(-1,-2).apply{bottomMargin=dp(6)})
-   val a=column().apply{background=(if(themeIndex==0)artBackground("nurt_year") else null) ?: ForgedFrame(themeIndex);setPadding(dp(5),dp(11),dp(5),dp(11))}
-   val b=column().apply{background=(if(themeIndex==0)artBackground("nurt_gregorian") else null) ?: ForgedFrame(themeIndex);setPadding(dp(8),dp(12),dp(8),dp(12))}
+   val a=column().apply{background=(if(themeIndex==0)artBackground("nurt_year") else null) ?: ForgedFrame(themeIndex);setPadding(dp(9),dp(10),dp(9),dp(10))}
+   val b=column().apply{background=(if(themeIndex==0)artBackground("nurt_gregorian") else null) ?: ForgedFrame(themeIndex);setPadding(dp(9),dp(10),dp(9),dp(10))}
    info.addView(a,LinearLayout.LayoutParams(0,-2,1f).apply{marginEnd=dp(4)})
    info.addView(b,LinearLayout.LayoutParams(0,-2,1f))
    add(a,"ANO ANÃO",11f,bronze,true);add(a,"D.R. ${day?.drYear?:"—"}",17f,cream,true)
