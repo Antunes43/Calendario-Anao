@@ -68,15 +68,18 @@ private class ProportionalArt(private val bitmap:Bitmap):Drawable(){
  override fun draw(canvas:Canvas){
   val b=bounds
   if(b.isEmpty)return
-  val sw=bitmap.width.toFloat()
-  val sh=bitmap.height.toFloat()
-  val scale=kotlin.math.min(b.width()/sw,b.height()/sh)
-  val dw=sw*scale
-  val dh=sh*scale
-  paint.color=0xff090b0f.toInt()
-  canvas.drawRect(b,paint)
-  paint.color=android.graphics.Color.WHITE
-  canvas.drawBitmap(bitmap,null,RectF(b.centerX()-dw/2f,b.centerY()-dh/2f,b.centerX()+dw/2f,b.centerY()+dh/2f),paint)
+  val w=b.width().toFloat();val h=b.height().toFloat()
+  val sw=bitmap.width.toFloat();val sh=bitmap.height.toFloat()
+  val xCut=sw*0.15f;val yCut=sh*0.20f
+  val edgeW=kotlin.math.min(w*0.15f,xCut)
+  val edgeH=kotlin.math.min(h*0.20f,yCut)
+  val sx=floatArrayOf(0f,xCut,sw-xCut,sw)
+  val sy=floatArrayOf(0f,yCut,sh-yCut,sh)
+  val dx=floatArrayOf(b.left.toFloat(),b.left+edgeW,b.right-edgeW,b.right.toFloat())
+  val dy=floatArrayOf(b.top.toFloat(),b.top+edgeH,b.bottom-edgeH,b.bottom.toFloat())
+  for(y in 0..2)for(x in 0..2){
+   canvas.drawBitmap(bitmap,Rect(sx[x].toInt(),sy[y].toInt(),sx[x+1].toInt(),sy[y+1].toInt()),RectF(dx[x],dy[y],dx[x+1],dy[y+1]),paint)
+  }
  }
  override fun setAlpha(alpha:Int){paint.alpha=alpha}
  override fun setColorFilter(filter:android.graphics.ColorFilter?){paint.colorFilter=filter}
