@@ -316,14 +316,14 @@ class MainActivity:Activity(){
    }
    val heading=column().apply{
     gravity=Gravity.CENTER_HORIZONTAL or Gravity.BOTTOM
-    setPadding(dp(12),dp(8),dp(12),dp(31))
+    setPadding(dp(12),dp(0),dp(12),dp(18))
    }
-   val main=text("NURTFAHANI",18f,bronze,true)
+   val main=text("NURTFAHANI",17f,bronze,true).apply{includeFontPadding=false;setPadding(0,0,0,0)}
    main.gravity=Gravity.CENTER
    heading.addView(main,LinearLayout.LayoutParams(-1,-2))
-   val subtitle=text("CALENDÁRIO ANÃO",10f,cream,true)
+   val subtitle=text("CALENDÁRIO ANÃO",10f,cream,true).apply{includeFontPadding=false;setPadding(0,0,0,0)}
    subtitle.gravity=Gravity.CENTER
-   heading.addView(subtitle,LinearLayout.LayoutParams(-1,-2).apply{topMargin=dp(-2)})
+   heading.addView(subtitle,LinearLayout.LayoutParams(-1,-2).apply{topMargin=dp(3)})
    header.addView(heading,FrameLayout.LayoutParams(-1,-1,Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL))
    root.addView(header,LinearLayout.LayoutParams(-1,dp(106)).apply{bottomMargin=dp(6)})
   }else{
@@ -338,7 +338,7 @@ class MainActivity:Activity(){
     val phase=lunarPhase(date)
     val index=phase.first
     val line=horizontal()
-    p.addView(line,LinearLayout.LayoutParams(-1,dp(110)))
+    p.addView(line,LinearLayout.LayoutParams(-1,dp(132)))
     val left=column().apply{gravity=Gravity.CENTER}
     line.addView(left,LinearLayout.LayoutParams(0,-2,0.30f))
     add(left,"FASE ATUAL",10f,bronze,true)
@@ -354,7 +354,7 @@ class MainActivity:Activity(){
     // The approved ring is a transparent, independent image layered above the moon.
     // FIT_CENTER keeps the forged ornaments square and undistorted.
     lunarStack.addView(moon,FrameLayout.LayoutParams(-1,-1).apply{
-     val inset=dp(9);setMargins(inset,inset,inset,inset)
+     val inset=dp(8);setMargins(inset,inset,inset,inset)
     })
     val ringId=resources.getIdentifier("nurt_lunar_ring_gold","drawable",packageName)
     if(ringId!=0){
@@ -366,7 +366,7 @@ class MainActivity:Activity(){
     }else{
      lunarStack.addView(View(this).apply{background=ForgedMoonRing()},FrameLayout.LayoutParams(-1,-1))
     }
-    line.addView(lunarStack,LinearLayout.LayoutParams(0,dp(110),0.40f))
+    line.addView(lunarStack,LinearLayout.LayoutParams(0,dp(132),0.40f))
     val right=column().apply{gravity=Gravity.CENTER}
     line.addView(right,LinearLayout.LayoutParams(0,-2,0.29f))
     add(right,"PRÓXIMA FASE",10f,bronze,true)
