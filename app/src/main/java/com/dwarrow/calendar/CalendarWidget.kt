@@ -45,6 +45,8 @@ abstract class BaseCalendarWidget(private val style:Int):AppWidgetProvider(){
   for(id in ids){
    val v=RemoteViews(context.packageName,R.layout.widget)
    v.setImageViewResource(R.id.widgetMoon,images[phase])
+   val phaseViews=intArrayOf(R.id.widgetPhase0,R.id.widgetPhase1,R.id.widgetPhase2,R.id.widgetPhase3,R.id.widgetPhase4,R.id.widgetPhase5,R.id.widgetPhase6,R.id.widgetPhase7)
+   for(i in phaseViews.indices)v.setInt(phaseViews[i],"setImageAlpha",if(i==phase)255 else 85)
    v.setTextViewText(R.id.widgetMoonLabel,names[phase])
    v.setTextViewText(R.id.widgetMoonKh,"")
    v.setTextViewText(R.id.widgetDate,if(day==null)"Fora do período" else "${day.day} de ${day.monthName}")
