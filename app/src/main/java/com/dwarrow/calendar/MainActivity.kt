@@ -86,6 +86,59 @@ private class ProportionalArt(private val bitmap:Bitmap):Drawable(){
  override fun setColorFilter(f:android.graphics.ColorFilter?){p.colorFilter=f}
  @Deprecated("Deprecated in Java") override fun getOpacity():Int=PixelFormat.OPAQUE
 }
+// Lunar art is composed from independent, aspect-safe pieces: stone, borders, corners and central ring.
+private class AdaptiveLunarFrame(private val art:Bitmap):Drawable(){
+ private val p=Paint(Paint.ANTI_ALIAS_FLAG or Paint.FILTER_BITMAP_FLAG)
+ override fun draw(c:Canvas){
+  val b=bounds;if(b.isEmpty)return
+  val w=b.width().toFloat();val h=b.height().toFloat()
+  val sw=art.width.toFloat();val sh=art.height.toFloat()
+  val scale=kotlin.math.min(w/sw,h/sh)
+  fun patch(x0:Float,y0:Float,x1:Float,y1:Float,dx0:Float,dy0:Float,dx1:Float,dy1:Float){
+   c.drawBitmap(art,Rect(x0.toInt(),y0.toInt(),x1.toInt(),y1.toInt()),
+    RectF(dx0,dy0,dx1,dy1),p)
+  }
+  // Stone texture comes from an undecorated region, not from the ring or border.
+  p.color=0xff0b0e12.toInt();c.drawRect(b,p)
+  patch(sw*.11f,sh*.49f,sw*.28f,sh*.79f,b.left.toFloat(),b.top.toFloat(),b.right.toFloat(),b.bottom.toFloat())
+  // Edge ornaments: only the plain middle stretches. Corners retain their proportions.
+  val corner=kotlin.math.min(kotlin.math.min(w*.075f,h*.24f),sh*.18f*scale*1.5f)
+  val srcCorner=sh*.18f
+  for(right in 0..1)for(bottom in 0..1){
+   val sx=if(right==0)0f else sw-srcCorner
+   val sy=if(bottom==0)0f else sh-srcCorner
+   val dx=if(right==0)b.left.toFloat() else b.right-corner
+   val dy=if(bottom==0)b.top.toFloat() else b.bottom-corner
+   patch(sx,sy,sx+srcCorner,sy+srcCorner,dx,dy,dx+corner,dy+corner)
+  }
+  for(bottom in 0..1){
+   val sy=if(bottom==0)0f else sh-9f
+   val dy=if(bottom==0)b.top.toFloat() else b.bottom-9f*scale
+   patch(sw*.12f,sy,sw*.24f,sy+9f,b.left+corner,dy,b.right-corner,dy+9f*scale)
+  }
+  for(right in 0..1){
+   val sx=if(right==0)0f else sw-9f
+   val dx=if(right==0)b.left.toFloat() else b.right-9f*scale
+   patch(sx,sh*.25f,sx+9f,sh*.40f,dx,b.top+corner,dx+9f*scale,b.bottom-corner)
+  }
+  // Central forged ring stays circular; it never inherits the panel aspect ratio.
+  val rx0=sw*.337f;val rx1=sw*.663f
+  val ringScale=kotlin.math.min(h/sh*.96f,w/(rx1-rx0)*.38f)
+  val rw=(rx1-rx0)*ringScale;val rh=sh*ringScale
+  patch(rx0,0f,rx1,sh,b.centerX()-rw/2f,b.centerY()-rh/2f,b.centerX()+rw/2f,b.centerY()+rh/2f)
+  // Short horizontal ornament strips sit on either side of the central ring.
+  val lineY=b.top+h*.38f
+  val leftEnd=b.centerX()-rw*.58f
+  val rightStart=b.centerX()+rw*.58f
+  if(leftEnd>b.left+corner+12f)
+   patch(sw*.055f,sh*.365f,sw*.33f,sh*.415f,b.left+corner,lineY,leftEnd,lineY+sh*.05f*ringScale)
+  if(rightStart<b.right-corner-12f)
+   patch(sw*.67f,sh*.365f,sw*.945f,sh*.415f,rightStart,lineY,b.right-corner,lineY+sh*.05f*ringScale)
+ }
+ override fun setAlpha(a:Int){p.alpha=a}
+ override fun setColorFilter(f:android.graphics.ColorFilter?){p.colorFilter=f}
+ @Deprecated("Deprecated in Java") override fun getOpacity():Int=PixelFormat.OPAQUE
+}
 // Content-first frame: the bitmap supplies only stone texture; borders are drawn at final view size.
 private class AdaptiveStoneFrame(private val stone:Bitmap?):Drawable(){
  private val p=Paint(Paint.ANTI_ALIAS_FLAG or Paint.FILTER_BITMAP_FLAG)
@@ -194,7 +247,11 @@ class MainActivity:Activity(){
   val id=resources.getIdentifier(name,"drawable",packageName)
   if(id==0)return null
   val bitmap=android.graphics.BitmapFactory.decodeResource(resources,id) ?: return null
-  return if(name=="nurt_header") ProportionalArt(bitmap) else AdaptiveStoneFrame(bitmap)
+  return when(name){
+   "nurt_header"->ProportionalArt(bitmap)
+   "nurt_lunar"->AdaptiveLunarFrame(bitmap)
+   else->AdaptiveStoneFrame(bitmap)
+  }
  }
  private fun panel(root:LinearLayout,space:Int=12,art:String?=null,build:(LinearLayout)->Unit){
   val c=column().apply{background=(if(themeIndex==0) art?.let{artBackground(it)} else null) ?: ForgedFrame(themeIndex);setPadding(dp(15),dp(10),dp(15),dp(10))}
