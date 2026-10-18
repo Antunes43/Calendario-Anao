@@ -9,8 +9,8 @@ android {
         applicationId = "com.dwarrow.calendar"
         minSdk = 26
         targetSdk = 35
-        versionCode = 14
-        versionName = "0.6.1-dev"
+        versionCode = 15
+        versionName = "0.6.2-dev"
     }
     signingConfigs {
         create("persistent") {
