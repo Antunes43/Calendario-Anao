@@ -399,9 +399,6 @@ class MainActivity:Activity(){
       }
      }
      val gemId=resources.getIdentifier(lunarImages[phaseIndex],"drawable",packageName)
-     if(offset==0){
-      item.addView(text("◆",9f,bronze,true).apply{gravity=Gravity.CENTER},FrameLayout.LayoutParams(-1,dp(13),Gravity.TOP or Gravity.CENTER_HORIZONTAL).apply{topMargin=dp(-3)})
-     }
      item.addView(ImageView(this).apply{
       if(gemId!=0)setImageResource(gemId) else setImageDrawable(KhazadMoon())
       scaleType=ImageView.ScaleType.FIT_CENTER
@@ -411,6 +408,9 @@ class MainActivity:Activity(){
       val inset=if(offset==0)dp(1) else dp(3)
       setMargins(inset,inset,inset,inset)
      })
+     if(offset==0){
+      item.addView(text("◆",9f,bronze,true).apply{gravity=Gravity.CENTER},FrameLayout.LayoutParams(-1,dp(13),Gravity.TOP or Gravity.CENTER_HORIZONTAL).apply{topMargin=dp(-3)})
+     }
     }
    }
   }
