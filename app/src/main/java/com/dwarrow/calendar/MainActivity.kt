@@ -122,28 +122,29 @@ private class AdaptiveLunarFrame(private val art:Bitmap):Drawable(){
    val dy=if(bottom==0)b.top.toFloat() else b.bottom-dstSize
    patch(sx,sy,sx+srcSize,sy+srcSize,dx,dy,dx+dstSize,dy+dstSize)
   }
-  // The ring is drawn as a single concentric forged ornament. No bitmap patch,
-  // rectangular crop or clipping can leave a visible seam around the moon.
+  // Restore the original forged ring, clipped to its actual round silhouette.
+  // A feather-free oval crop removes the source's rectangular stone patch.
   val cx=b.centerX().toFloat();val cy=b.centerY().toFloat()
-  val radius=kotlin.math.min(h*.445f,w*.205f)
-  p.style=Paint.Style.STROKE
-  p.strokeWidth=5f;p.color=0xff211c19.toInt()
-  c.drawCircle(cx,cy,radius,p)
-  p.strokeWidth=2.8f;p.color=0xffb6844e.toInt()
-  c.drawCircle(cx,cy,radius-3f,p)
-  p.strokeWidth=2f;p.color=0xff473327.toInt()
-  c.drawCircle(cx,cy,radius-8f,p)
-  p.strokeWidth=1.2f;p.color=0xffd0a46e.toInt()
-  c.drawCircle(cx,cy,radius-11f,p)
+  val rx0=sw*.327f;val rx1=sw*.673f
+  val ringScale=kotlin.math.min(h/sh*.94f,w/(rx1-rx0)*.39f)
+  val rw=(rx1-rx0)*ringScale;val rh=sh*ringScale
+  val ringRect=RectF(cx-rw/2f,cy-rh/2f,cx+rw/2f,cy+rh/2f)
+  val radius=kotlin.math.min(rw,rh)*.49f
+  c.save()
+  val mask=Path().apply{addCircle(cx,cy,radius,Path.Direction.CW)}
+  c.clipPath(mask)
+  patch(rx0,0f,rx1,sh,ringRect.left,ringRect.top,ringRect.right,ringRect.bottom)
+  c.restore()
+  // Four separate forged diamonds reproduce the ring's outer anchor points.
   p.style=Paint.Style.FILL
   for(angle in 0 until 360 step 90){
    val rad=Math.toRadians(angle.toDouble())
-   val x=cx+kotlin.math.cos(rad).toFloat()*(radius-2f)
-   val y=cy+kotlin.math.sin(rad).toFloat()*(radius-2f)
-   val d=kotlin.math.min(10f,radius*.10f)
-   val diamond=Path().apply{moveTo(x,y-d);lineTo(x+d*.65f,y);lineTo(x,y+d);lineTo(x-d*.65f,y);close()}
-   p.color=0xff241c18.toInt();c.drawPath(diamond,p)
-   p.style=Paint.Style.STROKE;p.strokeWidth=1.5f;p.color=0xffc39155.toInt()
+   val x=cx+kotlin.math.cos(rad).toFloat()*(radius-3f)
+   val y=cy+kotlin.math.sin(rad).toFloat()*(radius-3f)
+   val d=7f
+   val diamond=Path().apply{moveTo(x,y-d);lineTo(x+d*.70f,y);lineTo(x,y+d);lineTo(x-d*.70f,y);close()}
+   p.color=0xff241b16.toInt();c.drawPath(diamond,p)
+   p.style=Paint.Style.STROKE;p.strokeWidth=1.5f;p.color=0xffd4a369.toInt()
    c.drawPath(diamond,p);p.style=Paint.Style.FILL
   }
   // Thin side ornaments are vector strokes, so no bitmap fragments interrupt the stone.
@@ -229,19 +230,19 @@ class MainActivity:Activity(){
   panel(root,6,"nurt_events"){p->
    title(p,"ESTAÇÃO ANÃ")
    val season=day?.let{CalendarEngine.season(this,it)} ?: "—"
-   val row=horizontal().apply{gravity=Gravity.CENTER}
+   val row=horizontal().apply{gravity=Gravity.CENTER;setPadding(0,0,dp(24),0)}
    p.addView(row,LinearLayout.LayoutParams(-1,-2))
    val iconName=seasonArt(season)
    val id=iconName?.let{resources.getIdentifier(it,"drawable",packageName)} ?: 0
    if(id!=0){
     val icon=ImageView(this).apply{setImageResource(id);scaleType=ImageView.ScaleType.FIT_CENTER;contentDescription=season}
-    row.addView(icon,LinearLayout.LayoutParams(dp(100),dp(100)).apply{marginEnd=dp(20)})
+    row.addView(icon,LinearLayout.LayoutParams(dp(104),dp(104)).apply{marginEnd=dp(15)})
    }
    val parts=season.split(" · ",limit=2)
    val labels=column().apply{gravity=Gravity.CENTER_VERTICAL}
    row.addView(labels,LinearLayout.LayoutParams(-2,-2))
-   add(labels,parts[0],21f,bronze,true)
-   if(parts.size>1)add(labels,parts[1],16f,cream)
+   add(labels,parts[0],24f,bronze,true)
+   if(parts.size>1)add(labels,parts[1],18f,cream)
   }
  }
  private fun weekdayPortuguese(name:String):String=when(name){
