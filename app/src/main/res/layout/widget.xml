@@ -5,21 +5,21 @@
  android:background="@drawable/khazad_widget_bg">
  <LinearLayout android:layout_width="0dp" android:layout_weight="1.05" android:layout_height="match_parent" android:gravity="center" android:orientation="vertical">
   <ImageView android:id="@+id/widgetMoon" android:layout_width="88dp" android:layout_height="0dp" android:layout_weight="1" android:scaleType="fitCenter" android:contentDescription="Fase lunar"/>
-  <TextView android:id="@+id/widgetMoonLabel" android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center" android:maxLines="1" android:autoSizeTextType="uniform" android:autoSizeMinTextSize="8sp" android:autoSizeMaxTextSize="12sp" android:textColor="#F3E8D7"/>
+  <TextView android:id="@+id/widgetMoonLabel" android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center" android:maxLines="1" android:textColor="#F3E8D7"/>
   <TextView android:id="@+id/widgetMoonKh" android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center" android:textSize="10sp" android:textColor="#D8A35F"/>
  </LinearLayout>
- <View android:layout_width="1dp" android:layout_height="match_parent" android:layout_marginHorizontal="7dp" android:background="#6D5438"/>
+ <TextView android:layout_width="1dp" android:layout_height="match_parent" android:layout_marginHorizontal="7dp" android:background="#6D5438"/>
  <LinearLayout android:layout_width="0dp" android:layout_weight="1.45" android:layout_height="match_parent" android:orientation="vertical" android:gravity="center_vertical">
-  <TextView android:id="@+id/widgetDate" android:layout_width="match_parent" android:layout_height="wrap_content" android:maxLines="1" android:autoSizeTextType="uniform" android:autoSizeMinTextSize="12sp" android:autoSizeMaxTextSize="21sp" android:textStyle="bold" android:textColor="#F5E7CA"/>
+  <TextView android:id="@+id/widgetDate" android:layout_width="match_parent" android:layout_height="wrap_content" android:maxLines="1" android:textStyle="bold" android:textColor="#F5E7CA"/>
   <TextView android:id="@+id/widgetMonthMeaning" android:layout_width="match_parent" android:layout_height="wrap_content" android:maxLines="1" android:textSize="11sp" android:textColor="#C49A59"/>
   <TextView android:id="@+id/widgetWeekKh" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="5dp" android:textSize="14sp" android:textStyle="bold" android:textColor="#D8A35F"/>
   <TextView android:id="@+id/widgetWeekPt" android:layout_width="match_parent" android:layout_height="wrap_content" android:textSize="11sp" android:textColor="#F3E8D7"/>
   <TextView android:id="@+id/widgetGregorian" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="7dp" android:maxLines="1" android:textSize="10sp" android:textColor="#D0C2AE"/>
  </LinearLayout>
- <View android:layout_width="1dp" android:layout_height="match_parent" android:layout_marginHorizontal="7dp" android:background="#6D5438"/>
+ <TextView android:layout_width="1dp" android:layout_height="match_parent" android:layout_marginHorizontal="7dp" android:background="#6D5438"/>
  <LinearLayout android:layout_width="0dp" android:layout_weight="0.85" android:layout_height="match_parent" android:orientation="vertical" android:gravity="center">
   <ImageView android:id="@+id/widgetSeasonIcon" android:layout_width="75dp" android:layout_height="0dp" android:layout_weight="1" android:scaleType="fitCenter" android:contentDescription="Estação anã"/>
   <TextView android:id="@+id/widgetSeasonPt" android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center" android:maxLines="1" android:textSize="12sp" android:textStyle="bold" android:textColor="#D8A35F"/>
-  <TextView android:id="@+id/widgetSeasonKh" android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center" android:maxLines="1" android:autoSizeTextType="uniform" android:autoSizeMinTextSize="8sp" android:autoSizeMaxTextSize="11sp" android:textColor="#F3E8D7"/>
+  <TextView android:id="@+id/widgetSeasonKh" android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center" android:maxLines="1" android:textColor="#F3E8D7"/>
  </LinearLayout>
 </LinearLayout>
