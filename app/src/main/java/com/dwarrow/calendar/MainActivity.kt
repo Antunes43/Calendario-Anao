@@ -63,26 +63,27 @@ private class ForgedFrame(private val mode:Int=0):Drawable(){
 
 // Preserve the original artwork aspect ratio rather than stretching ornaments.
 // Nine-slice panel: corners retain their geometry; only plain edge/center strips resize.
+// Keep ornate corners and border strips intact while filling a variable-height panel.
 private class ProportionalArt(private val bitmap:Bitmap):Drawable(){
- private val paint=Paint(Paint.ANTI_ALIAS_FLAG or Paint.FILTER_BITMAP_FLAG)
- override fun draw(canvas:Canvas){
+ private val p=Paint(Paint.ANTI_ALIAS_FLAG or Paint.FILTER_BITMAP_FLAG)
+ override fun draw(c:Canvas){
   val b=bounds
   if(b.isEmpty)return
   val w=b.width().toFloat();val h=b.height().toFloat()
-  val sw=bitmap.width.toFloat();val sh=bitmap.height.toFloat()
-  val xCut=sw*0.15f;val yCut=sh*0.20f
-  val edgeW=kotlin.math.min(w*0.15f,xCut)
-  val edgeH=kotlin.math.min(h*0.20f,yCut)
-  val sx=floatArrayOf(0f,xCut,sw-xCut,sw)
-  val sy=floatArrayOf(0f,yCut,sh-yCut,sh)
-  val dx=floatArrayOf(b.left.toFloat(),b.left+edgeW,b.right-edgeW,b.right.toFloat())
-  val dy=floatArrayOf(b.top.toFloat(),b.top+edgeH,b.bottom-edgeH,b.bottom.toFloat())
-  for(y in 0..2)for(x in 0..2){
-   canvas.drawBitmap(bitmap,Rect(sx[x].toInt(),sy[y].toInt(),sx[x+1].toInt(),sy[y+1].toInt()),RectF(dx[x],dy[y],dx[x+1],dy[y+1]),paint)
-  }
+  val sw=bitmap.width;val sh=bitmap.height
+  val edgeX=(sw*0.12f).toInt().coerceAtLeast(1)
+  val edgeY=(sh*0.22f).toInt().coerceAtLeast(1)
+  val dstX=kotlin.math.min(w*0.12f,edgeX.toFloat())
+  val dstY=kotlin.math.min(h*0.22f,edgeY.toFloat())
+  val sx=intArrayOf(0,edgeX,sw-edgeX,sw)
+  val sy=intArrayOf(0,edgeY,sh-edgeY,sh)
+  val dx=floatArrayOf(b.left.toFloat(),b.left+dstX,b.right-dstX,b.right.toFloat())
+  val dy=floatArrayOf(b.top.toFloat(),b.top+dstY,b.bottom-dstY,b.bottom.toFloat())
+  for(y in 0..2)for(x in 0..2)
+   c.drawBitmap(bitmap,Rect(sx[x],sy[y],sx[x+1],sy[y+1]),RectF(dx[x],dy[y],dx[x+1],dy[y+1]),p)
  }
- override fun setAlpha(alpha:Int){paint.alpha=alpha}
- override fun setColorFilter(filter:android.graphics.ColorFilter?){paint.colorFilter=filter}
+ override fun setAlpha(a:Int){p.alpha=a}
+ override fun setColorFilter(f:android.graphics.ColorFilter?){p.colorFilter=f}
  @Deprecated("Deprecated in Java") override fun getOpacity():Int=PixelFormat.OPAQUE
 }
 class MainActivity:Activity(){
@@ -206,13 +207,14 @@ class MainActivity:Activity(){
   }
   if(tab==0||tab==1){
    panel(root,6,"nurt_date"){p->
+    p.setPadding(dp(18),dp(14),dp(18),dp(14))
     title(p,"NURT KHUZDUL")
-    add(p,if(day==null)"Fora da cobertura" else "${day.day} de ${day.monthName}",26f,cream,true)
-    if(day!=null)add(p,day.meaning,14f,cream)
-    add(p,"─── ◈ ───",12f,bronze)
+    add(p,if(day==null)"Fora da cobertura" else "${day.day} de ${day.monthName}",24f,cream,true)
+    if(day!=null)add(p,day.meaning,13f,cream)
+    add(p,"─── ◈ ───",11f,bronze)
     if(day!=null){
-     add(p,day.weekday,20f,bronze,true)
-     add(p,weekdayPortuguese(day.weekday),14f,cream)
+     add(p,day.weekday,18f,bronze,true)
+     add(p,weekdayPortuguese(day.weekday),13f,cream)
     }
    }
    val info=horizontal()
