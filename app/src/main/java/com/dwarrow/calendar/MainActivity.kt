@@ -126,14 +126,19 @@ private class AdaptiveLunarFrame(private val art:Bitmap):Drawable(){
   val rx0=sw*.337f;val rx1=sw*.663f
   val ringScale=kotlin.math.min(h/sh*.94f,w/(rx1-rx0)*.38f)
   val rw=(rx1-rx0)*ringScale;val rh=sh*ringScale
-  patch(rx0,0f,rx1,sh,b.centerX()-rw/2f,b.centerY()-rh/2f,b.centerX()+rw/2f,b.centerY()+rh/2f)
+  val ringDst=RectF(b.centerX()-rw/2f,b.centerY()-rh/2f,b.centerX()+rw/2f,b.centerY()+rh/2f)
+  c.save()
+  val ringMask=Path().apply{addOval(RectF(ringDst.left+rw*.035f,ringDst.top+rh*.035f,ringDst.right-rw*.035f,ringDst.bottom-rh*.035f),Path.Direction.CW)}
+  c.clipPath(ringMask)
+  patch(rx0,0f,rx1,sh,ringDst.left,ringDst.top,ringDst.right,ringDst.bottom)
+  c.restore()
   // Thin side ornaments are vector strokes, so no bitmap fragments interrupt the stone.
   p.color=0xff956b40.toInt();p.strokeWidth=1.5f
   val leftStart=b.left+dstSize+12f
   val leftEnd=b.centerX()-rw*.59f
   val rightStart=b.centerX()+rw*.59f
   val rightEnd=b.right-dstSize-12f
-  val y=b.top+h*.40f
+  val y=b.top+h*.72f
   if(leftEnd>leftStart)c.drawLine(leftStart,y,leftEnd,y,p)
   if(rightEnd>rightStart)c.drawLine(rightStart,y,rightEnd,y,p)
  }
@@ -216,13 +221,13 @@ class MainActivity:Activity(){
    val id=iconName?.let{resources.getIdentifier(it,"drawable",packageName)} ?: 0
    if(id!=0){
     val icon=ImageView(this).apply{setImageResource(id);scaleType=ImageView.ScaleType.FIT_CENTER;contentDescription=season}
-    row.addView(icon,LinearLayout.LayoutParams(dp(76),dp(76)).apply{marginEnd=dp(12)})
+    row.addView(icon,LinearLayout.LayoutParams(dp(106),dp(106)).apply{marginEnd=dp(10)})
    }
    val parts=season.split(" · ",limit=2)
    val labels=column().apply{gravity=Gravity.CENTER_VERTICAL}
    row.addView(labels,LinearLayout.LayoutParams(0,-2,1f))
-   add(labels,parts[0],18f,bronze,true)
-   if(parts.size>1)add(labels,parts[1],14f,cream)
+   add(labels,parts[0],21f,bronze,true)
+   if(parts.size>1)add(labels,parts[1],16f,cream)
   }
  }
  private fun weekdayPortuguese(name:String):String=when(name){
@@ -273,12 +278,31 @@ class MainActivity:Activity(){
   val root=column().apply{setPadding(dp(8),dp(6),dp(8),dp(8))}
   scroll.addView(root)
   outer.addView(scroll,LinearLayout.LayoutParams(-1,0,1f))
-  panel(root,6,"nurt_header"){h->
-   h.minimumHeight=dp(108)
-   h.gravity=Gravity.CENTER
-   h.setPadding(dp(15),dp(24),dp(15),dp(10))
-   add(h,if(themeIndex==0)"NURTFAHANI" else names[themeIndex].uppercase(Locale.ROOT),21f,bronze,true)
-   add(h,"CALENDÁRIO ANÃO",11f,cream,true)
+  if(themeIndex==0){
+   val header=FrameLayout(this)
+   val id=resources.getIdentifier("nurt_header","drawable",packageName)
+   if(id!=0){
+    val artwork=ImageView(this).apply{setImageResource(id);scaleType=ImageView.ScaleType.FIT_XY}
+    header.addView(artwork,FrameLayout.LayoutParams(-1,-1))
+   }
+   val heading=column().apply{
+    gravity=Gravity.CENTER
+    setPadding(dp(12),dp(27),dp(12),dp(8))
+   }
+   val main=text("NURTFAHANI",20f,bronze,true)
+   main.gravity=Gravity.CENTER
+   heading.addView(main,LinearLayout.LayoutParams(-1,-2))
+   val subtitle=text("CALENDÁRIO ANÃO",10f,cream,true)
+   subtitle.gravity=Gravity.CENTER
+   heading.addView(subtitle,LinearLayout.LayoutParams(-1,-2))
+   header.addView(heading,FrameLayout.LayoutParams(-1,-1,Gravity.CENTER))
+   root.addView(header,LinearLayout.LayoutParams(-1,dp(106)).apply{bottomMargin=dp(6)})
+  }else{
+   panel(root,6){h->
+    h.minimumHeight=dp(106)
+    add(h,names[themeIndex].uppercase(Locale.ROOT),20f,bronze,true)
+    add(h,"CALENDÁRIO ANÃO",10f,cream,true)
+   }
   }
   if(tab==0||tab==2){
    panel(root,6,"nurt_lunar"){p->
@@ -320,8 +344,8 @@ class MainActivity:Activity(){
    root.addView(info,LinearLayout.LayoutParams(-1,-2).apply{bottomMargin=dp(6)})
    val a=column().apply{background=(if(themeIndex==0)artBackground("nurt_year") else null) ?: ForgedFrame(themeIndex);setPadding(dp(9),dp(10),dp(9),dp(10))}
    val b=column().apply{background=(if(themeIndex==0)artBackground("nurt_gregorian") else null) ?: ForgedFrame(themeIndex);setPadding(dp(9),dp(10),dp(9),dp(10))}
-   info.addView(a,LinearLayout.LayoutParams(0,-2,1f).apply{marginEnd=dp(4)})
-   info.addView(b,LinearLayout.LayoutParams(0,-2,1f))
+   info.addView(a,LinearLayout.LayoutParams(0,dp(70),1f).apply{marginEnd=dp(4)})
+   info.addView(b,LinearLayout.LayoutParams(0,dp(70),1f))
    add(a,"ANO ANÃO",11f,bronze,true);add(a,"D.R. ${day?.drYear?:"—"}",17f,cream,true)
    add(b,"DATA GREGORIANA",10f,bronze,true);add(b,greg,13f,cream)
   }
