@@ -68,17 +68,15 @@ private class ProportionalArt(private val bitmap:Bitmap):Drawable(){
  override fun draw(canvas:Canvas){
   val b=bounds
   if(b.isEmpty)return
-  val sw=bitmap.width;val sh=bitmap.height
-  val sx=intArrayOf(0,(sw*0.18f).toInt(),(sw*0.82f).toInt(),sw)
-  val sy=intArrayOf(0,(sh*0.24f).toInt(),(sh*0.76f).toInt(),sh)
-  val cornerW=kotlin.math.min(sw*0.18f,b.width()*0.22f)
-  val cornerH=kotlin.math.min(sh*0.24f,b.height()*0.27f)
-  val dx=floatArrayOf(b.left.toFloat(),b.left+cornerW,b.right-cornerW,b.right.toFloat())
-  val dy=floatArrayOf(b.top.toFloat(),b.top+cornerH,b.bottom-cornerH,b.bottom.toFloat())
-  for(y in 0..2)for(x in 0..2){
-   canvas.drawBitmap(bitmap,Rect(sx[x],sy[y],sx[x+1],sy[y+1]),
-    RectF(dx[x],dy[y],dx[x+1],dy[y+1]),paint)
-  }
+  val sw=bitmap.width.toFloat()
+  val sh=bitmap.height.toFloat()
+  val scale=kotlin.math.min(b.width()/sw,b.height()/sh)
+  val dw=sw*scale
+  val dh=sh*scale
+  paint.color=0xff090b0f.toInt()
+  canvas.drawRect(b,paint)
+  paint.color=android.graphics.Color.WHITE
+  canvas.drawBitmap(bitmap,null,RectF(b.centerX()-dw/2f,b.centerY()-dh/2f,b.centerX()+dw/2f,b.centerY()+dh/2f),paint)
  }
  override fun setAlpha(alpha:Int){paint.alpha=alpha}
  override fun setColorFilter(filter:android.graphics.ColorFilter?){paint.colorFilter=filter}
