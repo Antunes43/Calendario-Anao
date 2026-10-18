@@ -302,7 +302,7 @@ class MainActivity:Activity(){
    }
    val heading=column().apply{
     gravity=Gravity.CENTER_HORIZONTAL or Gravity.BOTTOM
-    setPadding(dp(12),dp(8),dp(12),dp(14))
+    setPadding(dp(12),dp(8),dp(12),dp(22))
    }
    val main=text("NURTFAHANI",18f,bronze,true)
    main.gravity=Gravity.CENTER
