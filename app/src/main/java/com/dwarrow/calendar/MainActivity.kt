@@ -316,7 +316,7 @@ class MainActivity:Activity(){
    }
    val heading=column().apply{
     gravity=Gravity.CENTER_HORIZONTAL or Gravity.BOTTOM
-    setPadding(dp(12),dp(0),dp(12),dp(18))
+    setPadding(dp(12),dp(0),dp(12),dp(12))
    }
    val main=text("NURTFAHANI",17f,bronze,true).apply{includeFontPadding=false;setPadding(0,0,0,0)}
    main.gravity=Gravity.CENTER
@@ -373,6 +373,41 @@ class MainActivity:Activity(){
     lunarDivider(right)
     add(right,lunarNames[(index+1)%8],13f,cream,true)
     add(right,"≈ ${phase.second} dia(s)",11f,bronze)
+    // Nine approved gemstone assets: four preceding phases, current, four upcoming.
+    // Keep this strip in its own bounded area so its selection never touches the main ring.
+    val phaseStrip=LinearLayout(this).apply{
+     orientation=LinearLayout.HORIZONTAL
+     gravity=Gravity.CENTER_VERTICAL
+     setPadding(dp(5),dp(7),dp(5),dp(7))
+     background=android.graphics.drawable.GradientDrawable().apply{
+      setColor(0xff101216.toInt())
+      setStroke(dp(1),0xff805b35.toInt())
+      cornerRadius=dp(3).toFloat()
+     }
+    }
+    p.addView(phaseStrip,LinearLayout.LayoutParams(-1,dp(58)).apply{topMargin=dp(12)})
+    for(offset in -4..4){
+     val phaseIndex=((index+offset)%8+8)%8
+     val item=FrameLayout(this)
+     phaseStrip.addView(item,LinearLayout.LayoutParams(0,-1,1f))
+     if(offset==0){
+      item.background=android.graphics.drawable.GradientDrawable().apply{
+       setColor(0x243f2a14)
+       setStroke(dp(1),bronze)
+       cornerRadius=dp(4).toFloat()
+      }
+     }
+     val gemId=resources.getIdentifier(lunarImages[phaseIndex],"drawable",packageName)
+     item.addView(ImageView(this).apply{
+      if(gemId!=0)setImageResource(gemId) else setImageDrawable(KhazadMoon())
+      scaleType=ImageView.ScaleType.FIT_CENTER
+      adjustViewBounds=false
+      contentDescription=(if(offset==0)"Fase atual: " else if(offset<0)"Fase anterior: " else "Próxima fase: ")+lunarNames[phaseIndex]
+     },FrameLayout.LayoutParams(-1,-1).apply{
+      val inset=if(offset==0)dp(2) else dp(4)
+      setMargins(inset,inset,inset,inset)
+     })
+    }
    }
   }
   if(tab==0||tab==1){
