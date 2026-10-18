@@ -78,7 +78,7 @@ class MainActivity:Activity(){
  private fun title(root:LinearLayout,heading:String){add(root,"✦  $heading  ✦",14f,bronze,true)}
  private fun artBackground(name:String):Drawable? { val id=resources.getIdentifier(name,"drawable",packageName);if(id==0)return null;return resources.getDrawable(id,theme).apply{if(this is BitmapDrawable)gravity=Gravity.FILL} }
  private fun panel(root:LinearLayout,space:Int=12,art:String?=null,build:(LinearLayout)->Unit){
-  val c=column().apply{background=(art?.let{artBackground(it)} ?: ForgedFrame(themeIndex));setPadding(dp(20),dp(17),dp(20),dp(17))}
+  val c=column().apply{background=(if(themeIndex==0) art?.let{artBackground(it)} else null) ?: ForgedFrame(themeIndex);setPadding(dp(20),dp(17),dp(20),dp(17))}
   root.addView(c,LinearLayout.LayoutParams(-1,-2).apply{bottomMargin=dp(space)})
   build(c)
  }
@@ -92,7 +92,7 @@ class MainActivity:Activity(){
   val bg=if(themeIndex==2)0xffd4c4aa.toInt() else 0xff090b0f.toInt()
   val outer=column().apply{setBackgroundColor(bg)}
   val scroll=ScrollView(this).apply{isFillViewport=false}
-  val root=column().apply{setPadding(dp(10),dp(12),dp(10),dp(10))}
+  val root=column().apply{setPadding(dp(8),dp(6),dp(8),dp(8))}
   scroll.addView(root)
   outer.addView(scroll,LinearLayout.LayoutParams(-1,0,1f))
   panel(root,10,"nurt_header"){h->
@@ -129,8 +129,8 @@ class MainActivity:Activity(){
    }
    val info=horizontal()
    root.addView(info,LinearLayout.LayoutParams(-1,-2).apply{bottomMargin=dp(10)})
-   val a=column().apply{background=artBackground("nurt_year") ?: ForgedFrame(themeIndex);setPadding(dp(8),dp(12),dp(8),dp(12))}
-   val b=column().apply{background=artBackground("nurt_gregorian") ?: ForgedFrame(themeIndex);setPadding(dp(8),dp(12),dp(8),dp(12))}
+   val a=column().apply{background=(if(themeIndex==0)artBackground("nurt_year") else null) ?: ForgedFrame(themeIndex);setPadding(dp(8),dp(12),dp(8),dp(12))}
+   val b=column().apply{background=(if(themeIndex==0)artBackground("nurt_gregorian") else null) ?: ForgedFrame(themeIndex);setPadding(dp(8),dp(12),dp(8),dp(12))}
    info.addView(a,LinearLayout.LayoutParams(0,-2,1f).apply{marginEnd=dp(4)})
    info.addView(b,LinearLayout.LayoutParams(0,-2,1f))
    add(a,"♜  ANO ANÃO",12f,bronze,true);add(a,"D.R. ${day?.drYear?:"—"}",17f,cream,true)
@@ -147,7 +147,7 @@ class MainActivity:Activity(){
   if(tab==0){
    panel(root,12,"nurt_events"){p->
     title(p,"EVENTOS E OBSERVÂNCIAS")
-    val link=horizontal().apply{background=ForgedFrame(themeIndex);setPadding(dp(10),dp(10),dp(10),dp(10))}
+    val link=horizontal().apply{setPadding(dp(10),dp(10),dp(10),dp(10))}
     link.addView(text("✧",29f,bronze),LinearLayout.LayoutParams(dp(50),-2))
     val t=column();link.addView(t,LinearLayout.LayoutParams(0,-2,1f))
     add(t,"Consultar calendário oficial  ›",15f,cream,true)
@@ -176,7 +176,7 @@ class MainActivity:Activity(){
   labels.forEachIndexed{i,label->
    val item=column().apply{
     gravity=Gravity.CENTER
-    if(tab==i)background=ForgedFrame(themeIndex)
+    if(tab==i && themeIndex!=0)background=ForgedFrame(themeIndex)
     setOnClickListener{tab=i;draw()}
    }
    val artNames=arrayOf("nav_hoje","nav_calendario","nav_luas","nav_eventos","nav_mais")
