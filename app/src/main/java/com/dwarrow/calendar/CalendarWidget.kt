@@ -44,8 +44,6 @@ abstract class BaseCalendarWidget(private val style:Int):AppWidgetProvider(){
   }
   for(id in ids){
    val v=RemoteViews(context.packageName,R.layout.widget)
-   val approvedFrame=context.resources.getIdentifier("widget_nurtfahani_moldura_aprovada","drawable",context.packageName)
-   if(approvedFrame!=0)v.setInt(R.id.widgetRoot,"setBackgroundResource",approvedFrame)
    v.setImageViewResource(R.id.widgetMoon,images[phase])
    v.setTextViewText(R.id.widgetMoonLabel,names[phase])
    v.setTextViewText(R.id.widgetMoonKh,"")
