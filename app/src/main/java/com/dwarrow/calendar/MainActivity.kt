@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.content.Context
 import android.graphics.*
 import android.graphics.drawable.Drawable
+import android.graphics.drawable.BitmapDrawable
 import android.view.Gravity
 import android.view.View
 import android.widget.*
@@ -75,8 +76,9 @@ class MainActivity:Activity(){
  private fun column():LinearLayout=LinearLayout(this).apply{orientation=LinearLayout.VERTICAL;gravity=Gravity.CENTER_HORIZONTAL}
  private fun horizontal():LinearLayout=LinearLayout(this).apply{orientation=LinearLayout.HORIZONTAL;gravity=Gravity.CENTER_VERTICAL}
  private fun title(root:LinearLayout,heading:String){add(root,"✦  $heading  ✦",14f,bronze,true)}
- private fun panel(root:LinearLayout,space:Int=12,build:(LinearLayout)->Unit){
-  val c=column().apply{background=ForgedFrame(themeIndex);setPadding(dp(20),dp(17),dp(20),dp(17))}
+ private fun artBackground(name:String):Drawable? { val id=resources.getIdentifier(name,"drawable",packageName);if(id==0)return null;return resources.getDrawable(id,theme).apply{if(this is BitmapDrawable)gravity=Gravity.FILL} }
+ private fun panel(root:LinearLayout,space:Int=12,art:String?=null,build:(LinearLayout)->Unit){
+  val c=column().apply{background=(art?.let{artBackground(it)} ?: ForgedFrame(themeIndex));setPadding(dp(20),dp(17),dp(20),dp(17))}
   root.addView(c,LinearLayout.LayoutParams(-1,-2).apply{bottomMargin=dp(space)})
   build(c)
  }
@@ -93,18 +95,15 @@ class MainActivity:Activity(){
   val root=column().apply{setPadding(dp(10),dp(12),dp(10),dp(10))}
   scroll.addView(root)
   outer.addView(scroll,LinearLayout.LayoutParams(-1,0,1f))
-  panel(root,10){h->
-   if(themeIndex==0){
-    val emblem=ImageView(this).apply{setImageResource(R.drawable.khazad_dum_icon_final);scaleType=ImageView.ScaleType.FIT_CENTER}
-    h.addView(emblem,LinearLayout.LayoutParams(dp(74),dp(74)))
-   }
+  panel(root,10,"nurt_header"){h->
+   
    add(h,"◈ ━━━━━ ◈ ━━━━━ ◈",13f,bronze)
-   add(h,names[themeIndex].uppercase(Locale.ROOT),22f,bronze,true)
+   add(h,if(themeIndex==0)"NURTFAHANI" else names[themeIndex].uppercase(Locale.ROOT),22f,bronze,true)
    add(h,"C A L E N D Á R I O   A N Ã O",11f,cream,true)
    add(h,"◆ ━━━━━━━━━━━━━ ◆",12f,bronze)
   }
   if(tab==0||tab==2){
-   panel(root,10){p->
+   panel(root,10,"nurt_lunar"){p->
     val line=horizontal()
     p.addView(line,LinearLayout.LayoutParams(-1,-2))
     val moon=ImageView(this).apply{setImageDrawable(KhazadMoon());scaleType=ImageView.ScaleType.FIT_CENTER}
@@ -119,7 +118,7 @@ class MainActivity:Activity(){
    }
   }
   if(tab==0||tab==1){
-   panel(root,9){p->
+   panel(root,9,"nurt_date"){p->
     title(p,"DATA ANÃ")
     add(p,if(day==null)"Fora da cobertura" else "${day.day} de ${day.monthName}",31f,cream,true)
     add(p,"━━━ ◈ ━━━",12f,bronze)
@@ -131,8 +130,8 @@ class MainActivity:Activity(){
    }
    val info=horizontal()
    root.addView(info,LinearLayout.LayoutParams(-1,-2).apply{bottomMargin=dp(10)})
-   val a=column().apply{background=ForgedFrame(themeIndex);setPadding(dp(8),dp(12),dp(8),dp(12))}
-   val b=column().apply{background=ForgedFrame(themeIndex);setPadding(dp(8),dp(12),dp(8),dp(12))}
+   val a=column().apply{background=artBackground("nurt_year") ?: ForgedFrame(themeIndex);setPadding(dp(8),dp(12),dp(8),dp(12))}
+   val b=column().apply{background=artBackground("nurt_gregorian") ?: ForgedFrame(themeIndex);setPadding(dp(8),dp(12),dp(8),dp(12))}
    info.addView(a,LinearLayout.LayoutParams(0,-2,1f).apply{marginEnd=dp(4)})
    info.addView(b,LinearLayout.LayoutParams(0,-2,1f))
    add(a,"♜  ANO ANÃO",12f,bronze,true);add(a,"D.R. ${day?.drYear?:"—"}",17f,cream,true)
@@ -147,7 +146,7 @@ class MainActivity:Activity(){
    panel(root){title(it,"ESTAÇÃO ANÃ");add(it,day?.let{d->CalendarEngine.season(this,d)}?:"—",17f)}
   }
   if(tab==0){
-   panel(root){p->
+   panel(root,12,"nurt_events"){p->
     title(p,"EVENTOS E OBSERVÂNCIAS")
     val link=horizontal().apply{background=ForgedFrame(themeIndex);setPadding(dp(10),dp(10),dp(10),dp(10))}
     link.addView(text("✧",29f,bronze),LinearLayout.LayoutParams(dp(50),-2))
