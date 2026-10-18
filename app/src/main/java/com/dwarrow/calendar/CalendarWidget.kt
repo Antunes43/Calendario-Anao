@@ -19,29 +19,41 @@ abstract class BaseCalendarWidget(private val style:Int):AppWidgetProvider(){
    update(context,mgr,mgr.getAppWidgetIds(ComponentName(context,javaClass)))
   }
  }
- // Nine-slice: preserve ornamental corners at their original aspect ratio.
- // Only the central stretches are resampled; never crop the source frame.
+ // Draw a responsive frame. No bitmap corners or source interior are stretched.
+ // The source is retained only as four ornamental corner cutouts.
  private fun widgetFrame(context:Context,width:Int,height:Int):android.graphics.Bitmap{
-  val source=android.graphics.BitmapFactory.decodeResource(context.resources,R.drawable.widget_nurtfahani_moldura_aprovada)
   val output=android.graphics.Bitmap.createBitmap(width,height,android.graphics.Bitmap.Config.ARGB_8888)
   val canvas=android.graphics.Canvas(output)
   val paint=android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG or android.graphics.Paint.FILTER_BITMAP_FLAG)
-  val sw=source.width;val sh=source.height
-  // Keep corners proportional to the final height. Avoid stretching square gems.
-  val sourceCornerX=(sw*0.095f).toInt()
-  val sourceCornerY=(sh*0.19f).toInt()
-  val cornerScale=kotlin.math.min(1f,kotlin.math.min(
-   width.toFloat()/(sourceCornerX*2+1),height.toFloat()/(sourceCornerY*2+1)))
-  val destCornerX=(sourceCornerX*cornerScale).toInt().coerceAtLeast(1)
-  val destCornerY=(sourceCornerY*cornerScale).toInt().coerceAtLeast(1)
-  val xs=intArrayOf(0,sourceCornerX,sw-sourceCornerX,sw)
-  val ys=intArrayOf(0,sourceCornerY,sh-sourceCornerY,sh)
-  val xd=intArrayOf(0,destCornerX,width-destCornerX,width)
-  val yd=intArrayOf(0,destCornerY,height-destCornerY,height)
-  for(y in 0..2)for(x in 0..2){
-   canvas.drawBitmap(source,android.graphics.Rect(xs[x],ys[y],xs[x+1],ys[y+1]),
-    android.graphics.Rect(xd[x],yd[y],xd[x+1],yd[y+1]),paint)
-  }
+  val accent=when(style){1->0xff9b7759.toInt();2->0xffb8a071.toInt();else->0xffbb8447.toInt()}
+  canvas.drawColor(0xff0b0d10.toInt())
+  paint.color=0xff11151a.toInt()
+  canvas.drawRoundRect(3f,3f,width-3f,height-3f,12f,12f,paint)
+  paint.style=android.graphics.Paint.Style.STROKE
+  paint.strokeWidth=2f
+  paint.color=accent
+  canvas.drawRoundRect(5f,5f,width-5f,height-5f,11f,11f,paint)
+  paint.strokeWidth=1f
+  paint.color=0xff4a382b.toInt()
+  canvas.drawRoundRect(10f,10f,width-10f,height-10f,9f,9f,paint)
+  paint.style=android.graphics.Paint.Style.FILL
+  // A small fixed-size corner ornament is never rescaled to the widget height.
+  val source=android.graphics.BitmapFactory.decodeResource(context.resources,R.drawable.widget_nurtfahani_moldura_aprovada)
+  val srcSize=(source.width*0.105f).toInt().coerceAtMost(source.height/4)
+  val corner=(kotlin.math.min(width,height)*0.11f).toInt().coerceIn(15,35)
+  val srcRects=arrayOf(
+   android.graphics.Rect(0,0,srcSize,srcSize),
+   android.graphics.Rect(source.width-srcSize,0,source.width,srcSize),
+   android.graphics.Rect(0,source.height-srcSize,srcSize,source.height),
+   android.graphics.Rect(source.width-srcSize,source.height-srcSize,source.width,source.height)
+  )
+  val dstRects=arrayOf(
+   android.graphics.Rect(0,0,corner,corner),
+   android.graphics.Rect(width-corner,0,width,corner),
+   android.graphics.Rect(0,height-corner,corner,height),
+   android.graphics.Rect(width-corner,height-corner,width,height)
+  )
+  for(i in 0..3)canvas.drawBitmap(source,srcRects[i],dstRects[i],paint)
   source.recycle()
   return output
  }
