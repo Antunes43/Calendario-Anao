@@ -168,13 +168,13 @@ class MainActivity:Activity(){
     add(right,"PRÓXIMA FASE",10f,bronze,true)
     add(right,lunarNames[(index+1)%8],10f,cream)
     add(right,"≈ ${phase.second} dia(s)",10f,bronze)
-    if(day!=null)add(p,day.meaning,12f,cream,true)
    }
   }
   if(tab==0||tab==1){
    panel(root,9,"nurt_date"){p->
     title(p,"NURT KHUZDUL")
     add(p,if(day==null)"Fora da cobertura" else "${day.day} de ${day.monthName}",26f,cream,true)
+    if(day!=null)add(p,day.meaning,14f,cream)
     add(p,"─── ◈ ───",12f,bronze)
     if(day!=null){
      add(p,day.weekday,20f,bronze,true)
