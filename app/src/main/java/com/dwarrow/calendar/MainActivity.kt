@@ -62,18 +62,23 @@ private class ForgedFrame(private val mode:Int=0):Drawable(){
 }
 
 // Preserve the original artwork aspect ratio rather than stretching ornaments.
+// Nine-slice panel: corners retain their geometry; only plain edge/center strips resize.
 private class ProportionalArt(private val bitmap:Bitmap):Drawable(){
  private val paint=Paint(Paint.ANTI_ALIAS_FLAG or Paint.FILTER_BITMAP_FLAG)
  override fun draw(canvas:Canvas){
   val b=bounds
   if(b.isEmpty)return
-  canvas.drawColor(0xff090b0f.toInt())
-  val scale=kotlin.math.min(b.width().toFloat()/bitmap.width,b.height().toFloat()/bitmap.height)
-  val width=bitmap.width*scale
-  val height=bitmap.height*scale
-  val left=b.left+(b.width()-width)/2f
-  val top=b.top+(b.height()-height)/2f
-  canvas.drawBitmap(bitmap,null,RectF(left,top,left+width,top+height),paint)
+  val sw=bitmap.width;val sh=bitmap.height
+  val sx=intArrayOf(0,(sw*0.18f).toInt(),(sw*0.82f).toInt(),sw)
+  val sy=intArrayOf(0,(sh*0.24f).toInt(),(sh*0.76f).toInt(),sh)
+  val cornerW=kotlin.math.min(sw*0.18f,b.width()*0.22f)
+  val cornerH=kotlin.math.min(sh*0.24f,b.height()*0.27f)
+  val dx=floatArrayOf(b.left.toFloat(),b.left+cornerW,b.right-cornerW,b.right.toFloat())
+  val dy=floatArrayOf(b.top.toFloat(),b.top+cornerH,b.bottom-cornerH,b.bottom.toFloat())
+  for(y in 0..2)for(x in 0..2){
+   canvas.drawBitmap(bitmap,Rect(sx[x],sy[y],sx[x+1],sy[y+1]),
+    RectF(dx[x],dy[y],dx[x+1],dy[y+1]),paint)
+  }
  }
  override fun setAlpha(alpha:Int){paint.alpha=alpha}
  override fun setColorFilter(filter:android.graphics.ColorFilter?){paint.colorFilter=filter}
@@ -111,7 +116,7 @@ class MainActivity:Activity(){
   else->null
  }
  private fun seasonPanel(root:LinearLayout,day:CalendarEngine.Day?){
-  panel(root,12){p->
+  panel(root,6){p->
    title(p,"ESTAÇÃO ANÃ")
    val season=day?.let{CalendarEngine.season(this,it)} ?: "—"
    val row=horizontal()
@@ -168,18 +173,18 @@ class MainActivity:Activity(){
   val root=column().apply{setPadding(dp(8),dp(6),dp(8),dp(8))}
   scroll.addView(root)
   outer.addView(scroll,LinearLayout.LayoutParams(-1,0,1f))
-  panel(root,10,"nurt_header"){h->
-   h.minimumHeight=dp(132)
+  panel(root,6,"nurt_header"){h->
+   h.minimumHeight=dp(92)
    h.gravity=Gravity.CENTER
    add(h,if(themeIndex==0)"NURTFAHANI" else names[themeIndex].uppercase(Locale.ROOT),24f,bronze,true)
    add(h,"C A L E N D Á R I O   A N Ã O",11f,cream,true)
   }
   if(tab==0||tab==2){
-   panel(root,10,"nurt_lunar"){p->
+   panel(root,6,"nurt_lunar"){p->
     val phase=lunarPhase(date)
     val index=phase.first
     val line=horizontal()
-    p.addView(line,LinearLayout.LayoutParams(-1,dp(132)))
+    p.addView(line,LinearLayout.LayoutParams(-1,dp(118)))
     val left=column().apply{gravity=Gravity.CENTER}
     line.addView(left,LinearLayout.LayoutParams(0,-2,0.30f))
     add(left,"FASE ATUAL",10f,bronze,true)
@@ -190,7 +195,7 @@ class MainActivity:Activity(){
      scaleType=ImageView.ScaleType.FIT_CENTER
      contentDescription=lunarNames[index]
     }
-    line.addView(moon,LinearLayout.LayoutParams(0,dp(125),0.40f))
+    line.addView(moon,LinearLayout.LayoutParams(0,dp(108),0.40f))
     val right=column().apply{gravity=Gravity.CENTER}
     line.addView(right,LinearLayout.LayoutParams(0,-2,0.29f))
     add(right,"PRÓXIMA FASE",10f,bronze,true)
@@ -199,7 +204,7 @@ class MainActivity:Activity(){
    }
   }
   if(tab==0||tab==1){
-   panel(root,9,"nurt_date"){p->
+   panel(root,6,"nurt_date"){p->
     title(p,"NURT KHUZDUL")
     add(p,if(day==null)"Fora da cobertura" else "${day.day} de ${day.monthName}",26f,cream,true)
     if(day!=null)add(p,day.meaning,14f,cream)
@@ -210,7 +215,7 @@ class MainActivity:Activity(){
     }
    }
    val info=horizontal()
-   root.addView(info,LinearLayout.LayoutParams(-1,-2).apply{bottomMargin=dp(10)})
+   root.addView(info,LinearLayout.LayoutParams(-1,-2).apply{bottomMargin=dp(6)})
    val a=column().apply{background=(if(themeIndex==0)artBackground("nurt_year") else null) ?: ForgedFrame(themeIndex);setPadding(dp(5),dp(11),dp(5),dp(11))}
    val b=column().apply{background=(if(themeIndex==0)artBackground("nurt_gregorian") else null) ?: ForgedFrame(themeIndex);setPadding(dp(8),dp(12),dp(8),dp(12))}
    info.addView(a,LinearLayout.LayoutParams(0,-2,1f).apply{marginEnd=dp(4)})
