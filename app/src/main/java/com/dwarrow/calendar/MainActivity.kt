@@ -185,7 +185,7 @@ class MainActivity:Activity(){
  private fun text(value:String,size:Float=16f,color:Int=cream,bold:Boolean=false):TextView=TextView(this).apply{
   text=value;textSize=size;setTextColor(color);gravity=Gravity.CENTER
   if(bold)setTypeface(null,android.graphics.Typeface.BOLD)
-  setPadding(dp(7),dp(6),dp(7),dp(6))
+  setPadding(dp(5),dp(3),dp(5),dp(3))
  }
  private fun column():LinearLayout=LinearLayout(this).apply{orientation=LinearLayout.VERTICAL;gravity=Gravity.CENTER_HORIZONTAL}
  private fun horizontal():LinearLayout=LinearLayout(this).apply{orientation=LinearLayout.HORIZONTAL;gravity=Gravity.CENTER_VERTICAL}
@@ -194,10 +194,10 @@ class MainActivity:Activity(){
   val id=resources.getIdentifier(name,"drawable",packageName)
   if(id==0)return null
   val bitmap=android.graphics.BitmapFactory.decodeResource(resources,id) ?: return null
-  return if(name=="nurt_header" || name=="nurt_lunar") ProportionalArt(bitmap) else AdaptiveStoneFrame(bitmap)
+  return if(name=="nurt_header") ProportionalArt(bitmap) else AdaptiveStoneFrame(bitmap)
  }
  private fun panel(root:LinearLayout,space:Int=12,art:String?=null,build:(LinearLayout)->Unit){
-  val c=column().apply{background=(if(themeIndex==0) art?.let{artBackground(it)} else null) ?: ForgedFrame(themeIndex);setPadding(dp(18),dp(16),dp(18),dp(16))}
+  val c=column().apply{background=(if(themeIndex==0) art?.let{artBackground(it)} else null) ?: ForgedFrame(themeIndex);setPadding(dp(15),dp(10),dp(15),dp(10))}
   root.addView(c,LinearLayout.LayoutParams(-1,-2).apply{bottomMargin=dp(space)})
   build(c)
  }
@@ -215,17 +215,17 @@ class MainActivity:Activity(){
   scroll.addView(root)
   outer.addView(scroll,LinearLayout.LayoutParams(-1,0,1f))
   panel(root,6,"nurt_header"){h->
-   h.minimumHeight=dp(92)
+   h.minimumHeight=dp(108)
    h.gravity=Gravity.CENTER
-   add(h,if(themeIndex==0)"NURTFAHANI" else names[themeIndex].uppercase(Locale.ROOT),24f,bronze,true)
-   add(h,"C A L E N D Á R I O   A N Ã O",11f,cream,true)
+   add(h,if(themeIndex==0)"NURTFAHANI" else names[themeIndex].uppercase(Locale.ROOT),21f,bronze,true)
+   add(h,"CALENDÁRIO ANÃO",11f,cream,true)
   }
   if(tab==0||tab==2){
    panel(root,6,"nurt_lunar"){p->
     val phase=lunarPhase(date)
     val index=phase.first
     val line=horizontal()
-    p.addView(line,LinearLayout.LayoutParams(-1,dp(118)))
+    p.addView(line,LinearLayout.LayoutParams(-1,dp(110)))
     val left=column().apply{gravity=Gravity.CENTER}
     line.addView(left,LinearLayout.LayoutParams(0,-2,0.30f))
     add(left,"FASE ATUAL",10f,bronze,true)
@@ -236,7 +236,7 @@ class MainActivity:Activity(){
      scaleType=ImageView.ScaleType.FIT_CENTER
      contentDescription=lunarNames[index]
     }
-    line.addView(moon,LinearLayout.LayoutParams(0,dp(108),0.40f))
+    line.addView(moon,LinearLayout.LayoutParams(0,dp(102),0.40f))
     val right=column().apply{gravity=Gravity.CENTER}
     line.addView(right,LinearLayout.LayoutParams(0,-2,0.29f))
     add(right,"PRÓXIMA FASE",10f,bronze,true)
@@ -246,11 +246,11 @@ class MainActivity:Activity(){
   }
   if(tab==0||tab==1){
    panel(root,6,"nurt_date"){p->
-    p.setPadding(dp(18),dp(16),dp(18),dp(16))
+    p.setPadding(dp(14),dp(9),dp(14),dp(9))
     title(p,"NURT KHUZDUL")
     add(p,if(day==null)"Fora da cobertura" else "${day.day} de ${day.monthName}",24f,cream,true)
     if(day!=null)add(p,day.meaning,13f,cream)
-    add(p,"─── ◈ ───",11f,bronze)
+    add(p,"── ◈ ──",10f,bronze)
     if(day!=null){
      add(p,day.weekday,18f,bronze,true)
      add(p,weekdayPortuguese(day.weekday),13f,cream)
