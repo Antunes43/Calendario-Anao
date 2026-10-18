@@ -101,6 +101,34 @@ class MainActivity:Activity(){
   val remaining=((index+0.5)*cycle/8.0-age+cycle)%cycle
   return Triple(index,kotlin.math.ceil(remaining).toInt().coerceAtLeast(1),age)
  }
+ private fun seasonArt(name:String):String?=when(name.substringBefore(" · ")){
+  "Iklaladrân"->"estacao_iklaladran"
+  "Shulukadrân"->"estacao_shulukadran"
+  "Kêlithadrân"->"estacao_kelithadran"
+  "’Arsadrân"->"estacao_arsadran"
+  "Dabladrân"->"estacao_dabladran"
+  "Injamadrân"->"estacao_injamadran"
+  else->null
+ }
+ private fun seasonPanel(root:LinearLayout,day:CalendarEngine.Day?){
+  panel(root,12){p->
+   title(p,"ESTAÇÃO ANÃ")
+   val season=day?.let{CalendarEngine.season(this,it)} ?: "—"
+   val row=horizontal()
+   p.addView(row,LinearLayout.LayoutParams(-1,-2))
+   val iconName=seasonArt(season)
+   val id=iconName?.let{resources.getIdentifier(it,"drawable",packageName)} ?: 0
+   if(id!=0){
+    val icon=ImageView(this).apply{setImageResource(id);scaleType=ImageView.ScaleType.FIT_CENTER;contentDescription=season}
+    row.addView(icon,LinearLayout.LayoutParams(dp(76),dp(76)).apply{marginEnd=dp(12)})
+   }
+   val parts=season.split(" · ",limit=2)
+   val labels=column().apply{gravity=Gravity.CENTER_VERTICAL}
+   row.addView(labels,LinearLayout.LayoutParams(0,-2,1f))
+   add(labels,parts[0],18f,bronze,true)
+   if(parts.size>1)add(labels,parts[1],14f,cream)
+  }
+ }
  private fun weekdayPortuguese(name:String):String=when(name){
   "Izgilnurt"->"segunda-feira"
   "Akhlathnurt"->"terça-feira"
@@ -196,9 +224,10 @@ class MainActivity:Activity(){
    listOf(Triple("◀ Anterior",1f,-1),Triple("Hoje",0.7f,0),Triple("Próximo ▶",1f,1)).forEach{(label,weight,delta)->
     row.addView(action(label){date=if(delta==0)LocalDate.now(ZoneId.systemDefault()) else date.plusDays(delta.toLong())},LinearLayout.LayoutParams(0,-2,weight).apply{marginEnd=dp(3)})
    }
-   panel(root){title(it,"ESTAÇÃO ANÃ");add(it,day?.let{d->CalendarEngine.season(this,d)}?:"—",17f)}
+   seasonPanel(root,day)
   }
   if(tab==0){
+   seasonPanel(root,day)
    panel(root,12,"nurt_events"){p->
     title(p,"EVENTOS E OBSERVÂNCIAS")
     val link=horizontal().apply{setPadding(dp(10),dp(10),dp(10),dp(10))}
