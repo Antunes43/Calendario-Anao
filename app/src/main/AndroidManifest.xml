@@ -3,7 +3,8 @@
 
     <application
         android:label="Calendário Anão"
-        android:icon="@drawable/app_emblem"
+        android:icon="@drawable/khazad_dum_icon_final"
+        android:roundIcon="@drawable/khazad_dum_icon_final"
         android:theme="@android:style/Theme.Material.NoActionBar"
         android:usesCleartextTraffic="false">
 
