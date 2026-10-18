@@ -326,7 +326,7 @@ class MainActivity:Activity(){
    val subtitle=text("CALENDÁRIO ANÃO",10f,cream,true).apply{includeFontPadding=false;setPadding(0,0,0,0)}
    subtitle.gravity=Gravity.CENTER
    heading.addView(subtitle,LinearLayout.LayoutParams(-1,-2).apply{topMargin=dp(3)})
-   header.addView(heading,FrameLayout.LayoutParams(-1,dp(42),Gravity.TOP or Gravity.CENTER_HORIZONTAL).apply{topMargin=dp(53)})
+   header.addView(heading,FrameLayout.LayoutParams(-1,dp(42),Gravity.TOP or Gravity.CENTER_HORIZONTAL).apply{topMargin=dp(46)})
    root.addView(header,LinearLayout.LayoutParams(-1,dp(106)).apply{bottomMargin=dp(6)})
   }else{
    panel(root,6){h->
@@ -375,47 +375,7 @@ class MainActivity:Activity(){
     lunarDivider(right)
     add(right,lunarNames[(index+1)%8],13f,cream,true)
     add(right,"≈ ${phase.second} dia(s)",11f,bronze)
-    // Nine approved gemstone assets: four preceding phases, current, four upcoming.
-    // Keep this strip in its own bounded area so its selection never touches the main ring.
-    val phaseStrip=LinearLayout(this).apply{
-     orientation=LinearLayout.HORIZONTAL
-     gravity=Gravity.CENTER_VERTICAL
-     setPadding(dp(5),dp(3),dp(5),dp(3))
-     background=android.graphics.drawable.GradientDrawable().apply{
-      setColor(0xff101216.toInt())
-      setStroke(dp(1),0xff805b35.toInt())
-      cornerRadius=dp(3).toFloat()
-     }
-    }
-    p.addView(phaseStrip,LinearLayout.LayoutParams(-1,dp(43)).apply{topMargin=dp(5)})
-    val stripPhases=(-4..4).map{offset -> Math.floorMod(index+offset, lunarImages.size)}
-    // A complete ordered eight-phase cycle plus one endpoint; never repeat adjacent indices.
-    check(stripPhases.zipWithNext().all{(a,b)->a!=b})
-    for((slot,phaseIndex) in stripPhases.withIndex()){
-     val offset=slot-4
-     val item=FrameLayout(this)
-     phaseStrip.addView(item,LinearLayout.LayoutParams(0,-1,1f))
-     if(offset==0){
-      item.background=android.graphics.drawable.GradientDrawable().apply{
-       setColor(0x183f2a14)
-       setStroke(dp(1),bronze)
-       cornerRadius=dp(3).toFloat()
-      }
-     }
-     val gemId=resources.getIdentifier(lunarImages[phaseIndex],"drawable",packageName)
-     item.addView(ImageView(this).apply{
-      if(gemId!=0)setImageResource(gemId) else setImageDrawable(KhazadMoon())
-      scaleType=ImageView.ScaleType.FIT_CENTER
-      adjustViewBounds=false
-      contentDescription=(if(offset==0)"Fase atual: " else if(offset<0)"Fase anterior: " else "Próxima fase: ")+lunarNames[phaseIndex]
-     },FrameLayout.LayoutParams(-1,-1).apply{
-      val inset=if(offset==0)dp(1) else dp(3)
-      setMargins(inset,inset,inset,inset)
-     })
-     if(offset==0){
-      item.addView(text("◆",8f,bronze,true).apply{gravity=Gravity.CENTER},FrameLayout.LayoutParams(-1,dp(11),Gravity.TOP or Gravity.CENTER_HORIZONTAL).apply{topMargin=dp(-2)})
-     }
-    }
+
    }
   }
   if(tab==0||tab==1){
