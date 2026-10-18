@@ -96,25 +96,24 @@ class MainActivity:Activity(){
   scroll.addView(root)
   outer.addView(scroll,LinearLayout.LayoutParams(-1,0,1f))
   panel(root,10,"nurt_header"){h->
-   
-   add(h,"◈ ━━━━━ ◈ ━━━━━ ◈",13f,bronze)
-   add(h,if(themeIndex==0)"NURTFAHANI" else names[themeIndex].uppercase(Locale.ROOT),22f,bronze,true)
+   h.minimumHeight=dp(132)
+   add(h,if(themeIndex==0)"NURTFAHANI" else names[themeIndex].uppercase(Locale.ROOT),24f,bronze,true)
    add(h,"C A L E N D Á R I O   A N Ã O",11f,cream,true)
-   add(h,"◆ ━━━━━━━━━━━━━ ◆",12f,bronze)
   }
   if(tab==0||tab==2){
    panel(root,10,"nurt_lunar"){p->
     val line=horizontal()
-    p.addView(line,LinearLayout.LayoutParams(-1,-2))
+    p.addView(line,LinearLayout.LayoutParams(-1,dp(145)))
+    val left=column().apply{gravity=Gravity.CENTER}
+    line.addView(left,LinearLayout.LayoutParams(0,-2,0.29f))
+    add(left,"FASE ATUAL",10f,bronze,true)
+    add(left,"Em validação",12f,cream)
     val moon=ImageView(this).apply{setImageDrawable(KhazadMoon());scaleType=ImageView.ScaleType.FIT_CENTER}
-    line.addView(moon,LinearLayout.LayoutParams(0,dp(154),0.46f))
-    val details=column().apply{gravity=Gravity.CENTER_VERTICAL}
-    line.addView(details,LinearLayout.LayoutParams(0,-2,0.54f))
-    add(details,"☽  ${day?.monthName?.uppercase(Locale.ROOT)?:"—"}",18f,bronze,true)
-    add(details,day?.meaning?:"Data fora da cobertura",13f,cream)
-    add(details,"━━━━━━━━━━━━",11f,bronze)
-    add(details,"Ciclo lunar",13f,cream,true)
-    add(details,"Fase e iluminação em validação",11f,0xffaaa59d.toInt())
+    line.addView(moon,LinearLayout.LayoutParams(0,dp(135),0.42f))
+    val right=column().apply{gravity=Gravity.CENTER}
+    line.addView(right,LinearLayout.LayoutParams(0,-2,0.29f))
+    add(right,"PRÓXIMA FASE",10f,bronze,true)
+    add(right,"Aguardando cálculo",11f,cream)
    }
   }
   if(tab==0||tab==1){
