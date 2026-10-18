@@ -351,11 +351,21 @@ class MainActivity:Activity(){
      contentDescription=lunarNames[index]
     }
     val lunarStack=FrameLayout(this)
-    val ring=View(this).apply{background=ForgedMoonRing()}
-    lunarStack.addView(ring,FrameLayout.LayoutParams(-1,-1))
+    // The approved ring is a transparent, independent image layered above the moon.
+    // FIT_CENTER keeps the forged ornaments square and undistorted.
     lunarStack.addView(moon,FrameLayout.LayoutParams(-1,-1).apply{
-     val inset=dp(12);setMargins(inset,inset,inset,inset)
+     val inset=dp(9);setMargins(inset,inset,inset,inset)
     })
+    val ringId=resources.getIdentifier("nurt_lunar_ring_gold","drawable",packageName)
+    if(ringId!=0){
+     lunarStack.addView(ImageView(this).apply{
+      setImageResource(ringId)
+      scaleType=ImageView.ScaleType.FIT_CENTER
+      contentDescription=null
+     },FrameLayout.LayoutParams(-1,-1))
+    }else{
+     lunarStack.addView(View(this).apply{background=ForgedMoonRing()},FrameLayout.LayoutParams(-1,-1))
+    }
     line.addView(lunarStack,LinearLayout.LayoutParams(0,dp(110),0.40f))
     val right=column().apply{gravity=Gravity.CENTER}
     line.addView(right,LinearLayout.LayoutParams(0,-2,0.29f))
