@@ -179,7 +179,6 @@ class MainActivity:Activity(){
     if(day!=null){
      add(p,day.weekday,20f,bronze,true)
      add(p,weekdayPortuguese(day.weekday),14f,cream)
-     add(p,"Dia ${day.day} de ${day.length} · Mês ${day.month}",12f,0xffc6b7a2.toInt())
     }
    }
    val info=horizontal()
