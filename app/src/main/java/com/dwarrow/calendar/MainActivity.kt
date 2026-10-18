@@ -122,21 +122,35 @@ private class AdaptiveLunarFrame(private val art:Bitmap):Drawable(){
    val dy=if(bottom==0)b.top.toFloat() else b.bottom-dstSize
    patch(sx,sy,sx+srcSize,sy+srcSize,dx,dy,dx+dstSize,dy+dstSize)
   }
-  // Central architectural ring is sampled as one piece with no seams.
-  val rx0=sw*.337f;val rx1=sw*.663f
-  val ringScale=kotlin.math.min(h/sh*.94f,w/(rx1-rx0)*.38f)
-  val rw=(rx1-rx0)*ringScale;val rh=sh*ringScale
-  val ringDst=RectF(b.centerX()-rw/2f,b.centerY()-rh/2f,b.centerX()+rw/2f,b.centerY()+rh/2f)
-  c.save()
-  val ringMask=Path().apply{addOval(RectF(ringDst.left+rw*.035f,ringDst.top+rh*.035f,ringDst.right-rw*.035f,ringDst.bottom-rh*.035f),Path.Direction.CW)}
-  c.clipPath(ringMask)
-  patch(rx0,0f,rx1,sh,ringDst.left,ringDst.top,ringDst.right,ringDst.bottom)
-  c.restore()
+  // The ring is drawn as a single concentric forged ornament. No bitmap patch,
+  // rectangular crop or clipping can leave a visible seam around the moon.
+  val cx=b.centerX().toFloat();val cy=b.centerY().toFloat()
+  val radius=kotlin.math.min(h*.445f,w*.205f)
+  p.style=Paint.Style.STROKE
+  p.strokeWidth=5f;p.color=0xff211c19.toInt()
+  c.drawCircle(cx,cy,radius,p)
+  p.strokeWidth=2.8f;p.color=0xffb6844e.toInt()
+  c.drawCircle(cx,cy,radius-3f,p)
+  p.strokeWidth=2f;p.color=0xff473327.toInt()
+  c.drawCircle(cx,cy,radius-8f,p)
+  p.strokeWidth=1.2f;p.color=0xffd0a46e.toInt()
+  c.drawCircle(cx,cy,radius-11f,p)
+  p.style=Paint.Style.FILL
+  for(angle in 0 until 360 step 90){
+   val rad=Math.toRadians(angle.toDouble())
+   val x=cx+kotlin.math.cos(rad).toFloat()*(radius-2f)
+   val y=cy+kotlin.math.sin(rad).toFloat()*(radius-2f)
+   val d=kotlin.math.min(10f,radius*.10f)
+   val diamond=Path().apply{moveTo(x,y-d);lineTo(x+d*.65f,y);lineTo(x,y+d);lineTo(x-d*.65f,y);close()}
+   p.color=0xff241c18.toInt();c.drawPath(diamond,p)
+   p.style=Paint.Style.STROKE;p.strokeWidth=1.5f;p.color=0xffc39155.toInt()
+   c.drawPath(diamond,p);p.style=Paint.Style.FILL
+  }
   // Thin side ornaments are vector strokes, so no bitmap fragments interrupt the stone.
   p.color=0xff956b40.toInt();p.strokeWidth=1.5f
   val leftStart=b.left+dstSize+12f
-  val leftEnd=b.centerX()-rw*.59f
-  val rightStart=b.centerX()+rw*.59f
+  val leftEnd=b.centerX()-radius-14f
+  val rightStart=b.centerX()+radius+14f
   val rightEnd=b.right-dstSize-12f
   val y=b.top+h*.72f
   if(leftEnd>leftStart)c.drawLine(leftStart,y,leftEnd,y,p)
@@ -215,17 +229,17 @@ class MainActivity:Activity(){
   panel(root,6,"nurt_events"){p->
    title(p,"ESTAÇÃO ANÃ")
    val season=day?.let{CalendarEngine.season(this,it)} ?: "—"
-   val row=horizontal()
+   val row=horizontal().apply{gravity=Gravity.CENTER}
    p.addView(row,LinearLayout.LayoutParams(-1,-2))
    val iconName=seasonArt(season)
    val id=iconName?.let{resources.getIdentifier(it,"drawable",packageName)} ?: 0
    if(id!=0){
     val icon=ImageView(this).apply{setImageResource(id);scaleType=ImageView.ScaleType.FIT_CENTER;contentDescription=season}
-    row.addView(icon,LinearLayout.LayoutParams(dp(106),dp(106)).apply{marginEnd=dp(10)})
+    row.addView(icon,LinearLayout.LayoutParams(dp(100),dp(100)).apply{marginEnd=dp(20)})
    }
    val parts=season.split(" · ",limit=2)
    val labels=column().apply{gravity=Gravity.CENTER_VERTICAL}
-   row.addView(labels,LinearLayout.LayoutParams(0,-2,1f))
+   row.addView(labels,LinearLayout.LayoutParams(-2,-2))
    add(labels,parts[0],21f,bronze,true)
    if(parts.size>1)add(labels,parts[1],16f,cream)
   }
@@ -286,16 +300,16 @@ class MainActivity:Activity(){
     header.addView(artwork,FrameLayout.LayoutParams(-1,-1))
    }
    val heading=column().apply{
-    gravity=Gravity.CENTER
-    setPadding(dp(12),dp(27),dp(12),dp(8))
+    gravity=Gravity.CENTER_HORIZONTAL or Gravity.BOTTOM
+    setPadding(dp(12),dp(8),dp(12),dp(14))
    }
-   val main=text("NURTFAHANI",20f,bronze,true)
+   val main=text("NURTFAHANI",18f,bronze,true)
    main.gravity=Gravity.CENTER
    heading.addView(main,LinearLayout.LayoutParams(-1,-2))
    val subtitle=text("CALENDÁRIO ANÃO",10f,cream,true)
    subtitle.gravity=Gravity.CENTER
    heading.addView(subtitle,LinearLayout.LayoutParams(-1,-2))
-   header.addView(heading,FrameLayout.LayoutParams(-1,-1,Gravity.CENTER))
+   header.addView(heading,FrameLayout.LayoutParams(-1,-1,Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL))
    root.addView(header,LinearLayout.LayoutParams(-1,dp(106)).apply{bottomMargin=dp(6)})
   }else{
    panel(root,6){h->
