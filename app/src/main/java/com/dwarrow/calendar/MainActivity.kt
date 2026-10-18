@@ -122,43 +122,52 @@ private class AdaptiveLunarFrame(private val art:Bitmap):Drawable(){
    val dy=if(bottom==0)b.top.toFloat() else b.bottom-dstSize
    patch(sx,sy,sx+srcSize,sy+srcSize,dx,dy,dx+dstSize,dy+dstSize)
   }
-  // Restore the original forged ring, clipped to its actual round silhouette.
-  // A feather-free oval crop removes the source's rectangular stone patch.
-  val cx=b.centerX().toFloat();val cy=b.centerY().toFloat()
-  val rx0=sw*.307f;val rx1=sw*.693f
-  val ringScale=kotlin.math.min(h/sh*.98f,w/(rx1-rx0)*.42f)
-  val rw=(rx1-rx0)*ringScale;val rh=sh*ringScale
-  val ringRect=RectF(cx-rw/2f,cy-rh/2f,cx+rw/2f,cy+rh/2f)
-  val radius=kotlin.math.min(rw,rh)*.50f
-  c.save()
-  val mask=Path().apply{addCircle(cx,cy,radius,Path.Direction.CW)}
-  c.clipPath(mask)
-  patch(rx0,0f,rx1,sh,ringRect.left,ringRect.top,ringRect.right,ringRect.bottom)
-  c.restore()
-  // Four separate forged diamonds reproduce the ring's outer anchor points.
-  p.style=Paint.Style.FILL
-  for(angle in 0 until 360 step 90){
-   val rad=Math.toRadians(angle.toDouble())
-   val x=cx+kotlin.math.cos(rad).toFloat()*(radius-3f)
-   val y=cy+kotlin.math.sin(rad).toFloat()*(radius-3f)
-   val d=10f
-   val diamond=Path().apply{moveTo(x,y-d);lineTo(x+d*.70f,y);lineTo(x,y+d);lineTo(x-d*.70f,y);close()}
-   p.color=0xff241b16.toInt();c.drawPath(diamond,p)
-   p.style=Paint.Style.STROKE;p.strokeWidth=1.5f;p.color=0xffd4a369.toInt()
-   c.drawPath(diamond,p);p.style=Paint.Style.FILL
-  }
-  // Thin side ornaments are vector strokes, so no bitmap fragments interrupt the stone.
-  p.color=0xff956b40.toInt();p.strokeWidth=1.5f
-  val leftStart=b.left+dstSize+12f
-  val leftEnd=b.centerX()-radius-14f
-  val rightStart=b.centerX()+radius+14f
-  val rightEnd=b.right-dstSize-12f
-  val y=b.top+h*.72f
-  // Separators are laid out between labels in the view hierarchy, not painted behind text.
+
  }
  override fun setAlpha(a:Int){p.alpha=a}
  override fun setColorFilter(f:android.graphics.ColorFilter?){p.colorFilter=f}
  @Deprecated("Deprecated in Java") override fun getOpacity():Int=PixelFormat.OPAQUE
+}
+// Independent ornamental ring: no sampled PNG, no background and no image stretching.
+private class ForgedMoonRing:Drawable(){
+ private val p=Paint(Paint.ANTI_ALIAS_FLAG)
+ override fun draw(c:Canvas){
+  val b=bounds;val cx=b.exactCenterX();val cy=b.exactCenterY()
+  val r=kotlin.math.min(b.width(),b.height())*.455f
+  if(r<=0f)return
+  val bands=listOf(Triple(0f,7f,0xff171719.toInt()),Triple(3f,4f,0xffb7844c.toInt()),
+   Triple(8f,3f,0xff393a3c.toInt()),Triple(12f,2f,0xffd5aa6d.toInt()),
+   Triple(16f,3f,0xff49301e.toInt()))
+  p.style=Paint.Style.STROKE
+  for((offset,stroke,color) in bands){p.strokeWidth=stroke;p.color=color;c.drawCircle(cx,cy,r-offset,p)}
+  // Forged radial scoring around the outer metal band.
+  for(i in 0 until 48){
+   val angle=Math.PI*2*i/48.0
+   val x1=cx+kotlin.math.cos(angle).toFloat()*(r-5f)
+   val y1=cy+kotlin.math.sin(angle).toFloat()*(r-5f)
+   val x2=cx+kotlin.math.cos(angle).toFloat()*(r-10f)
+   val y2=cy+kotlin.math.sin(angle).toFloat()*(r-10f)
+   p.color=if(i%4==0)0xffc69b60.toInt() else 0xff584633.toInt()
+   p.strokeWidth=if(i%4==0)1.8f else .9f
+   c.drawLine(x1,y1,x2,y2,p)
+  }
+  for(i in 0..3){
+   val angle=Math.PI*i/2.0-Math.PI/2
+   val x=cx+kotlin.math.cos(angle).toFloat()*r
+   val y=cy+kotlin.math.sin(angle).toFloat()*r
+   val d=r*.15f
+   val diamond=Path().apply{moveTo(x,y-d);lineTo(x+d*.78f,y);lineTo(x,y+d);lineTo(x-d*.78f,y);close()}
+   p.style=Paint.Style.FILL;p.color=0xff141719.toInt();c.drawPath(diamond,p)
+   p.style=Paint.Style.STROKE;p.strokeWidth=3f;p.color=0xffa57443.toInt();c.drawPath(diamond,p)
+   val inner=Path().apply{moveTo(x,y-d*.52f);lineTo(x+d*.40f,y);lineTo(x,y+d*.52f);lineTo(x-d*.40f,y);close()}
+   p.style=Paint.Style.FILL;p.color=0xff714b2c.toInt();c.drawPath(inner,p)
+   p.style=Paint.Style.STROKE;p.strokeWidth=1.2f;p.color=0xffe0b278.toInt();c.drawPath(inner,p)
+  }
+  p.style=Paint.Style.FILL
+ }
+ override fun setAlpha(alpha:Int){p.alpha=alpha}
+ override fun setColorFilter(filter:android.graphics.ColorFilter?){p.colorFilter=filter}
+ @Deprecated("Deprecated in Java") override fun getOpacity():Int=PixelFormat.TRANSLUCENT
 }
 // Content-first frame: the bitmap supplies only stone texture; borders are drawn at final view size.
 private class AdaptiveStoneFrame(private val stone:Bitmap?):Drawable(){
@@ -341,7 +350,13 @@ class MainActivity:Activity(){
      scaleType=ImageView.ScaleType.FIT_CENTER
      contentDescription=lunarNames[index]
     }
-    line.addView(moon,LinearLayout.LayoutParams(0,dp(102),0.40f))
+    val lunarStack=FrameLayout(this)
+    val ring=View(this).apply{background=ForgedMoonRing()}
+    lunarStack.addView(ring,FrameLayout.LayoutParams(-1,-1))
+    lunarStack.addView(moon,FrameLayout.LayoutParams(-1,-1).apply{
+     val inset=dp(12);setMargins(inset,inset,inset,inset)
+    })
+    line.addView(lunarStack,LinearLayout.LayoutParams(0,dp(110),0.40f))
     val right=column().apply{gravity=Gravity.CENTER}
     line.addView(right,LinearLayout.LayoutParams(0,-2,0.29f))
     add(right,"PRÓXIMA FASE",10f,bronze,true)
