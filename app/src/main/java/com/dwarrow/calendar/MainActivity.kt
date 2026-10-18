@@ -282,7 +282,7 @@ class MainActivity:Activity(){
    val header=FrameLayout(this)
    val id=resources.getIdentifier("nurt_header","drawable",packageName)
    if(id!=0){
-    val artwork=ImageView(this).apply{setImageResource(id);scaleType=ImageView.ScaleType.FIT_XY}
+    val artwork=ImageView(this).apply{setImageResource(id);scaleType=ImageView.ScaleType.FIT_CENTER}
     header.addView(artwork,FrameLayout.LayoutParams(-1,-1))
    }
    val heading=column().apply{
