@@ -10,6 +10,8 @@ import android.view.Gravity
 import android.view.View
 import android.widget.*
 import java.time.LocalDate
+import java.time.Instant
+import java.time.temporal.ChronoUnit
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Locale
@@ -66,6 +68,21 @@ class MainActivity:Activity(){
  private var themeIndex=0
  private var tab=0
  private var date=LocalDate.now()
+ private val lunarImages=arrayOf("lua_nova","lua_crescente","quarto_crescente","gibosa_crescente","lua_cheia","gibosa_minguante","quarto_minguante","lua_minguante")
+ private val lunarNames=arrayOf("Lua nova","Lua crescente","Quarto crescente","Gibosa crescente","Lua cheia","Gibosa minguante","Quarto minguante","Lua minguante")
+ // Approximate synodic cycle anchored at the 2000-01-06 18:14 UTC new moon.
+ // Intended as an indicative phase, not a precise astronomical ephemeris.
+ private fun lunarPhase(day:LocalDate):Triple<Int,Int,Double>{
+  val epoch=Instant.parse("2000-01-06T18:14:00Z")
+  val noon=day.atTime(12,0).atZone(ZoneId.systemDefault()).toInstant()
+  val elapsed=ChronoUnit.SECONDS.between(epoch,noon)/86400.0
+  val cycle=29.530588853
+  val age=((elapsed%cycle)+cycle)%cycle
+  val position=age/cycle*8.0
+  val index=kotlin.math.floor(position+0.5).toInt()%8
+  val remaining=((index+0.5)*cycle/8.0-age+cycle)%cycle
+  return Triple(index,kotlin.math.ceil(remaining).toInt().coerceAtLeast(1),age)
+ }
  private fun dp(n:Int)=(n*resources.displayMetrics.density+0.5f).toInt()
  override fun onCreate(savedInstanceState:Bundle?){super.onCreate(savedInstanceState);themeIndex=getPreferences(MODE_PRIVATE).getInt("theme",0).coerceIn(0,2);draw()}
  private fun text(value:String,size:Float=16f,color:Int=cream,bold:Boolean=false):TextView=TextView(this).apply{
@@ -102,18 +119,27 @@ class MainActivity:Activity(){
   }
   if(tab==0||tab==2){
    panel(root,10,"nurt_lunar"){p->
+    val phase=lunarPhase(date)
+    val index=phase.first
     val line=horizontal()
     p.addView(line,LinearLayout.LayoutParams(-1,dp(145)))
     val left=column().apply{gravity=Gravity.CENTER}
     line.addView(left,LinearLayout.LayoutParams(0,-2,0.29f))
     add(left,"FASE ATUAL",10f,bronze,true)
-    add(left,"Em validação",12f,cream)
-    val moon=ImageView(this).apply{setImageDrawable(KhazadMoon());scaleType=ImageView.ScaleType.FIT_CENTER}
+    add(left,lunarNames[index],12f,cream)
+    val imageId=resources.getIdentifier(lunarImages[index],"drawable",packageName)
+    val moon=ImageView(this).apply{
+     if(imageId!=0)setImageResource(imageId) else setImageDrawable(KhazadMoon())
+     scaleType=ImageView.ScaleType.FIT_CENTER
+     contentDescription=lunarNames[index]
+    }
     line.addView(moon,LinearLayout.LayoutParams(0,dp(135),0.42f))
     val right=column().apply{gravity=Gravity.CENTER}
     line.addView(right,LinearLayout.LayoutParams(0,-2,0.29f))
     add(right,"PRÓXIMA FASE",10f,bronze,true)
-    add(right,"Aguardando cálculo",11f,cream)
+    add(right,lunarNames[(index+1)%8],11f,cream)
+    add(right,"≈ ${phase.second} dia(s)",10f,bronze)
+    add(p,"Fases estimadas pelo ciclo sinódico médio",10f,0xffb4a18b.toInt())
    }
   }
   if(tab==0||tab==1){
