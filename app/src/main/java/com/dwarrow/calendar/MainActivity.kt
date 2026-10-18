@@ -314,9 +314,11 @@ class MainActivity:Activity(){
     val artwork=ImageView(this).apply{setImageResource(id);scaleType=ImageView.ScaleType.FIT_CENTER}
     header.addView(artwork,FrameLayout.LayoutParams(-1,-1))
    }
+   // Place text inside a fixed safe band, between the upper crest and lower trim.
+   // Never align it to the bottom of the artwork: font metrics vary by device.
    val heading=column().apply{
-    gravity=Gravity.CENTER_HORIZONTAL or Gravity.BOTTOM
-    setPadding(dp(12),dp(0),dp(12),dp(25))
+    gravity=Gravity.CENTER
+    setPadding(dp(12),0,dp(12),0)
    }
    val main=text("NURTFAHANI",17f,bronze,true).apply{includeFontPadding=false;setPadding(0,0,0,0)}
    main.gravity=Gravity.CENTER
@@ -324,7 +326,7 @@ class MainActivity:Activity(){
    val subtitle=text("CALENDÁRIO ANÃO",10f,cream,true).apply{includeFontPadding=false;setPadding(0,0,0,0)}
    subtitle.gravity=Gravity.CENTER
    heading.addView(subtitle,LinearLayout.LayoutParams(-1,-2).apply{topMargin=dp(3)})
-   header.addView(heading,FrameLayout.LayoutParams(-1,-1,Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL))
+   header.addView(heading,FrameLayout.LayoutParams(-1,dp(42),Gravity.TOP or Gravity.CENTER_HORIZONTAL).apply{topMargin=dp(53)})
    root.addView(header,LinearLayout.LayoutParams(-1,dp(106)).apply{bottomMargin=dp(6)})
   }else{
    panel(root,6){h->
@@ -386,16 +388,18 @@ class MainActivity:Activity(){
      }
     }
     p.addView(phaseStrip,LinearLayout.LayoutParams(-1,dp(43)).apply{topMargin=dp(5)})
-    for(offset in -4..4){
-     // The nine positions span eight named phases; the repeated phase is at opposite ends only.
-     val phaseIndex=((index+offset)%8+8)%8
+    val stripPhases=(-4..4).map{offset -> Math.floorMod(index+offset, lunarImages.size)}
+    // A complete ordered eight-phase cycle plus one endpoint; never repeat adjacent indices.
+    check(stripPhases.zipWithNext().all{(a,b)->a!=b})
+    for((slot,phaseIndex) in stripPhases.withIndex()){
+     val offset=slot-4
      val item=FrameLayout(this)
      phaseStrip.addView(item,LinearLayout.LayoutParams(0,-1,1f))
      if(offset==0){
       item.background=android.graphics.drawable.GradientDrawable().apply{
-       setColor(0x143f2a14)
-       setStroke(dp(1),0xff805b35.toInt())
-       cornerRadius=dp(2).toFloat()
+       setColor(0x183f2a14)
+       setStroke(dp(1),bronze)
+       cornerRadius=dp(3).toFloat()
       }
      }
      val gemId=resources.getIdentifier(lunarImages[phaseIndex],"drawable",packageName)
@@ -409,7 +413,7 @@ class MainActivity:Activity(){
       setMargins(inset,inset,inset,inset)
      })
      if(offset==0){
-      item.addView(text("◆",9f,bronze,true).apply{gravity=Gravity.CENTER},FrameLayout.LayoutParams(-1,dp(13),Gravity.TOP or Gravity.CENTER_HORIZONTAL).apply{topMargin=dp(-3)})
+      item.addView(text("◆",8f,bronze,true).apply{gravity=Gravity.CENTER},FrameLayout.LayoutParams(-1,dp(11),Gravity.TOP or Gravity.CENTER_HORIZONTAL).apply{topMargin=dp(-2)})
      }
     }
    }
