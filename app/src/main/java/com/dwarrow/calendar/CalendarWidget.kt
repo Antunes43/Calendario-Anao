@@ -47,7 +47,8 @@ abstract class BaseCalendarWidget(private val style:Int):AppWidgetProvider(){
    "Ibriznurt"->"domingo";else->""
   }
   for(id in ids){
-   val v=RemoteViews(context.packageName,R.layout.widget)
+   val layoutId=if(style==0)R.layout.widget_khazad else R.layout.widget
+   val v=RemoteViews(context.packageName,layoutId)
    val accent=when(style){1->0xffd2a47d.toInt();2->0xffdfc995.toInt();else->0xffd8a35f.toInt()}
    v.setTextColor(R.id.widgetDate,accent)
    v.setTextColor(R.id.widgetWeekKh,accent)
