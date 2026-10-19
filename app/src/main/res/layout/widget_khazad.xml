@@ -42,7 +42,7 @@
    android:gravity="center" android:maxLines="1" android:singleLine="true" android:textSize="11sp" android:textColor="#D0C2AE"/>
  </LinearLayout>
  <LinearLayout android:layout_width="0dp" android:layout_weight="1" android:layout_height="match_parent"
-  android:orientation="vertical" android:gravity="center" android:translationX="11dp" android:paddingLeft="2dp" android:paddingRight="2dp">
+  android:orientation="vertical" android:gravity="center" android:translationX="5dp" android:paddingLeft="2dp" android:paddingRight="2dp">
   <ImageView android:id="@+id/widgetSeasonIcon" android:layout_width="86dp" android:layout_height="86dp" android:translationY="-14dp" android:scaleType="fitCenter" android:contentDescription="Estação anã"/>
   <TextView android:id="@+id/widgetSeasonPt" android:layout_width="match_parent" android:layout_height="wrap_content"
    android:gravity="center" android:maxLines="1" android:layout_marginTop="5dp" android:textSize="16sp" android:textStyle="bold" android:textColor="#D8A35F"/>
