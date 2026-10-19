@@ -19,44 +19,6 @@ abstract class BaseCalendarWidget(private val style:Int):AppWidgetProvider(){
    update(context,mgr,mgr.getAppWidgetIds(ComponentName(context,javaClass)))
   }
  }
- // Draw a responsive frame. No bitmap corners or source interior are stretched.
- // The source is retained only as four ornamental corner cutouts.
- private fun widgetFrame(context:Context,width:Int,height:Int):android.graphics.Bitmap{
-  val output=android.graphics.Bitmap.createBitmap(width,height,android.graphics.Bitmap.Config.ARGB_8888)
-  val canvas=android.graphics.Canvas(output)
-  val paint=android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG or android.graphics.Paint.FILTER_BITMAP_FLAG)
-  val accent=when(style){1->0xff9b7759.toInt();2->0xffb8a071.toInt();else->0xffbb8447.toInt()}
-  canvas.drawColor(0xff0b0d10.toInt())
-  paint.color=0xff11151a.toInt()
-  canvas.drawRoundRect(3f,3f,width-3f,height-3f,12f,12f,paint)
-  paint.style=android.graphics.Paint.Style.STROKE
-  paint.strokeWidth=2f
-  paint.color=accent
-  canvas.drawRoundRect(5f,5f,width-5f,height-5f,11f,11f,paint)
-  paint.strokeWidth=1f
-  paint.color=0xff4a382b.toInt()
-  canvas.drawRoundRect(10f,10f,width-10f,height-10f,9f,9f,paint)
-  paint.style=android.graphics.Paint.Style.FILL
-  // A small fixed-size corner ornament is never rescaled to the widget height.
-  val source=android.graphics.BitmapFactory.decodeResource(context.resources,R.drawable.widget_nurtfahani_moldura_aprovada)
-  val srcSize=(source.width*0.105f).toInt().coerceAtMost(source.height/4)
-  val corner=(kotlin.math.min(width,height)*0.11f).toInt().coerceIn(15,35)
-  val srcRects=arrayOf(
-   android.graphics.Rect(0,0,srcSize,srcSize),
-   android.graphics.Rect(source.width-srcSize,0,source.width,srcSize),
-   android.graphics.Rect(0,source.height-srcSize,srcSize,source.height),
-   android.graphics.Rect(source.width-srcSize,source.height-srcSize,source.width,source.height)
-  )
-  val dstRects=arrayOf(
-   android.graphics.Rect(0,0,corner,corner),
-   android.graphics.Rect(width-corner,0,width,corner),
-   android.graphics.Rect(0,height-corner,corner,height),
-   android.graphics.Rect(width-corner,height-corner,width,height)
-  )
-  for(i in 0..3)canvas.drawBitmap(source,srcRects[i],dstRects[i],paint)
-  source.recycle()
-  return output
- }
  override fun onAppWidgetOptionsChanged(context:Context,manager:AppWidgetManager,appWidgetId:Int,newOptions:android.os.Bundle){
   super.onAppWidgetOptionsChanged(context,manager,appWidgetId,newOptions)
   update(context,manager,intArrayOf(appWidgetId))
@@ -91,10 +53,12 @@ abstract class BaseCalendarWidget(private val style:Int):AppWidgetProvider(){
    v.setTextColor(R.id.widgetWeekKh,accent)
    v.setTextColor(R.id.widgetSeasonPt,accent)
 
-   val options=manager.getAppWidgetOptions(id)
-   val w=options.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH,320).coerceIn(180,600)
-   val h=options.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT,190).coerceIn(100,440)
-   v.setImageViewBitmap(R.id.widgetFrame,widgetFrame(context,480,(480f*h/w).toInt().coerceIn(150,900)))
+   val background=when(style){
+    1->R.drawable.widget_dornogal
+    2->R.drawable.widget_dwarrow_scholar
+    else->R.drawable.widget_khazad_dum
+   }
+   v.setImageViewResource(R.id.widgetFrame,background)
    v.setImageViewResource(R.id.widgetMoon,images[phase])
    val phaseViews=intArrayOf(R.id.widgetPhase0,R.id.widgetPhase1,R.id.widgetPhase2,R.id.widgetPhase3,R.id.widgetPhase4,R.id.widgetPhase5,R.id.widgetPhase6,R.id.widgetPhase7)
    for(i in phaseViews.indices)v.setInt(phaseViews[i],"setImageAlpha",if(i==phase)255 else 85)
