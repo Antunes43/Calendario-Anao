@@ -7,7 +7,7 @@
  android:paddingLeft="24dp" android:paddingRight="24dp" android:paddingTop="22dp" android:paddingBottom="28dp">
  <LinearLayout android:layout_width="0dp" android:layout_weight="1" android:layout_height="match_parent"
   android:orientation="vertical" android:gravity="center" android:paddingLeft="3dp" android:paddingRight="7dp">
-  <ImageView android:id="@+id/widgetMoon" android:layout_width="74dp" android:layout_height="74dp" android:scaleType="fitCenter" android:contentDescription="Fase lunar"/>
+  <ImageView android:id="@+id/widgetMoon" android:layout_width="match_parent" android:layout_height="112dp" android:scaleType="fitCenter" android:contentDescription="Fase lunar"/>
   <TextView android:id="@+id/widgetMoonLabel" android:layout_width="match_parent" android:layout_height="wrap_content"
    android:gravity="center" android:maxLines="2" android:layout_marginTop="4dp" android:textSize="10sp" android:textStyle="bold" android:textColor="#F3E8D7"/>
   <TextView android:id="@+id/widgetMoonKh" android:layout_width="match_parent" android:layout_height="wrap_content"
