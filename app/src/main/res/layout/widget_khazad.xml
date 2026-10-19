@@ -4,10 +4,10 @@
  <ImageView android:id="@+id/widgetFrame" android:layout_width="match_parent" android:layout_height="match_parent" android:scaleType="fitXY" android:contentDescription="Moldura NURTFAHANI"/>
  <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent"
  android:orientation="horizontal" android:gravity="center_vertical"
- android:paddingLeft="24dp" android:paddingRight="24dp" android:paddingTop="22dp" android:paddingBottom="28dp">
+ android:paddingLeft="17dp" android:paddingRight="17dp" android:paddingTop="22dp" android:paddingBottom="28dp">
  <LinearLayout android:layout_width="0dp" android:layout_weight="1" android:layout_height="match_parent"
-  android:orientation="vertical" android:gravity="center" android:paddingLeft="3dp" android:paddingRight="7dp">
-  <ImageView android:id="@+id/widgetMoon" android:layout_width="match_parent" android:layout_height="112dp" android:scaleType="fitCenter" android:contentDescription="Fase lunar"/>
+  android:orientation="vertical" android:gravity="center" android:paddingLeft="2dp" android:paddingRight="2dp">
+  <ImageView android:id="@+id/widgetMoon" android:layout_width="match_parent" android:layout_height="150dp" android:scaleType="fitCenter" android:contentDescription="Fase lunar"/>
   <TextView android:id="@+id/widgetMoonLabel" android:layout_width="match_parent" android:layout_height="wrap_content"
    android:gravity="center" android:maxLines="2" android:layout_marginTop="4dp" android:textSize="10sp" android:textStyle="bold" android:textColor="#F3E8D7"/>
   <TextView android:id="@+id/widgetMoonKh" android:layout_width="match_parent" android:layout_height="wrap_content"
@@ -25,7 +25,7 @@
   </LinearLayout>
  </LinearLayout>
  <LinearLayout android:layout_width="0dp" android:layout_weight="1" android:layout_height="match_parent"
-  android:orientation="vertical" android:gravity="center_horizontal" android:paddingLeft="9dp" android:paddingRight="8dp">
+  android:orientation="vertical" android:gravity="center_horizontal" android:paddingLeft="3dp" android:paddingRight="3dp">
   <TextView android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:text=""/>
   <TextView android:id="@+id/widgetDate" android:layout_width="match_parent" android:layout_height="wrap_content"
    android:gravity="center" android:maxLines="2" android:textSize="15sp" android:textStyle="bold" android:textColor="#F5E7CA"/>
@@ -42,7 +42,7 @@
    android:gravity="center" android:maxLines="1" android:singleLine="true" android:textSize="8sp" android:textColor="#D0C2AE"/>
  </LinearLayout>
  <LinearLayout android:layout_width="0dp" android:layout_weight="1" android:layout_height="match_parent"
-  android:orientation="vertical" android:gravity="center" android:paddingLeft="8dp" android:paddingRight="3dp">
+  android:orientation="vertical" android:gravity="center" android:paddingLeft="2dp" android:paddingRight="2dp">
   <ImageView android:id="@+id/widgetSeasonIcon" android:layout_width="78dp" android:layout_height="78dp" android:scaleType="fitCenter" android:contentDescription="Estação anã"/>
   <TextView android:id="@+id/widgetSeasonPt" android:layout_width="match_parent" android:layout_height="wrap_content"
    android:gravity="center" android:maxLines="1" android:layout_marginTop="8dp" android:textSize="11sp" android:textStyle="bold" android:textColor="#D8A35F"/>
