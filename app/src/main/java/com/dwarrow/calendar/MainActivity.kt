@@ -501,21 +501,32 @@ class MainActivity:Activity(){
      setPadding(0,dp(2),0,dp(2))
     },LinearLayout.LayoutParams(-1,-2))
    }
-   fun ornament(o:ObservanceEngine.Occurrence):TextView{
-    val name=o.entry.optString("pt").lowercase(Locale.ROOT)
-    val symbol=when{
-     "colheita" in name->"✦"
-     "inverno" in name->"❄"
-     "queimados" in name->"⚔"
-     "forja" in name->"⚒"
-     "primavera" in name->"❀"
-     else->"◆"
-    }
-    return text(symbol,29f,bronze,true).apply{
-     gravity=Gravity.CENTER
+   fun ornament(o:ObservanceEngine.Occurrence):View{
+    // Reserved portrait artwork slot: keep this aspect ratio for future event illustrations.
+    return View(this).apply{
      background=ForgedFrame(themeIndex)
+     contentDescription="Espaço reservado para a ilustração de "+o.entry.optString("name")
     }
    }
+   fun eventBadge(o:ObservanceEngine.Occurrence):TextView{
+    val value=displayStatus(o)
+    val fill=when(value){
+     "ATIVO"->0xff8b5008.toInt()
+     "PRÓXIMO"->0xff164a70.toInt()
+     "FUTURO"->0xff222e39.toInt()
+     else->0xff292b30.toInt()
+    }
+    return text(value,10f,if(value=="ATIVO")0xffffd18d.toInt() else cream,true).apply{
+     background=android.graphics.drawable.GradientDrawable().apply{
+      setColor(fill);setCornerRadius(dp(5).toFloat())
+      setStroke(dp(1),if(value=="ATIVO")0xffd99a42.toInt() else 0xff6b7882.toInt())
+     }
+     setPadding(dp(8),dp(5),dp(8),dp(5))
+    }
+   }
+   val nextDate=all.filter{it.start.isAfter(date)}.minOfOrNull{it.start}
+   fun displayStatus(o:ObservanceEngine.Occurrence):String =
+    if(!active(o)&&nextDate!=null&&o.start==nextDate)"PRÓXIMO" else status(o)
    val selected=all.firstOrNull{it.entry.optString("id")==selectedEventId}
    if(selected!=null){
     panel(root,8){p->
@@ -531,7 +542,7 @@ class MainActivity:Activity(){
      card.addView(hero,LinearLayout.LayoutParams(-1,dp(155)).apply{bottomMargin=dp(16)})
      line(card,selected.entry.optString("name"),23f,bronze,true)
      line(card,selected.entry.optString("pt"),17f,cream)
-     line(card,status(selected)+"  ·  "+selected.start.format(fmt)+" – "+selected.end.format(fmt),12f,bronze,true)
+     line(card,displayStatus(selected)+"  ·  "+selected.start.format(fmt)+" – "+selected.end.format(fmt),12f,bronze,true)
      lunarDivider(card)
      line(card,"RESUMO",13f,bronze,true)
      line(card,selected.entry.optString("descriptionShort"),15f,cream)
@@ -564,9 +575,7 @@ class MainActivity:Activity(){
        maxLines=2
       }
       top.addView(name,LinearLayout.LayoutParams(0,-2,1f))
-      val badge=text(status(o),10f,if(active(o))0xffffc879.toInt() else cream,true).apply{
-       setPadding(dp(5),dp(4),dp(5),dp(4))
-      }
+      val badge=eventBadge(o)
       top.addView(badge)
       info.addView(top)
       line(info,o.entry.optString("pt"),13f,bronze)
