@@ -421,7 +421,7 @@ class MainActivity:Activity(){
 
    }
   }
-  if(tab==0||tab==1){
+  if(tab==0){
    panel(root,6,"nurt_date"){p->
     p.setPadding(dp(14),dp(9),dp(14),dp(9))
     val khuzTitle=text("✦  NURT KHUZDUL  ✦",13f,bronze,true).apply{gravity=Gravity.CENTER}
@@ -454,20 +454,21 @@ class MainActivity:Activity(){
    val info=CalendarEngine.lookup(this,date)
    val month=if(info==null)null else CalendarEngine.monthsForYear(this,info.drYear).firstOrNull{!date.isBefore(it.start)&&!date.isAfter(it.end)}
    if(month!=null){
-    panel(root){p->
+    val navPanel=column().apply{gravity=Gravity.CENTER}
+    run{val p=navPanel
      val nav=horizontal()
-     nav.addView(action("‹"){date=month.start.minusDays(1);draw()},LinearLayout.LayoutParams(0,-2,1f))
+     nav.addView(text("‹ Voltar",13f,bronze,true).apply{gravity=Gravity.CENTER;setOnClickListener{date=month.start.minusDays(1);draw()}},LinearLayout.LayoutParams(0,-2,1f))
      nav.addView(text(month.name,20f,bronze,true).apply{gravity=Gravity.CENTER},LinearLayout.LayoutParams(0,-2,3f))
-     nav.addView(action("›"){date=month.end.plusDays(1);draw()},LinearLayout.LayoutParams(0,-2,1f))
+     nav.addView(text("Próximo ›",13f,bronze,true).apply{gravity=Gravity.CENTER;setOnClickListener{date=month.end.plusDays(1);draw()}},LinearLayout.LayoutParams(0,-2,1f))
      p.addView(nav)
      add(p,"Mês "+month.number+" · D.R. "+info!!.drYear,13f,cream)
     }
-    panel(root,8,"nurt_events"){p->
-     p.addView(View(this).apply{background=ForgedFrame(themeIndex)},LinearLayout.LayoutParams(-1,dp(155)))
-     add(p,month.start.toString()+" – "+month.end.toString(),13f,cream)
-    }
-    panel(root){p->
-     title(p,"DIAS DO MÊS")
+    root.addView(navPanel,LinearLayout.LayoutParams(-1,-2).apply{bottomMargin=dp(8)})
+    val artwork=View(this).apply{background=ForgedFrame(themeIndex)}
+    root.addView(artwork,LinearLayout.LayoutParams(-1,dp(155)).apply{bottomMargin=dp(5)})
+    val range=text(month.start.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))+" – "+month.end.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")),12f,cream).apply{gravity=Gravity.CENTER}
+    root.addView(range,LinearLayout.LayoutParams(-1,-2).apply{bottomMargin=dp(10)})
+    run{val p=root
      val labels=horizontal()
      listOf("SEG","TER","QUA","QUI","SEX","SÁB","DOM").forEach{n->
       labels.addView(text(n,10f,bronze,true).apply{gravity=Gravity.CENTER},LinearLayout.LayoutParams(0,dp(28),1f))
@@ -481,9 +482,9 @@ class MainActivity:Activity(){
        val on=if(n in 1..month.length)month.start.plusDays((n-1).toLong()) else null
        val selected=on==date
        val marked=on!=null&&ObservanceEngine.active(this,on).isNotEmpty()
-       val cell=text(if(on==null)" " else n.toString()+(if(marked)" •" else ""),13f,if(selected)bronze else cream,selected).apply{
+       val cell=text(if(on==null)" " else n.toString()+(if(marked)" •" else ""),13f,if(selected)0xffffd18d.toInt() else cream,selected).apply{
         gravity=Gravity.CENTER
-        background=ForgedFrame(themeIndex)
+        background=android.graphics.drawable.GradientDrawable().apply{setColor(if(selected)0xff65401d.toInt() else 0xff131820.toInt());setStroke(dp(1),if(selected)bronze else 0xff674b30.toInt())}
         if(on!=null)setOnClickListener{date=on;draw()}
        }
        row.addView(cell,LinearLayout.LayoutParams(0,dp(42),1f).apply{setMargins(dp(2),dp(2),dp(2),dp(2))})
@@ -491,7 +492,8 @@ class MainActivity:Activity(){
       p.addView(row)
      }
     }
-    panel(root,8,"nurt_events"){p->
+    root.addView(View(this).apply{setBackgroundColor(bronze)},LinearLayout.LayoutParams(-1,dp(1)).apply{topMargin=dp(14);bottomMargin=dp(9)})
+    run{val p=root
      title(p,"EVENTOS DO MÊS")
      val events=ArrayList<ObservanceEngine.Occurrence>()
      val seen=HashSet<String>()
@@ -508,7 +510,7 @@ class MainActivity:Activity(){
       val details=column()
       details.addView(text(o.entry.optString("name"),14f,bronze,true))
       details.addView(text(o.entry.optString("pt"),12f,cream))
-      details.addView(text(o.start.toString()+" – "+o.end.toString(),11f,cream))
+      details.addView(text(o.start.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))+" – "+o.end.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")),11f,cream))
       item.addView(details,LinearLayout.LayoutParams(0,-2,1f))
       item.addView(text("›",20f,bronze,true))
       item.setOnClickListener{selectedEventId=o.entry.optString("id");tab=3;draw()}
