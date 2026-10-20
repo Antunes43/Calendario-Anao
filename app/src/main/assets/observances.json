@@ -13,7 +13,49 @@
     "clan": "",
     "titleEn": "Winter Fest (Yule Fest)",
     "descriptionShort": "A winter festival spanning the latter part of 'afdush and the opening part of 'afiglêb.",
-    "descriptionLong": ""
+    "descriptionLong": "",
+    "id": "iklaladranamrag",
+    "active": true,
+    "sortOrder": 10,
+    "recurrence": {
+      "type": "annual",
+      "oneTimeDrYear": null,
+      "intervalYears": null,
+      "intervalAnchorDrYear": null,
+      "specificDrYears": []
+    },
+    "yearRules": {
+      "month12": {
+        "start": {
+          "month": 2,
+          "dayRule": "specific_day",
+          "day": 20
+        },
+        "end": {
+          "month": 3,
+          "dayRule": "specific_day",
+          "day": 18
+        },
+        "endYearOffset": 0
+      },
+      "month13": {
+        "start": {
+          "month": 2,
+          "dayRule": "specific_day",
+          "day": 20
+        },
+        "end": {
+          "month": 3,
+          "dayRule": "specific_day",
+          "day": 18
+        },
+        "endYearOffset": 0
+      }
+    },
+    "clanScope": {
+      "mode": "all",
+      "clans": []
+    }
   },
   {
     "name": "Nurtu Mamahrân",
@@ -29,7 +71,49 @@
     "clan": "",
     "titleEn": "Day of the Burned",
     "descriptionShort": "A sober day of remembrance for those who died at the Battle of Azanulbizar.",
-    "descriptionLong": "Held on the 27th of 'afdush. Feasts are not traditionally held and songs are not sung. Dwarves spend the day with family and friends, telling tales and remembering the dead of the Battle of Azanulbizar."
+    "descriptionLong": "Held on the 27th of 'afdush. Feasts are not traditionally held and songs are not sung. Dwarves spend the day with family and friends, telling tales and remembering the dead of the Battle of Azanulbizar.",
+    "id": "nurtu_mamahran",
+    "active": true,
+    "sortOrder": 20,
+    "recurrence": {
+      "type": "annual",
+      "oneTimeDrYear": null,
+      "intervalYears": null,
+      "intervalAnchorDrYear": null,
+      "specificDrYears": []
+    },
+    "yearRules": {
+      "month12": {
+        "start": {
+          "month": 2,
+          "dayRule": "specific_day",
+          "day": 27
+        },
+        "end": {
+          "month": 2,
+          "dayRule": "specific_day",
+          "day": 27
+        },
+        "endYearOffset": 0
+      },
+      "month13": {
+        "start": {
+          "month": 2,
+          "dayRule": "specific_day",
+          "day": 27
+        },
+        "end": {
+          "month": 2,
+          "dayRule": "specific_day",
+          "day": 27
+        },
+        "endYearOffset": 0
+      }
+    },
+    "clanScope": {
+      "mode": "all",
+      "clans": []
+    }
   },
   {
     "name": "Khebabnurtamrâg",
@@ -45,7 +129,49 @@
     "clan": "",
     "titleEn": "Forge Day Fest",
     "descriptionShort": "A feast sacred to smiths, marked by forging a great work in honour of Mahal.",
-    "descriptionLong": "Held on the 19th of 'afnu'khazâd. Forge Day traditionally marks the end of winter in many northern Halls. Smiths create an exceptional work for the occasion, followed in many communities by a heavy feast with dark bread, mutton, mushrooms and black ales. Works are displayed and the most highly praised creation may be gifted to the Lord of the Hall."
+    "descriptionLong": "Held on the 19th of 'afnu'khazâd. Forge Day traditionally marks the end of winter in many northern Halls. Smiths create an exceptional work for the occasion, followed in many communities by a heavy feast with dark bread, mutton, mushrooms and black ales. Works are displayed and the most highly praised creation may be gifted to the Lord of the Hall.",
+    "id": "khebabnurtamrag",
+    "active": true,
+    "sortOrder": 30,
+    "recurrence": {
+      "type": "annual",
+      "oneTimeDrYear": null,
+      "intervalYears": null,
+      "intervalAnchorDrYear": null,
+      "specificDrYears": []
+    },
+    "yearRules": {
+      "month12": {
+        "start": {
+          "month": 4,
+          "dayRule": "specific_day",
+          "day": 19
+        },
+        "end": {
+          "month": 4,
+          "dayRule": "specific_day",
+          "day": 19
+        },
+        "endYearOffset": 0
+      },
+      "month13": {
+        "start": {
+          "month": 4,
+          "dayRule": "specific_day",
+          "day": 19
+        },
+        "end": {
+          "month": 4,
+          "dayRule": "specific_day",
+          "day": 19
+        },
+        "endYearOffset": 0
+      }
+    },
+    "clanScope": {
+      "mode": "all",
+      "clans": []
+    }
   },
   {
     "name": "Mamahduldanakhamrâg",
@@ -61,7 +187,49 @@
     "clan": "",
     "titleEn": "Blessed Green Fest (Spring Fest)",
     "descriptionShort": "A spring festival associated with the first cutting of spring barley and the carrying of a fresh barley straw.",
-    "descriptionLong": "Begins on the 1st of 'af-mahd-danakh and ends on the 20th. The opening day traditionally marks the cutting of spring barley. A fresh straw of barley is carried for good fortune, a custom linked in Dwarven tradition with Kaminzabdûna. The final day is associated with the Broken Bone Race between Thorin's Halls and Needlehole."
+    "descriptionLong": "Begins on the 1st of 'af-mahd-danakh and ends on the 20th. The opening day traditionally marks the cutting of spring barley. A fresh straw of barley is carried for good fortune, a custom linked in Dwarven tradition with Kaminzabdûna. The final day is associated with the Broken Bone Race between Thorin's Halls and Needlehole.",
+    "id": "mamahduldanakhamrag",
+    "active": true,
+    "sortOrder": 40,
+    "recurrence": {
+      "type": "annual",
+      "oneTimeDrYear": null,
+      "intervalYears": null,
+      "intervalAnchorDrYear": null,
+      "specificDrYears": []
+    },
+    "yearRules": {
+      "month12": {
+        "start": {
+          "month": 6,
+          "dayRule": "specific_day",
+          "day": 1
+        },
+        "end": {
+          "month": 6,
+          "dayRule": "specific_day",
+          "day": 20
+        },
+        "endYearOffset": 0
+      },
+      "month13": {
+        "start": {
+          "month": 6,
+          "dayRule": "specific_day",
+          "day": 1
+        },
+        "end": {
+          "month": 6,
+          "dayRule": "specific_day",
+          "day": 20
+        },
+        "endYearOffset": 0
+      }
+    },
+    "clanScope": {
+      "mode": "all",
+      "clans": []
+    }
   },
   {
     "name": "Gargbuzrâmrâg",
@@ -77,7 +245,49 @@
     "clan": "",
     "titleEn": "Harnkegger Fest (Deep Ale Fest)",
     "descriptionShort": "A festival of ale, food, games and merriment following a period of hard work.",
-    "descriptionLong": "Begins on the 9th of 'afgargablâg and ends on the 19th. The feast is named for the ceremonial Harnkegger, a Dwarf honoured for conspicuous hard work, who taps and samples the first barrel of summer ale. The festival features drinking, feasting, games and awards for the best ale. It originated in Ered Luin and was later adopted more widely."
+    "descriptionLong": "Begins on the 9th of 'afgargablâg and ends on the 19th. The feast is named for the ceremonial Harnkegger, a Dwarf honoured for conspicuous hard work, who taps and samples the first barrel of summer ale. The festival features drinking, feasting, games and awards for the best ale. It originated in Ered Luin and was later adopted more widely.",
+    "id": "gargbuzramrag",
+    "active": true,
+    "sortOrder": 50,
+    "recurrence": {
+      "type": "annual",
+      "oneTimeDrYear": null,
+      "intervalYears": null,
+      "intervalAnchorDrYear": null,
+      "specificDrYears": []
+    },
+    "yearRules": {
+      "month12": {
+        "start": {
+          "month": 8,
+          "dayRule": "specific_day",
+          "day": 9
+        },
+        "end": {
+          "month": 8,
+          "dayRule": "specific_day",
+          "day": 19
+        },
+        "endYearOffset": 0
+      },
+      "month13": {
+        "start": {
+          "month": 8,
+          "dayRule": "specific_day",
+          "day": 9
+        },
+        "end": {
+          "month": 8,
+          "dayRule": "specific_day",
+          "day": 19
+        },
+        "endYearOffset": 0
+      }
+    },
+    "clanScope": {
+      "mode": "all",
+      "clans": []
+    }
   },
   {
     "name": "Galkhabsatamrâg",
@@ -93,7 +303,49 @@
     "clan": "",
     "titleEn": "Feast of Good Health (Summer Fest)",
     "descriptionShort": "A summer festival celebrating a period of plenty in food and ale.",
-    "descriptionLong": ""
+    "descriptionLong": "",
+    "id": "galkhabsatamrag",
+    "active": true,
+    "sortOrder": 60,
+    "recurrence": {
+      "type": "annual",
+      "oneTimeDrYear": null,
+      "intervalYears": null,
+      "intervalAnchorDrYear": null,
+      "specificDrYears": []
+    },
+    "yearRules": {
+      "month12": {
+        "start": {
+          "month": 9,
+          "dayRule": "specific_day",
+          "day": 3
+        },
+        "end": {
+          "month": 9,
+          "dayRule": "specific_day",
+          "day": 23
+        },
+        "endYearOffset": 0
+      },
+      "month13": {
+        "start": {
+          "month": 9,
+          "dayRule": "specific_day",
+          "day": 3
+        },
+        "end": {
+          "month": 9,
+          "dayRule": "specific_day",
+          "day": 23
+        },
+        "endYearOffset": 0
+      }
+    },
+    "clanScope": {
+      "mode": "all",
+      "clans": []
+    }
   },
   {
     "name": "Zudraibrizamrâg",
@@ -109,7 +361,51 @@
     "clan": "Firebeards",
     "titleEn": "Firebeard Midsummer Fest (High Sun Feast)",
     "descriptionShort": "A Firebeard midsummer gathering of the Seven Houses, traditionally held at Tumunzahar.",
-    "descriptionLong": "Begins on the 19th of 'afgalkhabsât and ends on the 23rd. The Kings of the other Houses are traditionally invited with their followers, crafters and traders. The celebration includes Nurtu Galabi (Day of Words), Nurtu Asjâr (Day of Trade), Nurtu Finit (Wide Day) and Nurtu Zarkh (Spire Day), ending on a more solemn note of thanksgiving."
+    "descriptionLong": "Begins on the 19th of 'afgalkhabsât and ends on the 23rd. The Kings of the other Houses are traditionally invited with their followers, crafters and traders. The celebration includes Nurtu Galabi (Day of Words), Nurtu Asjâr (Day of Trade), Nurtu Finit (Wide Day) and Nurtu Zarkh (Spire Day), ending on a more solemn note of thanksgiving.",
+    "id": "zudraibrizamrag",
+    "active": true,
+    "sortOrder": 70,
+    "recurrence": {
+      "type": "annual",
+      "oneTimeDrYear": null,
+      "intervalYears": null,
+      "intervalAnchorDrYear": null,
+      "specificDrYears": []
+    },
+    "yearRules": {
+      "month12": {
+        "start": {
+          "month": 9,
+          "dayRule": "specific_day",
+          "day": 19
+        },
+        "end": {
+          "month": 9,
+          "dayRule": "specific_day",
+          "day": 23
+        },
+        "endYearOffset": 0
+      },
+      "month13": {
+        "start": {
+          "month": 9,
+          "dayRule": "specific_day",
+          "day": 19
+        },
+        "end": {
+          "month": 9,
+          "dayRule": "specific_day",
+          "day": 23
+        },
+        "endYearOffset": 0
+      }
+    },
+    "clanScope": {
+      "mode": "selected",
+      "clans": [
+        "Firebeards"
+      ]
+    }
   },
   {
     "name": "Zannu Adrâf",
@@ -125,7 +421,49 @@
     "clan": "",
     "titleEn": "Night of the Kill",
     "descriptionShort": "A solemn night of hunting, charity and remembrance on the final day of 'af'iz.",
-    "descriptionLong": "Observed on the evening of the last day of 'af'iz and lasting until foredawn. A fellowship traditionally hunts a deer or boar, with the meat and hides donated to less fortunate Dwarves. The night is marked by simple mead and meagre fare rather than heavy feasting, and by remembrance of those who have gone to the Halls of Waiting. Because the Dwarvish day continues until sunrise, the foredawn ending remains within the same Dwarvish calendar date."
+    "descriptionLong": "Observed on the evening of the last day of 'af'iz and lasting until foredawn. A fellowship traditionally hunts a deer or boar, with the meat and hides donated to less fortunate Dwarves. The night is marked by simple mead and meagre fare rather than heavy feasting, and by remembrance of those who have gone to the Halls of Waiting. Because the Dwarvish day continues until sunrise, the foredawn ending remains within the same Dwarvish calendar date.",
+    "id": "zannu_adraf",
+    "active": true,
+    "sortOrder": 80,
+    "recurrence": {
+      "type": "annual",
+      "oneTimeDrYear": null,
+      "intervalYears": null,
+      "intervalAnchorDrYear": null,
+      "specificDrYears": []
+    },
+    "yearRules": {
+      "month12": {
+        "start": {
+          "month": 11,
+          "dayRule": "last_day",
+          "day": null
+        },
+        "end": {
+          "month": 11,
+          "dayRule": "last_day",
+          "day": null
+        },
+        "endYearOffset": 0
+      },
+      "month13": {
+        "start": {
+          "month": 11,
+          "dayRule": "last_day",
+          "day": null
+        },
+        "end": {
+          "month": 11,
+          "dayRule": "last_day",
+          "day": null
+        },
+        "endYearOffset": 0
+      }
+    },
+    "clanScope": {
+      "mode": "all",
+      "clans": []
+    }
   },
   {
     "name": "Gabashzudnamrâg",
@@ -141,6 +479,48 @@
     "clan": "",
     "titleEn": "Treasures of the Land Fest (Harvest Fest)",
     "descriptionShort": "The harvest festival begins on the final day of 'afakrâgyan.",
-    "descriptionLong": "The Treasures of the Land Fest begins on the last day of 'afakrâgyan. In a 13-month year it ends on the 16th of 'aftharn. In a 12-month year it continues across the Dwarvish New Year and ends on the 16th of the following 'afdehar."
+    "descriptionLong": "The Treasures of the Land Fest begins on the last day of 'afakrâgyan. In a 13-month year it ends on the 16th of 'aftharn. In a 12-month year it continues across the Dwarvish New Year and ends on the 16th of the following 'afdehar.",
+    "id": "gabashzudnamrag",
+    "active": true,
+    "sortOrder": 90,
+    "recurrence": {
+      "type": "annual",
+      "oneTimeDrYear": null,
+      "intervalYears": null,
+      "intervalAnchorDrYear": null,
+      "specificDrYears": []
+    },
+    "yearRules": {
+      "month12": {
+        "start": {
+          "month": 12,
+          "dayRule": "last_day",
+          "day": null
+        },
+        "end": {
+          "month": 1,
+          "dayRule": "specific_day",
+          "day": 16
+        },
+        "endYearOffset": 1
+      },
+      "month13": {
+        "start": {
+          "month": 12,
+          "dayRule": "last_day",
+          "day": null
+        },
+        "end": {
+          "month": 13,
+          "dayRule": "specific_day",
+          "day": 16
+        },
+        "endYearOffset": 0
+      }
+    },
+    "clanScope": {
+      "mode": "all",
+      "clans": []
+    }
   }
 ]
