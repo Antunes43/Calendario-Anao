@@ -209,6 +209,8 @@ class MainActivity:Activity(){
  private val cream=0xfff3e8d7.toInt()
  private var themeIndex=0
  private var tab=0
+ private var eventFilter=0
+ private var selectedEventId:String?=null
  private var date=LocalDate.now()
  private val lunarImages=arrayOf("lua_nova","lua_crescente","quarto_crescente","gibosa_crescente","lua_cheia","gibosa_minguante","quarto_minguante","lua_minguante")
  private val lunarNames=arrayOf("Lua nova","Lua crescente","Quarto crescente","Gibosa crescente","Lua cheia","Gibosa minguante","Quarto minguante","Lua minguante")
@@ -451,26 +453,75 @@ class MainActivity:Activity(){
   }
   if(tab==2)panel(root){title(it,"FASES E MESES LUNARES");add(it,"Dados astronômicos em validação. Nenhuma fase ou porcentagem é apresentada como cálculo confirmado.",14f)}
   if(tab==3){
-   panel(root){title(it,"EVENTOS E OBSERVÂNCIAS")}
-   val entries=observances
-   for(i in 0 until entries.length()){
-    val e=entries.getJSONObject(i)
-    panel(root,8){card->
+   val all=ObservanceEngine.catalogue(this,date)
+   val fmt=DateTimeFormatter.ofPattern("dd/MM/yyyy")
+   fun status(o:ObservanceEngine.Occurrence):Int=when {
+    !date.isBefore(o.start)&&!date.isAfter(o.end)->1
+    o.start.isAfter(date)->2
+    else->3
+   }
+   fun label(o:ObservanceEngine.Occurrence):String=when(status(o)){
+    1->"ATIVO";2->"FUTURO";else->"PASSADO"
+   }
+   fun eventText(parent:LinearLayout,value:String,size:Float,color:Int,bold:Boolean=false){
+    if(value.isBlank())return
+    parent.addView(text(value,size,color,bold).apply{
+     gravity=Gravity.START
+     textAlignment=View.TEXT_ALIGNMENT_VIEW_START
+     setPadding(0,dp(4),0,dp(4))
+    },LinearLayout.LayoutParams(-1,-2))
+   }
+   val selected=all.firstOrNull{it.entry.optString("id")==selectedEventId}
+   if(selected!=null){
+    panel(root,12,"nurt_events"){card->
      card.gravity=Gravity.START
-     card.setPadding(dp(20),dp(16),dp(20),dp(16))
-     fun line(value:String,size:Float,color:Int,bold:Boolean=false){
-      if(value.isBlank())return
-      card.addView(text(value,size,color,bold).apply{
-       gravity=Gravity.START
-       textAlignment=View.TEXT_ALIGNMENT_VIEW_START
-       setPadding(0,dp(4),0,dp(4))
-      },LinearLayout.LayoutParams(-1,-2))
+     card.setPadding(dp(20),dp(18),dp(20),dp(20))
+     val back=text("‹  Voltar aos eventos",14f,bronze,true).apply{
+      gravity=Gravity.START
+      setOnClickListener{selectedEventId=null;draw()}
      }
-     line(e.getString("name"),19f,bronze,true)
-     line(e.optString("pt"),14f,cream)
-     line(e.optString("descriptionShort"),14f,cream)
-     val details=e.optString("descriptionLong")
-     if(details.isNotBlank()) line(details,14f,cream)
+     card.addView(back)
+     eventText(card,selected.entry.optString("name"),23f,bronze,true)
+     eventText(card,selected.entry.optString("pt"),17f,cream)
+     eventText(card,label(selected)+"  ·  "+selected.start.format(fmt)+" – "+selected.end.format(fmt),12f,bronze,true)
+     eventText(card,"RESUMO",12f,bronze,true)
+     eventText(card,selected.entry.optString("descriptionShort"),15f,cream)
+     val full=selected.entry.optString("descriptionLong")
+     if(full.isNotBlank()){
+      eventText(card,"DESCRIÇÃO COMPLETA",12f,bronze,true)
+      eventText(card,full,15f,cream)
+     }
+     eventText(card,"TIPO  ·  "+selected.entry.optString("type","festival"),12f,bronze)
+     val scope=selected.entry.optJSONObject("clanScope")
+     if(scope?.optString("mode")=="selected"){
+      eventText(card,"CLÃS  ·  "+scope.optJSONArray("clans")?.let{arr->(0 until arr.length()).joinToString(", "){arr.optString(it)}}.orEmpty(),12f,bronze)
+     }
+    }
+   }else{
+    panel(root,10){p->
+     title(p,"EVENTOS E OBSERVÂNCIAS")
+     val filters=horizontal().apply{gravity=Gravity.CENTER;setPadding(0,dp(8),0,dp(5))}
+     arrayOf("Todos","Ativos","Futuros","Passados").forEachIndexed{index,label->
+      val button=text(label,12f,if(eventFilter==index)bronze else cream,eventFilter==index).apply{
+       setPadding(dp(9),dp(12),dp(9),dp(12))
+       setOnClickListener{eventFilter=index;draw()}
+      }
+      filters.addView(button,LinearLayout.LayoutParams(0,-2,1f))
+     }
+     p.addView(filters,LinearLayout.LayoutParams(-1,-2))
+    }
+    val visible=all.filter{eventFilter==0||status(it)==eventFilter}
+    if(visible.isEmpty())panel(root){eventText(it,"Nenhum evento nesta categoria.",14f,cream)}
+    visible.forEach{o->
+     panel(root,8,"nurt_events"){card->
+      card.gravity=Gravity.START
+      card.setPadding(dp(18),dp(12),dp(18),dp(12))
+      eventText(card,o.entry.optString("name")+"   ›",17f,bronze,true)
+      eventText(card,o.entry.optString("pt"),14f,cream)
+      eventText(card,label(o)+"  ·  "+o.start.format(fmt)+" – "+o.end.format(fmt),12f,bronze)
+      eventText(card,o.entry.optString("descriptionShort"),13f,cream)
+      card.setOnClickListener{selectedEventId=o.entry.optString("id");draw()}
+     }
     }
    }
   }
