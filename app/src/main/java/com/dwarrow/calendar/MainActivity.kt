@@ -470,25 +470,7 @@ class MainActivity:Activity(){
      line(e.optString("pt"),14f,cream)
      line(e.optString("descriptionShort"),14f,cream)
      val details=e.optString("descriptionLong")
-     if(details.isNotBlank()){
-      val detailView=text(details,14f,cream).apply{
-       gravity=Gravity.START
-       textAlignment=View.TEXT_ALIGNMENT_VIEW_START
-       setPadding(0,dp(8),0,dp(4))
-       visibility=View.GONE
-      }
-      val toggle=text("▸ Ler mais",13f,bronze,true).apply{
-       gravity=Gravity.START
-       setPadding(0,dp(8),0,dp(4))
-       setOnClickListener{
-        val expand=detailView.visibility!=View.VISIBLE
-        detailView.visibility=if(expand)View.VISIBLE else View.GONE
-        text=if(expand)"▾ Mostrar menos" else "▸ Ler mais"
-       }
-      }
-      card.addView(toggle,LinearLayout.LayoutParams(-1,-2))
-      card.addView(detailView,LinearLayout.LayoutParams(-1,-2))
-     }
+     if(details.isNotBlank()) line(details,14f,cream)
     }
    }
   }
