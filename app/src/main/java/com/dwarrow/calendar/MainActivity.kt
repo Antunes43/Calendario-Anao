@@ -302,38 +302,6 @@ class MainActivity:Activity(){
  private val observances by lazy {
   JSONArray(assets.open("observances.json").bufferedReader().use { it.readText() })
  }
- // Local catalogue is provisional until the site's presentation API can be verified.
- private fun observanceMatches(entry:org.json.JSONObject, day:CalendarEngine.Day):Boolean {
-  val start=entry.getJSONArray("start"); val end=entry.getJSONArray("end")
-  val sm=start.getInt(0);val em=end.getInt(0)
-  val sd=if(start.getInt(1)==-1) monthLength(day.drYear,sm) else start.getInt(1)
-  val ed=if(end.getInt(1)==-1) monthLength(day.drYear,em) else end.getInt(1)
-  if(sd==null||ed==null)return false
-  val current=day.month*100+day.day
-  val first=sm*100+sd;val last=em*100+ed
-  return if(first<=last)current in first..last else current>=first||current<=last
- }
- private val monthLengths by lazy {
-  val months=org.json.JSONObject(assets.open("core.json").bufferedReader().use{it.readText()}).getJSONArray("months")
-  val lengths=HashMap<Pair<Int,Int>,Int>()
-  for(i in 0 until months.length()){
-   val m=months.getJSONObject(i)
-   lengths[m.getInt("drYear") to m.getInt("monthNumber")]=m.getInt("lengthDays")
-  }
-  lengths
- }
- private fun monthLength(year:Int,month:Int):Int?=monthLengths[year to month]
- private fun eventsFor(day:CalendarEngine.Day):List<org.json.JSONObject> =
-  (0 until observances.length()).map{observances.getJSONObject(it)}.filter{observanceMatches(it,day)}
- private fun nextEvent(from:LocalDate):Pair<LocalDate,org.json.JSONObject>? {
-  for(offset in 1..400){
-   val target=from.plusDays(offset.toLong())
-   val day=CalendarEngine.lookup(this,target)?:continue
-   val found=eventsFor(day).firstOrNull()?:continue
-   return target to found
-  }
-  return null
- }
  private fun draw(){
   val day=CalendarEngine.lookup(this,date)
   val greg=date.format(DateTimeFormatter.ofPattern("d 'de' MMMM 'de' yyyy",Locale("pt","BR")))
@@ -459,20 +427,21 @@ class MainActivity:Activity(){
      gravity=Gravity.START
      setPadding(dp(18),dp(10),dp(18),dp(12))
     }
-    val todays=day?.let{eventsFor(it)} ?: emptyList()
+    val todays=ObservanceEngine.active(this,date)
     if(todays.isNotEmpty()){
-     todays.forEach{event->
+     todays.forEach{occurrence->
+      val event=occurrence.entry
       content.addView(text(event.getString("name"),17f,cream,true).apply{gravity=Gravity.START})
       content.addView(text(event.optString("pt"),13f,bronze).apply{gravity=Gravity.START})
       content.addView(text(event.optString("descriptionShort"),13f,cream).apply{gravity=Gravity.START})
      }
     }else{
-     val upcoming=nextEvent(date)
+     val upcoming=ObservanceEngine.next(this,date).firstOrNull()
      if(upcoming!=null){
       content.addView(text("PRÓXIMA OBSERVÂNCIA",11f,bronze,true).apply{gravity=Gravity.START})
-      content.addView(text(upcoming.second.getString("name"),17f,cream,true).apply{gravity=Gravity.START})
-      content.addView(text(upcoming.first.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")),12f,bronze).apply{gravity=Gravity.START})
-      content.addView(text(upcoming.second.optString("descriptionShort"),13f,cream).apply{gravity=Gravity.START})
+      content.addView(text(upcoming.entry.getString("name"),17f,cream,true).apply{gravity=Gravity.START})
+      content.addView(text(upcoming.start.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")),12f,bronze).apply{gravity=Gravity.START})
+      content.addView(text(upcoming.entry.optString("descriptionShort"),13f,cream).apply{gravity=Gravity.START})
      }else content.addView(text("Nenhuma observância encontrada",13f,cream).apply{gravity=Gravity.START})
     }
     content.addView(text("Ver todos os eventos  ›",12f,bronze,true).apply{gravity=Gravity.START})
