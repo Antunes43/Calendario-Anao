@@ -79,6 +79,23 @@ object ObservanceEngine {
   }
   return result.sortedBy{it.entry.optInt("sortOrder",1000)}
  }
+
+ fun catalogue(ctx:Context,on:LocalDate):List<Occurrence> {
+  val day=CalendarEngine.lookup(ctx,on)?:return emptyList()
+  val d=data(ctx)
+  val result=ArrayList<Occurrence>()
+  for(i in 0 until d.entries.length()){
+   val e=d.entries.getJSONObject(i)
+   val choices=((day.drYear-1)..(day.drYear+2)).mapNotNull{occurrence(d,e,it)}
+   val selected=choices.firstOrNull{!on.isBefore(it.start)&&!on.isAfter(it.end)}
+    ?:choices.filter{it.start.isAfter(on)}.minByOrNull{it.start}
+    ?:choices.maxByOrNull{it.end}
+   if(selected!=null)result.add(selected)
+  }
+  return result.sortedWith(compareBy<Occurrence>{
+   if(!on.isBefore(it.start)&&!on.isAfter(it.end))0 else if(it.start.isAfter(on))1 else 2
+  }.thenBy{it.start})
+ }
  fun next(ctx:Context,after:LocalDate):List<Occurrence> {
   val day=CalendarEngine.lookup(ctx,after)?:return emptyList()
   val d=data(ctx)
