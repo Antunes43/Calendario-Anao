@@ -471,15 +471,14 @@ class MainActivity:Activity(){
      val isActive=todays.isNotEmpty()
      val row=horizontal().apply{
       gravity=Gravity.CENTER_VERTICAL
-      background=ForgedFrame(themeIndex)
-      setPadding(dp(9),dp(9),dp(9),dp(9))
+      setPadding(dp(4),dp(7),dp(4),dp(7))
      }
      val imageSlot=View(this).apply{
       background=ForgedFrame(themeIndex)
       contentDescription="Espaço reservado para a imagem de "+event.optString("name")
      }
      row.addView(imageSlot,LinearLayout.LayoutParams(dp(66),dp(92)).apply{rightMargin=dp(11)})
-     val info=column()
+     val info=column().apply{gravity=Gravity.START}
      val heading=horizontal().apply{gravity=Gravity.CENTER_VERTICAL}
      heading.addView(text(event.optString("name"),15f,bronze,true).apply{maxLines=2},LinearLayout.LayoutParams(0,-2,1f))
      val label=if(isActive)"ATIVO" else "PRÓXIMO"
@@ -493,10 +492,10 @@ class MainActivity:Activity(){
      }
      heading.addView(badge)
      info.addView(heading)
-     info.addView(text(event.optString("pt"),13f,bronze))
-     info.addView(text(occurrence.start.format(fmt)+" – "+occurrence.end.format(fmt),11f,cream))
+     info.addView(text(event.optString("pt"),13f,bronze).apply{gravity=Gravity.START})
+     info.addView(text(occurrence.start.format(fmt)+" – "+occurrence.end.format(fmt),11f,cream).apply{gravity=Gravity.START})
      info.addView(text(event.optString("descriptionShortPt"),12f,cream).apply{
-      maxLines=2;ellipsize=android.text.TextUtils.TruncateAt.END
+      gravity=Gravity.START;maxLines=2;ellipsize=android.text.TextUtils.TruncateAt.END
      })
      row.addView(info,LinearLayout.LayoutParams(0,-2,1f))
      p.addView(row,LinearLayout.LayoutParams(-1,-2).apply{bottomMargin=dp(7)})
