@@ -491,7 +491,30 @@ class MainActivity:Activity(){
       p.addView(row)
      }
     }
-    seasonPanel(root,info)
+    panel(root,8,"nurt_events"){p->
+     title(p,"EVENTOS DO MÊS")
+     val events=ArrayList<ObservanceEngine.Occurrence>()
+     val seen=HashSet<String>()
+     for(i in 0 until month.length){
+      ObservanceEngine.active(this,month.start.plusDays(i.toLong())).forEach{o->
+       val key=o.entry.optString("id")+o.start.toString()
+       if(seen.add(key))events.add(o)
+      }
+     }
+     if(events.isEmpty())add(p,"Nenhuma festividade neste mês.",13f,cream)
+     events.sortedBy{it.start}.forEach{o->
+      val item=horizontal().apply{gravity=Gravity.CENTER_VERTICAL;setPadding(dp(5),dp(5),dp(5),dp(5))}
+      item.addView(View(this).apply{background=ForgedFrame(themeIndex)},LinearLayout.LayoutParams(dp(52),dp(64)).apply{rightMargin=dp(10)})
+      val details=column()
+      details.addView(text(o.entry.optString("name"),14f,bronze,true))
+      details.addView(text(o.entry.optString("pt"),12f,cream))
+      details.addView(text(o.start.toString()+" – "+o.end.toString(),11f,cream))
+      item.addView(details,LinearLayout.LayoutParams(0,-2,1f))
+      item.addView(text("›",20f,bronze,true))
+      item.setOnClickListener{selectedEventId=o.entry.optString("id");tab=3;draw()}
+      p.addView(item)
+     }
+    }
    }
   }
   if(tab==0){
