@@ -455,19 +455,53 @@ class MainActivity:Activity(){
    val month=if(info==null)null else CalendarEngine.monthsForYear(this,info.drYear).firstOrNull{!date.isBefore(it.start)&&!date.isAfter(it.end)}
    if(month!=null){
     val navPanel=column().apply{gravity=Gravity.CENTER}
-    run{val p=navPanel
-     val nav=horizontal()
-     nav.addView(text("‹ Voltar",13f,bronze,true).apply{gravity=Gravity.CENTER;setOnClickListener{date=month.start.minusDays(1);draw()}},LinearLayout.LayoutParams(0,-2,1f))
-     nav.addView(text(month.name,20f,bronze,true).apply{gravity=Gravity.CENTER},LinearLayout.LayoutParams(0,-2,3f))
-     nav.addView(text("Próximo ›",13f,bronze,true).apply{gravity=Gravity.CENTER;setOnClickListener{date=month.end.plusDays(1);draw()}},LinearLayout.LayoutParams(0,-2,1f))
-     p.addView(nav)
-     add(p,"Mês "+month.number+" · D.R. "+info!!.drYear,13f,cream)
+    val nav=horizontal().apply{gravity=Gravity.CENTER_VERTICAL}
+    fun monthArrow(label:String,previous:Boolean):View{
+     val button=FrameLayout(this)
+     val shape=object:android.graphics.drawable.Drawable(){
+      val paint=android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG).apply{
+       color=bronze;style=android.graphics.Paint.Style.STROKE;strokeWidth=dp(2).toFloat()
+      }
+      override fun draw(canvas:android.graphics.Canvas){
+       val w=bounds.width().toFloat();val h=bounds.height().toFloat()
+       val path=android.graphics.Path()
+       if(previous){
+        path.moveTo(w*.34f,dp(3).toFloat());path.lineTo(w*.04f,h/2)
+        path.lineTo(w*.34f,h-dp(3));path.lineTo(w-dp(3),h-dp(3))
+        path.lineTo(w-dp(3),dp(3).toFloat());path.close()
+       }else{
+        path.moveTo(dp(3).toFloat(),dp(3).toFloat());path.lineTo(w*.66f,dp(3).toFloat())
+        path.lineTo(w*.96f,h/2);path.lineTo(w*.66f,h-dp(3))
+        path.lineTo(dp(3).toFloat(),h-dp(3));path.close()
+       }
+       canvas.drawPath(path,paint)
+      }
+      override fun setAlpha(alpha:Int){paint.alpha=alpha}
+      override fun setColorFilter(filter:android.graphics.ColorFilter?){paint.colorFilter=filter}
+      @Deprecated("Deprecated in Java")
+      override fun getOpacity():Int=android.graphics.PixelFormat.TRANSLUCENT
+     }
+     button.background=shape
+     button.addView(text(label,11f,bronze,true).apply{gravity=Gravity.CENTER},FrameLayout.LayoutParams(-1,-1))
+     button.setOnClickListener{date=if(previous)month.start.minusDays(1) else month.end.plusDays(1);draw()}
+     return button
     }
-    root.addView(navPanel,LinearLayout.LayoutParams(-1,-2).apply{bottomMargin=dp(8)})
+    nav.addView(monthArrow("‹ Voltar",true),LinearLayout.LayoutParams(0,dp(44),1.2f))
+    val heading=column().apply{gravity=Gravity.CENTER}
+    heading.addView(text(month.name,20f,bronze,true).apply{gravity=Gravity.CENTER})
+    heading.addView(text("Mês "+month.number+" · D.R. "+info!!.drYear,12f,cream).apply{gravity=Gravity.CENTER})
+    nav.addView(heading,LinearLayout.LayoutParams(0,-2,2.7f))
+    nav.addView(monthArrow("Próximo ›",false),LinearLayout.LayoutParams(0,dp(44),1.2f))
+    navPanel.addView(nav,LinearLayout.LayoutParams(-1,-2))
+    root.addView(navPanel,LinearLayout.LayoutParams(-1,-2).apply{bottomMargin=dp(10)})
     val artwork=View(this).apply{background=ForgedFrame(themeIndex)}
     root.addView(artwork,LinearLayout.LayoutParams(-1,dp(155)).apply{bottomMargin=dp(5)})
-    val range=text(month.start.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))+" – "+month.end.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")),12f,cream).apply{gravity=Gravity.CENTER}
-    root.addView(range,LinearLayout.LayoutParams(-1,-2).apply{bottomMargin=dp(10)})
+    val dateBox=column().apply{
+     background=ForgedFrame(themeIndex)
+     setPadding(dp(12),dp(8),dp(12),dp(8))
+    }
+    dateBox.addView(text(month.start.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))+" – "+month.end.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")),12f,cream).apply{gravity=Gravity.CENTER})
+    root.addView(dateBox,LinearLayout.LayoutParams(-1,-2).apply{topMargin=dp(2);bottomMargin=dp(12)})
     run{val p=root
      val labels=horizontal()
      listOf("SEG","TER","QUA","QUI","SEX","SÁB","DOM").forEach{n->
@@ -487,13 +521,13 @@ class MainActivity:Activity(){
         background=android.graphics.drawable.GradientDrawable().apply{setColor(if(selected)0xff65401d.toInt() else 0xff131820.toInt());setStroke(dp(1),if(selected)bronze else 0xff674b30.toInt())}
         if(on!=null)setOnClickListener{date=on;draw()}
        }
-       row.addView(cell,LinearLayout.LayoutParams(0,dp(42),1f).apply{setMargins(dp(2),dp(2),dp(2),dp(2))})
+       row.addView(cell,LinearLayout.LayoutParams(0,dp(30),1f).apply{setMargins(dp(2),dp(3),dp(2),dp(3))})
       }
       p.addView(row)
      }
     }
     root.addView(View(this).apply{setBackgroundColor(bronze)},LinearLayout.LayoutParams(-1,dp(1)).apply{topMargin=dp(14);bottomMargin=dp(9)})
-    run{val p=root
+    panel(root,8,"nurt_events"){p->
      title(p,"EVENTOS DO MÊS")
      val events=ArrayList<ObservanceEngine.Occurrence>()
      val seen=HashSet<String>()
