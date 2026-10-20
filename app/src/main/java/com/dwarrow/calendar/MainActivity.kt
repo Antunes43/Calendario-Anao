@@ -298,6 +298,40 @@ class MainActivity:Activity(){
  private fun action(label:String,onClick:()->Unit):TextView=text(label,13f,bronze,true).apply{
   background=ForgedFrame(themeIndex);setPadding(dp(8),dp(15),dp(8),dp(15));setOnClickListener{onClick();draw()}
  }
+
+ private val observances by lazy {
+  JSONArray(assets.open("observances.json").bufferedReader().use { it.readText() })
+ }
+ // Local catalogue is provisional until the site's presentation API can be verified.
+ private fun observanceMatches(entry:org.json.JSONObject, day:CalendarEngine.Day):Boolean {
+  val start=entry.getJSONArray("start"); val end=entry.getJSONArray("end")
+  val sm=start.getInt(0);val em=end.getInt(0)
+  val sd=if(start.getInt(1)==-1) monthLength(day.drYear,sm) else start.getInt(1)
+  val ed=if(end.getInt(1)==-1) monthLength(day.drYear,em) else end.getInt(1)
+  if(sd==null||ed==null)return false
+  val current=day.month*100+day.day
+  val first=sm*100+sd;val last=em*100+ed
+  return if(first<=last)current in first..last else current>=first||current<=last
+ }
+ private fun monthLength(year:Int,month:Int):Int? {
+  val months=JSONObject(assets.open("core.json").bufferedReader().use{it.readText()}).getJSONArray("months")
+  for(i in 0 until months.length()){
+   val m=months.getJSONObject(i)
+   if(m.getInt("drYear")==year&&m.getInt("monthNumber")==month)return m.getInt("lengthDays")
+  }
+  return null
+ }
+ private fun eventsFor(day:CalendarEngine.Day):List<org.json.JSONObject> =
+  (0 until observances.length()).map{observances.getJSONObject(it)}.filter{observanceMatches(it,day)}
+ private fun nextEvent(from:LocalDate):Pair<LocalDate,org.json.JSONObject>? {
+  for(offset in 1..400){
+   val target=from.plusDays(offset.toLong())
+   val day=CalendarEngine.lookup(this,target)?:continue
+   val found=eventsFor(day).firstOrNull()?:continue
+   return target to found
+  }
+  return null
+ }
  private fun draw(){
   val day=CalendarEngine.lookup(this,date)
   val greg=date.format(DateTimeFormatter.ofPattern("d 'de' MMMM 'de' yyyy",Locale("pt","BR")))
@@ -422,16 +456,28 @@ class MainActivity:Activity(){
     val link=horizontal().apply{setPadding(dp(10),dp(10),dp(10),dp(10))}
     link.addView(text("✧",29f,bronze),LinearLayout.LayoutParams(dp(50),-2))
     val t=column();link.addView(t,LinearLayout.LayoutParams(0,-2,1f))
-    add(t,"Consultar calendário oficial  ›",13f,cream,true)
-    add(t,"Festivais e observâncias registradas",10f,0xffc5b4a0.toInt())
+    val todays=day?.let{eventsFor(it)} ?: emptyList()
+    if(todays.isNotEmpty()){
+     todays.forEach{event->
+      add(t,event.getString("name"),16f,cream,true)
+      add(t,event.optString("pt"),12f,bronze)
+     }
+    }else{
+     val upcoming=nextEvent(date)
+     if(upcoming!=null){
+      add(t,"Próxima observância: ${upcoming.second.getString("name")}",14f,cream,true)
+      add(t,upcoming.first.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")),12f,bronze)
+     }else add(t,"Nenhuma observância encontrada",13f,cream)
+    }
+    add(t,"Catálogo local provisório · tocar para ver todos ›",10f,0xffc5b4a0.toInt())
     p.addView(link,LinearLayout.LayoutParams(-1,-2))
     link.setOnClickListener{tab=3;draw()}
    }
   }
   if(tab==2)panel(root){title(it,"FASES E MESES LUNARES");add(it,"Dados astronômicos em validação. Nenhuma fase ou porcentagem é apresentada como cálculo confirmado.",14f)}
   if(tab==3){
-   panel(root){title(it,"EVENTOS E OBSERVÂNCIAS");add(it,"Catálogo offline · datas ainda não validadas",12f,cream)}
-   val entries=JSONArray(assets.open("observances.json").bufferedReader().use{r->r.readText()})
+   panel(root){title(it,"EVENTOS E OBSERVÂNCIAS");add(it,"Catálogo local provisório · datas ainda não validadas",12f,cream)}
+   val entries=observances
    for(i in 0 until entries.length()){
     val e=entries.getJSONObject(i)
     panel(root,8){add(it,"✧  "+e.getString("name"),17f,bronze,true);add(it,e.getString("pt"),14f)}
