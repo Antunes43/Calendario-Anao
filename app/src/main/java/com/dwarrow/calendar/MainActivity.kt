@@ -313,14 +313,16 @@ class MainActivity:Activity(){
   val first=sm*100+sd;val last=em*100+ed
   return if(first<=last)current in first..last else current>=first||current<=last
  }
- private fun monthLength(year:Int,month:Int):Int? {
+ private val monthLengths by lazy {
   val months=JSONObject(assets.open("core.json").bufferedReader().use{it.readText()}).getJSONArray("months")
+  val lengths=HashMap<Pair<Int,Int>,Int>()
   for(i in 0 until months.length()){
    val m=months.getJSONObject(i)
-   if(m.getInt("drYear")==year&&m.getInt("monthNumber")==month)return m.getInt("lengthDays")
+   lengths[m.getInt("drYear") to m.getInt("monthNumber")]=m.getInt("lengthDays")
   }
-  return null
+  lengths
  }
+ private fun monthLength(year:Int,month:Int):Int?=monthLengths[year to month]
  private fun eventsFor(day:CalendarEngine.Day):List<org.json.JSONObject> =
   (0 until observances.length()).map{observances.getJSONObject(it)}.filter{observanceMatches(it,day)}
  private fun nextEvent(from:LocalDate):Pair<LocalDate,org.json.JSONObject>? {
