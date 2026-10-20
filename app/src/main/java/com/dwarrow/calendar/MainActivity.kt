@@ -1,6 +1,10 @@
 package com.dwarrow.calendar
 
 import android.app.Activity
+import android.Manifest
+import android.content.pm.PackageManager
+import android.location.LocationManager
+import android.location.Location
 import android.os.Bundle
 import android.content.Context
 import android.graphics.*
@@ -209,6 +213,40 @@ class MainActivity:Activity(){
  private val cream=0xfff3e8d7.toInt()
  private var themeIndex=0
  private var tab=0
+ private val locationRequestCode=740
+ private fun locationAllowed():Boolean =
+  checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION)==PackageManager.PERMISSION_GRANTED ||
+  checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION)==PackageManager.PERMISSION_GRANTED
+ private fun savedLocation():String {
+  val prefs=getPreferences(MODE_PRIVATE)
+  if(!prefs.contains("durin_lat"))return "Nenhuma localização disponível"
+  return String.format(Locale("pt","BR"),"%.3f°, %.3f°",prefs.getFloat("durin_lat",0f),prefs.getFloat("durin_lon",0f))
+ }
+ private fun refreshDurinLocation(){
+  if(!locationAllowed()){
+   requestPermissions(arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION,Manifest.permission.ACCESS_FINE_LOCATION),locationRequestCode)
+   return
+  }
+  try{
+   val manager=getSystemService(Context.LOCATION_SERVICE) as LocationManager
+   val available=listOf(LocationManager.GPS_PROVIDER,LocationManager.NETWORK_PROVIDER)
+    .filter{manager.isProviderEnabled(it)}
+   val last=available.mapNotNull{manager.getLastKnownLocation(it)}.maxByOrNull{it.time}
+   if(last!=null){
+    getPreferences(MODE_PRIVATE).edit().putFloat("durin_lat",last.latitude.toFloat())
+     .putFloat("durin_lon",last.longitude.toFloat()).apply()
+    Toast.makeText(this,"Localização atualizada",Toast.LENGTH_SHORT).show()
+   }else Toast.makeText(this,"Ainda não há uma localização conhecida no aparelho",Toast.LENGTH_LONG).show()
+  }catch(e:SecurityException){
+   Toast.makeText(this,"Permissão de localização necessária",Toast.LENGTH_SHORT).show()
+  }
+  draw()
+ }
+ override fun onRequestPermissionsResult(requestCode:Int,permissions:Array<out String>,grantResults:IntArray){
+  super.onRequestPermissionsResult(requestCode,permissions,grantResults)
+  if(requestCode==locationRequestCode&&locationAllowed())refreshDurinLocation()
+ }
+
  private var selectedEventId:String?=null
  private var date=LocalDate.now()
  private val lunarImages=arrayOf("lua_nova","lua_crescente","quarto_crescente","gibosa_crescente","lua_cheia","gibosa_minguante","quarto_minguante","lua_minguante")
@@ -518,6 +556,12 @@ class MainActivity:Activity(){
     names.forEachIndexed{i,n->it.addView(action((if(themeIndex==i)"◆ " else "◇ ")+n){themeIndex=i;getPreferences(MODE_PRIVATE).edit().putInt("theme",i).apply()})}
    }
    panel(root){title(it,"FUSO HORÁRIO");add(it,ZoneId.systemDefault().id,15f)}
+   panel(root){p->
+    title(p,"DIA DE DURIN · LOCALIZAÇÃO")
+    add(p,savedLocation(),15f)
+    p.addView(action("Atualizar localização"){refreshDurinLocation()})
+    add(p,"O cálculo astronômico local ainda está em desenvolvimento. Nenhuma data será estimada sem validar o modelo de visibilidade lunar.",12f)
+   }
   }
   val tabs=horizontal().apply{background=ForgedFrame(themeIndex);setPadding(dp(4),dp(7),dp(4),dp(7))}
   val labels=arrayOf("Hoje","Calendário","Luas","Eventos","Mais")
