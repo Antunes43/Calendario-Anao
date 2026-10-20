@@ -482,7 +482,7 @@ class MainActivity:Activity(){
       override fun getOpacity():Int=android.graphics.PixelFormat.TRANSLUCENT
      }
      button.background=shape
-     button.addView(text(label,11f,bronze,true).apply{gravity=Gravity.CENTER},FrameLayout.LayoutParams(-1,-1))
+     button.addView(text(label,11f,bronze,true).apply{gravity=Gravity.CENTER;translationX=if(previous)dp(7).toFloat() else -dp(7).toFloat()},FrameLayout.LayoutParams(-1,-1))
      button.setOnClickListener{date=if(previous)month.start.minusDays(1) else month.end.plusDays(1);draw()}
      return button
     }
@@ -494,14 +494,17 @@ class MainActivity:Activity(){
     nav.addView(monthArrow("Próximo ›",false),LinearLayout.LayoutParams(0,dp(44),1.2f))
     navPanel.addView(nav,LinearLayout.LayoutParams(-1,-2))
     root.addView(navPanel,LinearLayout.LayoutParams(-1,-2).apply{bottomMargin=dp(10)})
-    val artwork=View(this).apply{background=ForgedFrame(themeIndex)}
-    root.addView(artwork,LinearLayout.LayoutParams(-1,dp(155)).apply{bottomMargin=dp(5)})
-    val dateBox=column().apply{
+    // Single framed panel: artwork and Gregorian dates share one border and divider.
+    val monthPanel=column().apply{
      background=ForgedFrame(themeIndex)
-     setPadding(dp(12),dp(8),dp(12),dp(8))
+     setPadding(dp(5),dp(5),dp(5),dp(5))
     }
-    dateBox.addView(text(month.start.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))+" – "+month.end.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")),12f,cream).apply{gravity=Gravity.CENTER})
-    root.addView(dateBox,LinearLayout.LayoutParams(-1,-2).apply{topMargin=dp(2);bottomMargin=dp(12)})
+    monthPanel.addView(View(this),LinearLayout.LayoutParams(-1,dp(155)))
+    monthPanel.addView(View(this).apply{setBackgroundColor(bronze)},LinearLayout.LayoutParams(-1,dp(1)))
+    monthPanel.addView(text(month.start.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))+" – "+month.end.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")),12f,cream).apply{
+     gravity=Gravity.CENTER
+    },LinearLayout.LayoutParams(-1,dp(35)))
+    root.addView(monthPanel,LinearLayout.LayoutParams(-1,-2).apply{bottomMargin=dp(12)})
     run{val p=root
      val labels=horizontal()
      listOf("SEG","TER","QUA","QUI","SEX","SÁB","DOM").forEach{n->
@@ -521,7 +524,7 @@ class MainActivity:Activity(){
         background=android.graphics.drawable.GradientDrawable().apply{setColor(if(selected)0xff65401d.toInt() else 0xff131820.toInt());setStroke(dp(1),if(selected)bronze else 0xff674b30.toInt())}
         if(on!=null)setOnClickListener{date=on;draw()}
        }
-       row.addView(cell,LinearLayout.LayoutParams(0,dp(30),1f).apply{setMargins(dp(2),dp(3),dp(2),dp(3))})
+       row.addView(cell,LinearLayout.LayoutParams(0,dp(58),1f).apply{setMargins(dp(2),dp(3),dp(2),dp(3))})
       }
       p.addView(row)
      }
