@@ -472,7 +472,7 @@ class MainActivity:Activity(){
       val event=occurrence.entry
       content.addView(text(event.getString("name"),17f,cream,true).apply{gravity=Gravity.START})
       content.addView(text(event.optString("pt"),13f,bronze).apply{gravity=Gravity.START})
-      content.addView(text(event.optString("descriptionShort"),13f,cream).apply{gravity=Gravity.START})
+      content.addView(text(event.optString("descriptionShortPt"),13f,cream).apply{gravity=Gravity.START})
      }
     }else{
      val upcoming=ObservanceEngine.next(this,date).firstOrNull()
@@ -480,7 +480,7 @@ class MainActivity:Activity(){
       content.addView(text("PRÓXIMA OBSERVÂNCIA",11f,bronze,true).apply{gravity=Gravity.START})
       content.addView(text(upcoming.entry.getString("name"),17f,cream,true).apply{gravity=Gravity.START})
       content.addView(text(upcoming.start.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")),12f,bronze).apply{gravity=Gravity.START})
-      content.addView(text(upcoming.entry.optString("descriptionShort"),13f,cream).apply{gravity=Gravity.START})
+      content.addView(text(upcoming.entry.optString("descriptionShortPt"),13f,cream).apply{gravity=Gravity.START})
      }else content.addView(text("Nenhuma observância encontrada",13f,cream).apply{gravity=Gravity.START})
     }
     content.addView(text("Ver todos os eventos  ›",12f,bronze,true).apply{gravity=Gravity.START})
