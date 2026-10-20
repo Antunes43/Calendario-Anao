@@ -55,7 +55,9 @@
     "clanScope": {
       "mode": "all",
       "clans": []
-    }
+    },
+    "descriptionShortPt": "Festival de inverno que abrange a parte final de 'afdush e o início de 'afiglêb.",
+    "descriptionLongPt": ""
   },
   {
     "name": "Nurtu Mamahrân",
@@ -113,7 +115,9 @@
     "clanScope": {
       "mode": "all",
       "clans": []
-    }
+    },
+    "descriptionShortPt": "Dia solene em memória dos que morreram na Batalha de Azanulbizar.",
+    "descriptionLongPt": "Celebrado no dia 27 de 'afdush. Tradicionalmente, não se realizam banquetes nem se entoam canções. Os anões passam o dia com familiares e amigos, contando histórias e recordando os mortos da Batalha de Azanulbizar."
   },
   {
     "name": "Khebabnurtamrâg",
@@ -171,7 +175,9 @@
     "clanScope": {
       "mode": "all",
       "clans": []
-    }
+    },
+    "descriptionShortPt": "Celebração sagrada para os ferreiros, marcada pela criação de uma grande obra em honra de Mahal.",
+    "descriptionLongPt": "Celebrado no dia 19 de 'afnu'khazâd. O Dia da Forja marca tradicionalmente o fim do inverno em muitos salões do norte. Os ferreiros criam uma obra excepcional para a ocasião, seguida, em muitas comunidades, por um grande banquete com pão escuro, carneiro, cogumelos e cervejas escuras. As obras são expostas, e a criação mais elogiada pode ser oferecida ao Senhor do Salão."
   },
   {
     "name": "Mamahduldanakhamrâg",
@@ -229,7 +235,9 @@
     "clanScope": {
       "mode": "all",
       "clans": []
-    }
+    },
+    "descriptionShortPt": "Festival da primavera associado ao primeiro corte da cevada e ao costume de carregar uma palha fresca.",
+    "descriptionLongPt": "Começa no dia 1º de 'af-mahd-danakh e termina no dia 20. O primeiro dia marca tradicionalmente o corte da cevada da primavera. Uma palha fresca de cevada é carregada para atrair boa sorte, costume ligado, na tradição anã, a Kaminzabdûna. O último dia está associado à Corrida do Osso Quebrado, entre os Salões de Thorin e Needlehole."
   },
   {
     "name": "Gargbuzrâmrâg",
@@ -287,7 +295,9 @@
     "clanScope": {
       "mode": "all",
       "clans": []
-    }
+    },
+    "descriptionShortPt": "Festival de cerveja, comida, jogos e alegria após um período de trabalho árduo.",
+    "descriptionLongPt": "Começa no dia 9 de 'afgargablâg e termina no dia 19. A celebração recebe seu nome do Harnkegger cerimonial, um anão homenageado por seu trabalho excepcional, que abre e prova o primeiro barril de cerveja do verão. O festival reúne bebidas, banquetes, jogos e prêmios para a melhor cerveja. Surgiu em Ered Luin e depois foi adotado em outras regiões."
   },
   {
     "name": "Galkhabsatamrâg",
@@ -345,7 +355,9 @@
     "clanScope": {
       "mode": "all",
       "clans": []
-    }
+    },
+    "descriptionShortPt": "Festival de verão que celebra um período de fartura de comida e cerveja.",
+    "descriptionLongPt": ""
   },
   {
     "name": "Zudraibrizamrâg",
@@ -405,7 +417,9 @@
       "clans": [
         "Firebeards"
       ]
-    }
+    },
+    "descriptionShortPt": "Encontro de meio de verão dos Barbas-de-Fogo, que reúne as Sete Casas e é tradicionalmente realizado em Tumunzahar.",
+    "descriptionLongPt": "Começa no dia 19 de 'afgalkhabsât e termina no dia 23. Os reis das outras Casas são tradicionalmente convidados, acompanhados de seus seguidores, artesãos e comerciantes. A celebração inclui Nurtu Galabi (Dia das Palavras), Nurtu Asjâr (Dia do Comércio), Nurtu Finit (Dia Amplo) e Nurtu Zarkh (Dia do Pináculo), encerrando-se com um agradecimento mais solene."
   },
   {
     "name": "Zannu Adrâf",
@@ -463,7 +477,9 @@
     "clanScope": {
       "mode": "all",
       "clans": []
-    }
+    },
+    "descriptionShortPt": "Noite solene de caça, caridade e lembrança no último dia de 'af'iz.",
+    "descriptionLongPt": "Observada na noite do último dia de 'af'iz até pouco antes do amanhecer. Um grupo tradicionalmente caça um cervo ou javali, doando a carne e as peles aos anões menos afortunados. A noite é marcada por hidromel simples e refeições modestas, em vez de grandes banquetes, e pela lembrança daqueles que partiram para os Salões da Espera. Como o dia anão continua até o nascer do sol, o fim da celebração antes do amanhecer ainda pertence à mesma data do calendário anão."
   },
   {
     "name": "Gabashzudnamrâg",
@@ -521,6 +537,8 @@
     "clanScope": {
       "mode": "all",
       "clans": []
-    }
+    },
+    "descriptionShortPt": "O Festival da Colheita começa no último dia de 'afakrâgyan.",
+    "descriptionLongPt": "O Festival dos Tesouros da Terra começa no último dia de 'afakrâgyan. Em um ano de 13 meses, termina no dia 16 de 'aftharn. Em um ano de 12 meses, continua durante o Ano-Novo anão e termina no dia 16 do 'afdehar seguinte."
   }
 ]
