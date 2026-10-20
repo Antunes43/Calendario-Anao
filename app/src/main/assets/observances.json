@@ -1,1 +1,146 @@
-[{"name": "Iklaladranamrâg", "pt": "Festival de Inverno", "start": [2, 20], "end": [3, 18], "clan": ""}, {"name": "Nurtu Mamahrân", "pt": "Dia dos Queimados", "start": [2, 27], "end": [2, 27], "clan": ""}, {"name": "Khebabnurtamrâg", "pt": "Festival da Forja", "start": [4, 19], "end": [4, 19], "clan": ""}, {"name": "Mamahduldanakhamrâg", "pt": "Festival da Primavera", "start": [6, 1], "end": [6, 20], "clan": ""}, {"name": "Gargbuzrâmrâg", "pt": "Festival da Cerveja", "start": [8, 9], "end": [8, 19], "clan": ""}, {"name": "Galkhabsatamrâg", "pt": "Festival de Verão", "start": [9, 3], "end": [9, 23], "clan": ""}, {"name": "Zudraibrizamrâg", "pt": "Festival do Sol Alto", "start": [9, 19], "end": [9, 23], "clan": "Firebeards"}, {"name": "Zannu Adrâf", "pt": "Noite da Caça", "start": [11, -1], "end": [11, -1], "clan": ""}, {"name": "Gabashzudnamrâg", "pt": "Festival da Colheita", "start": [12, -1], "end": [13, 16], "clan": ""}]
+[
+  {
+    "name": "Iklaladranamrâg",
+    "pt": "Festival de Inverno",
+    "start": [
+      2,
+      20
+    ],
+    "end": [
+      3,
+      18
+    ],
+    "clan": "",
+    "titleEn": "Winter Fest (Yule Fest)",
+    "descriptionShort": "A winter festival spanning the latter part of 'afdush and the opening part of 'afiglêb.",
+    "descriptionLong": ""
+  },
+  {
+    "name": "Nurtu Mamahrân",
+    "pt": "Dia dos Queimados",
+    "start": [
+      2,
+      27
+    ],
+    "end": [
+      2,
+      27
+    ],
+    "clan": "",
+    "titleEn": "Day of the Burned",
+    "descriptionShort": "A sober day of remembrance for those who died at the Battle of Azanulbizar.",
+    "descriptionLong": "Held on the 27th of 'afdush. Feasts are not traditionally held and songs are not sung. Dwarves spend the day with family and friends, telling tales and remembering the dead of the Battle of Azanulbizar."
+  },
+  {
+    "name": "Khebabnurtamrâg",
+    "pt": "Festival da Forja",
+    "start": [
+      4,
+      19
+    ],
+    "end": [
+      4,
+      19
+    ],
+    "clan": "",
+    "titleEn": "Forge Day Fest",
+    "descriptionShort": "A feast sacred to smiths, marked by forging a great work in honour of Mahal.",
+    "descriptionLong": "Held on the 19th of 'afnu'khazâd. Forge Day traditionally marks the end of winter in many northern Halls. Smiths create an exceptional work for the occasion, followed in many communities by a heavy feast with dark bread, mutton, mushrooms and black ales. Works are displayed and the most highly praised creation may be gifted to the Lord of the Hall."
+  },
+  {
+    "name": "Mamahduldanakhamrâg",
+    "pt": "Festival da Primavera",
+    "start": [
+      6,
+      1
+    ],
+    "end": [
+      6,
+      20
+    ],
+    "clan": "",
+    "titleEn": "Blessed Green Fest (Spring Fest)",
+    "descriptionShort": "A spring festival associated with the first cutting of spring barley and the carrying of a fresh barley straw.",
+    "descriptionLong": "Begins on the 1st of 'af-mahd-danakh and ends on the 20th. The opening day traditionally marks the cutting of spring barley. A fresh straw of barley is carried for good fortune, a custom linked in Dwarven tradition with Kaminzabdûna. The final day is associated with the Broken Bone Race between Thorin's Halls and Needlehole."
+  },
+  {
+    "name": "Gargbuzrâmrâg",
+    "pt": "Festival da Cerveja",
+    "start": [
+      8,
+      9
+    ],
+    "end": [
+      8,
+      19
+    ],
+    "clan": "",
+    "titleEn": "Harnkegger Fest (Deep Ale Fest)",
+    "descriptionShort": "A festival of ale, food, games and merriment following a period of hard work.",
+    "descriptionLong": "Begins on the 9th of 'afgargablâg and ends on the 19th. The feast is named for the ceremonial Harnkegger, a Dwarf honoured for conspicuous hard work, who taps and samples the first barrel of summer ale. The festival features drinking, feasting, games and awards for the best ale. It originated in Ered Luin and was later adopted more widely."
+  },
+  {
+    "name": "Galkhabsatamrâg",
+    "pt": "Festival de Verão",
+    "start": [
+      9,
+      3
+    ],
+    "end": [
+      9,
+      23
+    ],
+    "clan": "",
+    "titleEn": "Feast of Good Health (Summer Fest)",
+    "descriptionShort": "A summer festival celebrating a period of plenty in food and ale.",
+    "descriptionLong": ""
+  },
+  {
+    "name": "Zudraibrizamrâg",
+    "pt": "Festival do Sol Alto",
+    "start": [
+      9,
+      19
+    ],
+    "end": [
+      9,
+      23
+    ],
+    "clan": "Firebeards",
+    "titleEn": "Firebeard Midsummer Fest (High Sun Feast)",
+    "descriptionShort": "A Firebeard midsummer gathering of the Seven Houses, traditionally held at Tumunzahar.",
+    "descriptionLong": "Begins on the 19th of 'afgalkhabsât and ends on the 23rd. The Kings of the other Houses are traditionally invited with their followers, crafters and traders. The celebration includes Nurtu Galabi (Day of Words), Nurtu Asjâr (Day of Trade), Nurtu Finit (Wide Day) and Nurtu Zarkh (Spire Day), ending on a more solemn note of thanksgiving."
+  },
+  {
+    "name": "Zannu Adrâf",
+    "pt": "Noite da Caça",
+    "start": [
+      11,
+      -1
+    ],
+    "end": [
+      11,
+      -1
+    ],
+    "clan": "",
+    "titleEn": "Night of the Kill",
+    "descriptionShort": "A solemn night of hunting, charity and remembrance on the final day of 'af'iz.",
+    "descriptionLong": "Observed on the evening of the last day of 'af'iz and lasting until foredawn. A fellowship traditionally hunts a deer or boar, with the meat and hides donated to less fortunate Dwarves. The night is marked by simple mead and meagre fare rather than heavy feasting, and by remembrance of those who have gone to the Halls of Waiting. Because the Dwarvish day continues until sunrise, the foredawn ending remains within the same Dwarvish calendar date."
+  },
+  {
+    "name": "Gabashzudnamrâg",
+    "pt": "Festival da Colheita",
+    "start": [
+      12,
+      -1
+    ],
+    "end": [
+      13,
+      16
+    ],
+    "clan": "",
+    "titleEn": "Treasures of the Land Fest (Harvest Fest)",
+    "descriptionShort": "The harvest festival begins on the final day of 'afakrâgyan.",
+    "descriptionLong": "The Treasures of the Land Fest begins on the last day of 'afakrâgyan. In a 13-month year it ends on the 16th of 'aftharn. In a 12-month year it continues across the Dwarvish New Year and ends on the 16th of the following 'afdehar."
+  }
+]
