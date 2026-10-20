@@ -10,6 +10,18 @@ import java.time.temporal.ChronoUnit
 /** Offline lookup based exclusively on original core.json month/year intervals. */
 object CalendarEngine {
  data class Day(val drYear:Int,val month:Int,val monthName:String,val meaning:String,val day:Int,val weekday:String,val intercalary:Boolean,val length:Int)
+
+ data class MonthInfo(val number:Int,val name:String,val meaning:String,val start:LocalDate,val end:LocalDate,val length:Int)
+ fun monthsForYear(ctx:Context,year:Int):List<MonthInfo>{
+  val source=core(ctx).getJSONArray("months")
+  val found=ArrayList<MonthInfo>()
+  for(i in 0 until source.length()){
+   val m=source.getJSONObject(i)
+   if(m.getInt("drYear")!=year)continue
+   found.add(MonthInfo(m.getInt("monthNumber"),m.getString("name"),m.optString("meaning"),LocalDate.parse(m.getString("startDate")),LocalDate.parse(m.getString("endDate")),m.getInt("lengthDays")))
+  }
+  return found.sortedBy{it.number}
+ }
  private var root:JSONObject?=null
  private var seasons:JSONArray?=null
  private fun core(ctx:Context):JSONObject {
