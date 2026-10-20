@@ -209,7 +209,6 @@ class MainActivity:Activity(){
  private val cream=0xfff3e8d7.toInt()
  private var themeIndex=0
  private var tab=0
- private var eventFilter=0
  private var selectedEventId:String?=null
  private var date=LocalDate.now()
  private val lunarImages=arrayOf("lua_nova","lua_crescente","quarto_crescente","gibosa_crescente","lua_cheia","gibosa_minguante","quarto_minguante","lua_minguante")
@@ -498,20 +497,9 @@ class MainActivity:Activity(){
      }
     }
    }else{
-    panel(root,10){p->
-     title(p,"EVENTOS E OBSERVÂNCIAS")
-     val filters=horizontal().apply{gravity=Gravity.CENTER;setPadding(0,dp(8),0,dp(5))}
-     arrayOf("Todos","Ativos","Futuros","Passados").forEachIndexed{index,label->
-      val button=text(label,12f,if(eventFilter==index)bronze else cream,eventFilter==index).apply{
-       setPadding(dp(9),dp(12),dp(9),dp(12))
-       setOnClickListener{eventFilter=index;draw()}
-      }
-      filters.addView(button,LinearLayout.LayoutParams(0,-2,1f))
-     }
-     p.addView(filters,LinearLayout.LayoutParams(-1,-2))
-    }
-    val visible=all.filter{eventFilter==0||status(it)==eventFilter}
-    if(visible.isEmpty())panel(root){eventText(it,"Nenhum evento nesta categoria.",14f,cream)}
+    panel(root,10){title(it,"EVENTOS E OBSERVÂNCIAS")}
+    val visible=all
+    if(visible.isEmpty())panel(root){eventText(it,"Nenhum evento encontrado.",14f,cream)}
     visible.forEach{o->
      panel(root,8,"nurt_events"){card->
       card.gravity=Gravity.START
