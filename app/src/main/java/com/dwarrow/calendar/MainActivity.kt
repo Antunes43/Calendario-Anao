@@ -455,41 +455,71 @@ class MainActivity:Activity(){
    seasonPanel(root,day)
    panel(root,12,"nurt_events"){p->
     title(p,"EVENTOS E OBSERVÂNCIAS")
-    val link=horizontal().apply{setPadding(dp(10),dp(10),dp(10),dp(10))}
-    link.addView(text("✧",29f,bronze),LinearLayout.LayoutParams(dp(50),-2))
-    val t=column();link.addView(t,LinearLayout.LayoutParams(0,-2,1f))
+    val content=column().apply{
+     gravity=Gravity.START
+     setPadding(dp(18),dp(10),dp(18),dp(12))
+    }
     val todays=day?.let{eventsFor(it)} ?: emptyList()
     if(todays.isNotEmpty()){
      todays.forEach{event->
-      add(t,event.getString("name"),16f,cream,true)
-      add(t,event.optString("pt"),12f,bronze)
-      add(t,event.optString("descriptionShort"),12f,cream)
+      content.addView(text(event.getString("name"),17f,cream,true).apply{gravity=Gravity.START})
+      content.addView(text(event.optString("pt"),13f,bronze).apply{gravity=Gravity.START})
+      content.addView(text(event.optString("descriptionShort"),13f,cream).apply{gravity=Gravity.START})
      }
     }else{
      val upcoming=nextEvent(date)
      if(upcoming!=null){
-      add(t,"Próxima observância: ${upcoming.second.getString("name")}",14f,cream,true)
-      add(t,upcoming.first.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")),12f,bronze)
-      add(t,upcoming.second.optString("descriptionShort"),12f,cream)
-     }else add(t,"Nenhuma observância encontrada",13f,cream)
+      content.addView(text("PRÓXIMA OBSERVÂNCIA",11f,bronze,true).apply{gravity=Gravity.START})
+      content.addView(text(upcoming.second.getString("name"),17f,cream,true).apply{gravity=Gravity.START})
+      content.addView(text(upcoming.first.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")),12f,bronze).apply{gravity=Gravity.START})
+      content.addView(text(upcoming.second.optString("descriptionShort"),13f,cream).apply{gravity=Gravity.START})
+     }else content.addView(text("Nenhuma observância encontrada",13f,cream).apply{gravity=Gravity.START})
     }
-    add(t,"Catálogo local provisório · tocar para ver todos ›",10f,0xffc5b4a0.toInt())
-    p.addView(link,LinearLayout.LayoutParams(-1,-2))
-    link.setOnClickListener{tab=3;draw()}
+    content.addView(text("Ver todos os eventos  ›",12f,bronze,true).apply{gravity=Gravity.START})
+    p.addView(content,LinearLayout.LayoutParams(-1,-2))
+    content.setOnClickListener{tab=3;draw()}
    }
   }
   if(tab==2)panel(root){title(it,"FASES E MESES LUNARES");add(it,"Dados astronômicos em validação. Nenhuma fase ou porcentagem é apresentada como cálculo confirmado.",14f)}
   if(tab==3){
-   panel(root){title(it,"EVENTOS E OBSERVÂNCIAS");add(it,"Catálogo local provisório · datas ainda não validadas",12f,cream)}
+   panel(root){title(it,"EVENTOS E OBSERVÂNCIAS")}
    val entries=observances
    for(i in 0 until entries.length()){
     val e=entries.getJSONObject(i)
-    panel(root,8){
-     add(it,"✧  "+e.getString("name"),17f,bronze,true)
-     add(it,e.getString("pt"),14f)
-     add(it,e.optString("descriptionShort"),13f,cream)
+    panel(root,8){card->
+     card.gravity=Gravity.START
+     card.setPadding(dp(20),dp(16),dp(20),dp(16))
+     fun line(value:String,size:Float,color:Int,bold:Boolean=false){
+      if(value.isBlank())return
+      card.addView(text(value,size,color,bold).apply{
+       gravity=Gravity.START
+       textAlignment=View.TEXT_ALIGNMENT_VIEW_START
+       setPadding(0,dp(4),0,dp(4))
+      },LinearLayout.LayoutParams(-1,-2))
+     }
+     line(e.getString("name"),19f,bronze,true)
+     line(e.optString("pt"),14f,cream)
+     line(e.optString("descriptionShort"),14f,cream)
      val details=e.optString("descriptionLong")
-     if(details.isNotBlank()) add(it,details,12f,cream)
+     if(details.isNotBlank()){
+      val detailView=text(details,14f,cream).apply{
+       gravity=Gravity.START
+       textAlignment=View.TEXT_ALIGNMENT_VIEW_START
+       setPadding(0,dp(8),0,dp(4))
+       visibility=View.GONE
+      }
+      val toggle=text("▸ Ler mais",13f,bronze,true).apply{
+       gravity=Gravity.START
+       setPadding(0,dp(8),0,dp(4))
+       setOnClickListener{
+        val expand=detailView.visibility!=View.VISIBLE
+        detailView.visibility=if(expand)View.VISIBLE else View.GONE
+        text=if(expand)"▾ Mostrar menos" else "▸ Ler mais"
+       }
+      }
+      card.addView(toggle,LinearLayout.LayoutParams(-1,-2))
+      card.addView(detailView,LinearLayout.LayoutParams(-1,-2))
+     }
     }
    }
   }
