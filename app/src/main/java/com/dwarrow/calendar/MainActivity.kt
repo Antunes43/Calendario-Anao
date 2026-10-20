@@ -508,6 +508,9 @@ class MainActivity:Activity(){
      contentDescription="Espaço reservado para a ilustração de "+o.entry.optString("name")
     }
    }
+   val nextDate=all.filter{it.start.isAfter(date)}.minOfOrNull{it.start}
+   fun displayStatus(o:ObservanceEngine.Occurrence):String =
+    if(!active(o)&&nextDate!=null&&o.start==nextDate)"PRÓXIMO" else status(o)
    fun eventBadge(o:ObservanceEngine.Occurrence):TextView{
     val value=displayStatus(o)
     val fill=when(value){
@@ -524,9 +527,6 @@ class MainActivity:Activity(){
      setPadding(dp(8),dp(5),dp(8),dp(5))
     }
    }
-   val nextDate=all.filter{it.start.isAfter(date)}.minOfOrNull{it.start}
-   fun displayStatus(o:ObservanceEngine.Occurrence):String =
-    if(!active(o)&&nextDate!=null&&o.start==nextDate)"PRÓXIMO" else status(o)
    val selected=all.firstOrNull{it.entry.optString("id")==selectedEventId}
    if(selected!=null){
     panel(root,8){p->
