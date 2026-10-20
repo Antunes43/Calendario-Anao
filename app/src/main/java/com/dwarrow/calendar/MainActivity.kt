@@ -463,12 +463,14 @@ class MainActivity:Activity(){
      todays.forEach{event->
       add(t,event.getString("name"),16f,cream,true)
       add(t,event.optString("pt"),12f,bronze)
+      add(t,event.optString("descriptionShort"),12f,cream)
      }
     }else{
      val upcoming=nextEvent(date)
      if(upcoming!=null){
       add(t,"Próxima observância: ${upcoming.second.getString("name")}",14f,cream,true)
       add(t,upcoming.first.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")),12f,bronze)
+      add(t,upcoming.second.optString("descriptionShort"),12f,cream)
      }else add(t,"Nenhuma observância encontrada",13f,cream)
     }
     add(t,"Catálogo local provisório · tocar para ver todos ›",10f,0xffc5b4a0.toInt())
@@ -482,7 +484,13 @@ class MainActivity:Activity(){
    val entries=observances
    for(i in 0 until entries.length()){
     val e=entries.getJSONObject(i)
-    panel(root,8){add(it,"✧  "+e.getString("name"),17f,bronze,true);add(it,e.getString("pt"),14f)}
+    panel(root,8){
+     add(it,"✧  "+e.getString("name"),17f,bronze,true)
+     add(it,e.getString("pt"),14f)
+     add(it,e.optString("descriptionShort"),13f,cream)
+     val details=e.optString("descriptionLong")
+     if(details.isNotBlank()) add(it,details,12f,cream)
+    }
    }
   }
   if(tab==4){
