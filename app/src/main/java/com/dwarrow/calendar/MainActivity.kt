@@ -491,61 +491,93 @@ class MainActivity:Activity(){
   if(tab==2)panel(root){title(it,"FASES E MESES LUNARES");add(it,"Dados astronômicos em validação. Nenhuma fase ou porcentagem é apresentada como cálculo confirmado.",14f)}
   if(tab==3){
    val all=ObservanceEngine.catalogue(this,date)
-   val fmt=DateTimeFormatter.ofPattern("dd/MM/yyyy")
-   fun status(o:ObservanceEngine.Occurrence):Int=when {
-    !date.isBefore(o.start)&&!date.isAfter(o.end)->1
-    o.start.isAfter(date)->2
-    else->3
-   }
-   fun label(o:ObservanceEngine.Occurrence):String=when(status(o)){
-    1->"ATIVO";2->"FUTURO";else->"PASSADO"
-   }
-   fun eventText(parent:LinearLayout,value:String,size:Float,color:Int,bold:Boolean=false){
+   val fmt=DateTimeFormatter.ofPattern("dd 'de' MMM 'de' yyyy",Locale("pt","BR"))
+   fun active(o:ObservanceEngine.Occurrence)=!date.isBefore(o.start)&&!date.isAfter(o.end)
+   fun status(o:ObservanceEngine.Occurrence)=if(active(o))"ATIVO" else if(o.start.isAfter(date))"FUTURO" else "PASSADO"
+   fun line(parent:LinearLayout,value:String,size:Float,color:Int,bold:Boolean=false){
     if(value.isBlank())return
     parent.addView(text(value,size,color,bold).apply{
-     gravity=Gravity.START
-     textAlignment=View.TEXT_ALIGNMENT_VIEW_START
-     setPadding(0,dp(4),0,dp(4))
+     gravity=Gravity.START;textAlignment=View.TEXT_ALIGNMENT_VIEW_START
+     setPadding(0,dp(2),0,dp(2))
     },LinearLayout.LayoutParams(-1,-2))
+   }
+   fun ornament(o:ObservanceEngine.Occurrence):TextView{
+    val name=o.entry.optString("pt").lowercase(Locale.ROOT)
+    val symbol=when{
+     "colheita" in name->"✦"
+     "inverno" in name->"❄"
+     "queimados" in name->"⚔"
+     "forja" in name->"⚒"
+     "primavera" in name->"❀"
+     else->"◆"
+    }
+    return text(symbol,29f,bronze,true).apply{
+     gravity=Gravity.CENTER
+     background=ForgedFrame(themeIndex)
+    }
    }
    val selected=all.firstOrNull{it.entry.optString("id")==selectedEventId}
    if(selected!=null){
-    panel(root,12,"nurt_events"){card->
+    panel(root,8){p->
+     val back=text("‹  Voltar para a lista",14f,bronze,true)
+     back.setPadding(dp(4),dp(12),0,dp(12))
+     back.setOnClickListener{selectedEventId=null;draw()}
+     p.addView(back)
+    }
+    panel(root,10,"nurt_events"){card->
      card.gravity=Gravity.START
-     card.setPadding(dp(20),dp(18),dp(20),dp(20))
-     val back=text("‹  Voltar aos eventos",14f,bronze,true).apply{
-      gravity=Gravity.START
-      setOnClickListener{selectedEventId=null;draw()}
-     }
-     card.addView(back)
-     eventText(card,selected.entry.optString("name"),23f,bronze,true)
-     eventText(card,selected.entry.optString("pt"),17f,cream)
-     eventText(card,label(selected)+"  ·  "+selected.start.format(fmt)+" – "+selected.end.format(fmt),12f,bronze,true)
-     eventText(card,"RESUMO",12f,bronze,true)
-     eventText(card,selected.entry.optString("descriptionShort"),15f,cream)
+     card.setPadding(dp(18),dp(18),dp(18),dp(22))
+     val hero=ornament(selected)
+     card.addView(hero,LinearLayout.LayoutParams(-1,dp(155)).apply{bottomMargin=dp(16)})
+     line(card,selected.entry.optString("name"),23f,bronze,true)
+     line(card,selected.entry.optString("pt"),17f,cream)
+     line(card,status(selected)+"  ·  "+selected.start.format(fmt)+" – "+selected.end.format(fmt),12f,bronze,true)
+     lunarDivider(card)
+     line(card,"RESUMO",13f,bronze,true)
+     line(card,selected.entry.optString("descriptionShort"),15f,cream)
      val full=selected.entry.optString("descriptionLong")
      if(full.isNotBlank()){
-      eventText(card,"DESCRIÇÃO COMPLETA",12f,bronze,true)
-      eventText(card,full,15f,cream)
+      lunarDivider(card)
+      line(card,"DESCRIÇÃO COMPLETA",13f,bronze,true)
+      line(card,full,15f,cream)
      }
-     eventText(card,"TIPO  ·  "+selected.entry.optString("type","festival"),12f,bronze)
+     lunarDivider(card)
+     line(card,"TIPO",13f,bronze,true)
+     line(card,selected.entry.optString("type","Festival"),14f,cream)
+     line(card,"RECORRÊNCIA",13f,bronze,true)
+     line(card,selected.entry.optString("recurrence","Anual"),14f,cream)
      val scope=selected.entry.optJSONObject("clanScope")
-     if(scope?.optString("mode")=="selected"){
-      eventText(card,"CLÃS  ·  "+scope.optJSONArray("clans")?.let{arr->(0 until arr.length()).joinToString(", "){arr.optString(it)}}.orEmpty(),12f,bronze)
-     }
+     line(card,"APLICAÇÃO",13f,bronze,true)
+     line(card,if(scope?.optString("mode")=="selected")"Clãs específicos" else "Todos os clãs",14f,cream)
     }
    }else{
-    panel(root,10){title(it,"EVENTOS E OBSERVÂNCIAS")}
-    val visible=all
-    if(visible.isEmpty())panel(root){eventText(it,"Nenhum evento encontrado.",14f,cream)}
-    visible.forEach{o->
-     panel(root,8,"nurt_events"){card->
-      card.gravity=Gravity.START
-      card.setPadding(dp(18),dp(12),dp(18),dp(12))
-      eventText(card,o.entry.optString("name")+"   ›",17f,bronze,true)
-      eventText(card,o.entry.optString("pt"),14f,cream)
-      eventText(card,label(o)+"  ·  "+o.start.format(fmt)+" – "+o.end.format(fmt),12f,bronze)
-      eventText(card,o.entry.optString("descriptionShort"),13f,cream)
+    panel(root,8){title(it,"EVENTOS E OBSERVÂNCIAS")}
+    if(all.isEmpty())panel(root){line(it,"Nenhum evento encontrado.",14f,cream)}
+    all.forEach{o->
+     panel(root,6,"nurt_events"){card->
+      card.setPadding(dp(10),dp(9),dp(10),dp(9))
+      val row=horizontal().apply{gravity=Gravity.CENTER_VERTICAL}
+      row.addView(ornament(o),LinearLayout.LayoutParams(dp(66),dp(92)).apply{rightMargin=dp(11)})
+      val info=column()
+      val top=horizontal().apply{gravity=Gravity.CENTER_VERTICAL}
+      val name=text(o.entry.optString("name"),16f,bronze,true).apply{
+       maxLines=2
+      }
+      top.addView(name,LinearLayout.LayoutParams(0,-2,1f))
+      val badge=text(status(o),10f,if(active(o))0xffffc879.toInt() else cream,true).apply{
+       setPadding(dp(5),dp(4),dp(5),dp(4))
+      }
+      top.addView(badge)
+      info.addView(top)
+      line(info,o.entry.optString("pt"),13f,bronze)
+      line(info,o.start.format(fmt)+" – "+o.end.format(fmt),11f,cream)
+      val summary=text(o.entry.optString("descriptionShort"),12f,cream).apply{
+       maxLines=2;ellipsize=android.text.TextUtils.TruncateAt.END
+       setPadding(0,dp(4),0,0)
+      }
+      info.addView(summary)
+      row.addView(info,LinearLayout.LayoutParams(0,-2,1f))
+      card.addView(row)
       card.setOnClickListener{selectedEventId=o.entry.optString("id");draw()}
      }
     }
