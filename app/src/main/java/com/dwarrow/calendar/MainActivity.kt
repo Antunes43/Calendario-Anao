@@ -462,30 +462,51 @@ class MainActivity:Activity(){
    seasonPanel(root,day)
    panel(root,12,"nurt_events"){p->
     title(p,"EVENTOS E OBSERVÂNCIAS")
-    val content=column().apply{
-     gravity=Gravity.START
-     setPadding(dp(18),dp(10),dp(18),dp(12))
-    }
     val todays=ObservanceEngine.active(this,date)
-    if(todays.isNotEmpty()){
-     todays.forEach{occurrence->
-      val event=occurrence.entry
-      content.addView(text(event.getString("name"),17f,cream,true).apply{gravity=Gravity.START})
-      content.addView(text(event.optString("pt"),13f,bronze).apply{gravity=Gravity.START})
-      content.addView(text(event.optString("descriptionShortPt"),13f,cream).apply{gravity=Gravity.START})
+    val entries=if(todays.isNotEmpty())todays else ObservanceEngine.next(this,date)
+    val fmt=DateTimeFormatter.ofPattern("dd 'de' MMM 'de' yyyy",Locale("pt","BR"))
+    if(entries.isEmpty())add(p,"Nenhuma observância encontrada",13f)
+    entries.forEach{occurrence->
+     val event=occurrence.entry
+     val isActive=todays.isNotEmpty()
+     val row=horizontal().apply{
+      gravity=Gravity.CENTER_VERTICAL
+      background=ForgedFrame(themeIndex)
+      setPadding(dp(9),dp(9),dp(9),dp(9))
      }
-    }else{
-     val upcoming=ObservanceEngine.next(this,date).firstOrNull()
-     if(upcoming!=null){
-      content.addView(text("PRÓXIMA OBSERVÂNCIA",11f,bronze,true).apply{gravity=Gravity.START})
-      content.addView(text(upcoming.entry.getString("name"),17f,cream,true).apply{gravity=Gravity.START})
-      content.addView(text(upcoming.start.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")),12f,bronze).apply{gravity=Gravity.START})
-      content.addView(text(upcoming.entry.optString("descriptionShortPt"),13f,cream).apply{gravity=Gravity.START})
-     }else content.addView(text("Nenhuma observância encontrada",13f,cream).apply{gravity=Gravity.START})
+     val imageSlot=View(this).apply{
+      background=ForgedFrame(themeIndex)
+      contentDescription="Espaço reservado para a imagem de "+event.optString("name")
+     }
+     row.addView(imageSlot,LinearLayout.LayoutParams(dp(66),dp(92)).apply{rightMargin=dp(11)})
+     val info=column()
+     val heading=horizontal().apply{gravity=Gravity.CENTER_VERTICAL}
+     heading.addView(text(event.optString("name"),15f,bronze,true).apply{maxLines=2},LinearLayout.LayoutParams(0,-2,1f))
+     val label=if(isActive)"ATIVO" else "PRÓXIMO"
+     val badge=text(label,10f,cream,true).apply{
+      background=android.graphics.drawable.GradientDrawable().apply{
+       setColor(if(isActive)0xff8b5008.toInt() else 0xff164a70.toInt())
+       setCornerRadius(dp(5).toFloat())
+       setStroke(dp(1),if(isActive)0xffd99a42.toInt() else 0xff6b7882.toInt())
+      }
+      setPadding(dp(7),dp(5),dp(7),dp(5))
+     }
+     heading.addView(badge)
+     info.addView(heading)
+     info.addView(text(event.optString("pt"),13f,bronze))
+     info.addView(text(occurrence.start.format(fmt)+" – "+occurrence.end.format(fmt),11f,cream))
+     info.addView(text(event.optString("descriptionShortPt"),12f,cream).apply{
+      maxLines=2;ellipsize=android.text.TextUtils.TruncateAt.END
+     })
+     row.addView(info,LinearLayout.LayoutParams(0,-2,1f))
+     p.addView(row,LinearLayout.LayoutParams(-1,-2).apply{bottomMargin=dp(7)})
+     row.setOnClickListener{selectedEventId=event.optString("id");tab=3;draw()}
     }
-    content.addView(text("Ver todos os eventos  ›",12f,bronze,true).apply{gravity=Gravity.START})
-    p.addView(content,LinearLayout.LayoutParams(-1,-2))
-    content.setOnClickListener{tab=3;draw()}
+    val link=text("Ver todos os eventos  ›",12f,bronze,true).apply{
+     gravity=Gravity.END;setPadding(dp(8),dp(8),dp(8),dp(6))
+     setOnClickListener{selectedEventId=null;tab=3;draw()}
+    }
+    p.addView(link,LinearLayout.LayoutParams(-1,-2))
    }
   }
   if(tab==2)panel(root){title(it,"FASES E MESES LUNARES");add(it,"Dados astronômicos em validação. Nenhuma fase ou porcentagem é apresentada como cálculo confirmado.",14f)}
