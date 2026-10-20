@@ -314,7 +314,7 @@ class MainActivity:Activity(){
   return if(first<=last)current in first..last else current>=first||current<=last
  }
  private val monthLengths by lazy {
-  val months=JSONObject(assets.open("core.json").bufferedReader().use{it.readText()}).getJSONArray("months")
+  val months=org.json.JSONObject(assets.open("core.json").bufferedReader().use{it.readText()}).getJSONArray("months")
   val lengths=HashMap<Pair<Int,Int>,Int>()
   for(i in 0 until months.length()){
    val m=months.getJSONObject(i)
