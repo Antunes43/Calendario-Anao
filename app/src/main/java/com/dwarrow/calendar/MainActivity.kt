@@ -451,12 +451,23 @@ class MainActivity:Activity(){
    add(b,"DATA GREGORIANA",11f,bronze,true);add(b,greg,15f,cream,true)
   }
   if(tab==1){
-   val row=horizontal()
-   root.addView(row,LinearLayout.LayoutParams(-1,-2).apply{bottomMargin=dp(12)})
-   listOf(Triple("◀ Anterior",1f,-1),Triple("Hoje",0.7f,0),Triple("Próximo ▶",1f,1)).forEach{(label,weight,delta)->
-    row.addView(action(label){date=if(delta==0)LocalDate.now(ZoneId.systemDefault()) else date.plusDays(delta.toLong())},LinearLayout.LayoutParams(0,-2,weight).apply{marginEnd=dp(3)})
+   val info=CalendarEngine.lookup(this,date)
+   val month=if(info==null)null else CalendarEngine.monthsForYear(this,info.drYear).firstOrNull{!date.isBefore(it.start)&&!date.isAfter(it.end)}
+   if(month!=null){
+    panel(root){p->
+     val nav=horizontal()
+     nav.addView(action("‹"){date=month.start.minusDays(1);draw()},LinearLayout.LayoutParams(0,-2,1f))
+     nav.addView(text(month.name,20f,bronze,true).apply{gravity=Gravity.CENTER},LinearLayout.LayoutParams(0,-2,3f))
+     nav.addView(action("›"){date=month.end.plusDays(1);draw()},LinearLayout.LayoutParams(0,-2,1f))
+     p.addView(nav)
+     add(p,"Mês "+month.number+" · D.R. "+info!!.drYear,13f,cream)
+    }
+    panel(root,8,"nurt_events"){p->
+     p.addView(View(this).apply{background=ForgedFrame(themeIndex)},LinearLayout.LayoutParams(-1,dp(155)))
+     add(p,month.start.toString()+" – "+month.end.toString(),13f,cream)
+    }
+    seasonPanel(root,info)
    }
-   seasonPanel(root,day)
   }
   if(tab==0){
    seasonPanel(root,day)
