@@ -466,6 +466,31 @@ class MainActivity:Activity(){
      p.addView(View(this).apply{background=ForgedFrame(themeIndex)},LinearLayout.LayoutParams(-1,dp(155)))
      add(p,month.start.toString()+" – "+month.end.toString(),13f,cream)
     }
+    panel(root){p->
+     title(p,"DIAS DO MÊS")
+     val labels=horizontal()
+     listOf("SEG","TER","QUA","QUI","SEX","SÁB","DOM").forEach{n->
+      labels.addView(text(n,10f,bronze,true).apply{gravity=Gravity.CENTER},LinearLayout.LayoutParams(0,dp(28),1f))
+     }
+     p.addView(labels)
+     val offset=month.start.dayOfWeek.value-1
+     for(w in 0 until (offset+month.length+6)/7){
+      val row=horizontal()
+      for(c in 0..6){
+       val n=w*7+c-offset+1
+       val on=if(n in 1..month.length)month.start.plusDays((n-1).toLong()) else null
+       val selected=on==date
+       val marked=on!=null&&ObservanceEngine.active(this,on).isNotEmpty()
+       val cell=text(if(on==null)" " else n.toString()+(if(marked)" •" else ""),13f,if(selected)bronze else cream,selected).apply{
+        gravity=Gravity.CENTER
+        background=ForgedFrame(themeIndex)
+        if(on!=null)setOnClickListener{date=on;draw()}
+       }
+       row.addView(cell,LinearLayout.LayoutParams(0,dp(42),1f).apply{setMargins(dp(2),dp(2),dp(2),dp(2))})
+      }
+      p.addView(row)
+     }
+    }
     seasonPanel(root,info)
    }
   }
