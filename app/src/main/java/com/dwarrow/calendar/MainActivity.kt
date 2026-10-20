@@ -545,8 +545,8 @@ class MainActivity:Activity(){
      line(card,displayStatus(selected)+"  ·  "+selected.start.format(fmt)+" – "+selected.end.format(fmt),12f,bronze,true)
      lunarDivider(card)
      line(card,"RESUMO",13f,bronze,true)
-     line(card,selected.entry.optString("descriptionShort"),15f,cream)
-     val full=selected.entry.optString("descriptionLong")
+     line(card,selected.entry.optString("descriptionShortPt"),15f,cream)
+     val full=selected.entry.optString("descriptionLongPt")
      if(full.isNotBlank()){
       lunarDivider(card)
       line(card,"DESCRIÇÃO COMPLETA",13f,bronze,true)
@@ -556,7 +556,7 @@ class MainActivity:Activity(){
      line(card,"TIPO",13f,bronze,true)
      line(card,selected.entry.optString("type","Festival"),14f,cream)
      line(card,"RECORRÊNCIA",13f,bronze,true)
-     line(card,selected.entry.optString("recurrence","Anual"),14f,cream)
+     line(card,"Anual",14f,cream)
      val scope=selected.entry.optJSONObject("clanScope")
      line(card,"APLICAÇÃO",13f,bronze,true)
      line(card,if(scope?.optString("mode")=="selected")"Clãs específicos" else "Todos os clãs",14f,cream)
@@ -580,7 +580,7 @@ class MainActivity:Activity(){
       info.addView(top)
       line(info,o.entry.optString("pt"),13f,bronze)
       line(info,o.start.format(fmt)+" – "+o.end.format(fmt),11f,cream)
-      val summary=text(o.entry.optString("descriptionShort"),12f,cream).apply{
+      val summary=text(o.entry.optString("descriptionShortPt"),12f,cream).apply{
        maxLines=2;ellipsize=android.text.TextUtils.TruncateAt.END
        setPadding(0,dp(4),0,0)
       }
