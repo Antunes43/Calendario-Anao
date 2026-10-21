@@ -611,35 +611,43 @@ class MainActivity:Activity(){
    val age=phase.third
    val fraction=age/29.530588853
    val illumination=((1-kotlin.math.cos(2*Math.PI*fraction))/2*100).toInt()
-   title(root,"LUAS")
+   title(root,"ASTROLÁBIO LUNAR")
+   val instrument=FrameLayout(this).apply{
+    background=ForgedFrame(themeIndex)
+    setPadding(dp(10),dp(10),dp(10),dp(10))
+   }
    val dial=FrameLayout(this)
    dial.background=object:Drawable(){
     val paint=Paint(Paint.ANTI_ALIAS_FLAG)
     override fun draw(c:Canvas){
      val b=bounds;val cx=b.exactCenterX();val cy=b.exactCenterY()
      val radius=kotlin.math.min(b.width(),b.height())*.47f
-     paint.color=0xff0b1118.toInt();paint.style=Paint.Style.FILL;c.drawRect(b,paint)
-     for(i in 0..5){
-      paint.style=Paint.Style.STROKE;paint.strokeWidth=if(i%2==0)5f else 2f
-      paint.color=if(i%2==0)0xffc28b4c.toInt() else 0xff76512e.toInt()
-      c.drawCircle(cx,cy,radius*(1-i*.09f),paint)
+     paint.style=Paint.Style.FILL;paint.color=0xff10151b.toInt();c.drawRect(b,paint)
+     val gold=0xffd6a264.toInt()
+     for(i in 0..3){
+      paint.style=Paint.Style.STROKE
+      paint.color=if(i%2==0)gold else 0xff78512f.toInt()
+      paint.strokeWidth=if(i==0)dp(4).toFloat() else dp(1).toFloat()
+      c.drawCircle(cx,cy,radius*(1-i*.12f),paint)
      }
-     for(i in 0 until 48){
-      val a=(i*2*Math.PI/48-Math.PI/2).toFloat()
-      val x=kotlin.math.cos(a);val y=kotlin.math.sin(a)
-      paint.color=0xffd9aa66.toInt();paint.strokeWidth=if(i%4==0)4f else 2f
-      c.drawLine(cx+x*radius*.78f,cy+y*radius*.78f,cx+x*radius*.89f,cy+y*radius*.89f,paint)
+     paint.style=Paint.Style.STROKE;paint.strokeWidth=dp(2).toFloat();paint.color=gold
+     for(i in 0 until 12){
+      val angle=(i*Math.PI/6-Math.PI/2).toFloat()
+      val x=kotlin.math.cos(angle);val y=kotlin.math.sin(angle)
+      c.drawLine(cx+x*radius*.78f,cy+y*radius*.78f,cx+x*radius*.92f,cy+y*radius*.92f,paint)
      }
      paint.style=Paint.Style.FILL
      for(i in 0..3){
-      val a=(i*Math.PI/2-Math.PI/2).toFloat()
-      val x=cx+kotlin.math.cos(a)*radius*.72f;val y=cy+kotlin.math.sin(a)*radius*.72f
-      val diamond=Path().apply{moveTo(x,y-16f);lineTo(x+11f,y);lineTo(x,y+16f);lineTo(x-11f,y);close()}
-      paint.color=0xffe8b66c.toInt();c.drawPath(diamond,paint)
+      val angle=(i*Math.PI/2-Math.PI/2).toFloat()
+      val x=cx+kotlin.math.cos(angle)*radius*.88f
+      val y=cy+kotlin.math.sin(angle)*radius*.88f
+      val path=Path().apply{moveTo(x,y-dp(10));lineTo(x+dp(8),y);lineTo(x,y+dp(10));lineTo(x-dp(8),y);close()}
+      paint.color=0xffa76536.toInt();c.drawPath(path,paint)
+      paint.style=Paint.Style.STROKE;paint.color=gold;paint.strokeWidth=dp(1).toFloat();c.drawPath(path,paint);paint.style=Paint.Style.FILL
      }
-     val a=(fraction*2*Math.PI-Math.PI/2).toFloat()
-     paint.color=0xffffd188.toInt()
-     c.drawCircle(cx+kotlin.math.cos(a)*radius*.67f,cy+kotlin.math.sin(a)*radius*.67f,7f,paint)
+     val angle=(fraction*2*Math.PI-Math.PI/2).toFloat()
+     paint.color=0xffffd99b.toInt()
+     c.drawCircle(cx+kotlin.math.cos(angle)*radius*.7f,cy+kotlin.math.sin(angle)*radius*.7f,dp(5).toFloat(),paint)
     }
     override fun setAlpha(alpha:Int){paint.alpha=alpha}
     override fun setColorFilter(cf:android.graphics.ColorFilter?){paint.colorFilter=cf}
@@ -650,44 +658,47 @@ class MainActivity:Activity(){
     if(id!=0)setImageResource(id) else setImageDrawable(KhazadMoon())
     scaleType=ImageView.ScaleType.FIT_CENTER
    }
-   dial.addView(moon,FrameLayout.LayoutParams(dp(162),dp(162),Gravity.CENTER))
-   root.addView(dial,LinearLayout.LayoutParams(-1,dp(330)).apply{bottomMargin=dp(8)})
-   fun lunarStat(row:LinearLayout,label:String,value:String){
-    val box=column().apply{background=ForgedFrame(themeIndex);setPadding(dp(5),dp(8),dp(5),dp(8))}
-    box.addView(text(label,10f,bronze,true));box.addView(text(value,14f,cream,true))
-    row.addView(box,LinearLayout.LayoutParams(0,dp(82),1f).apply{setMargins(dp(3),0,dp(3),0)})
-   }
-   val top=horizontal()
-   lunarStat(top,"FASE ATUAL",lunarNames[phase.first])
-   lunarStat(top,"ILUMINAÇÃO","≈ "+illumination+"%")
-   root.addView(top,LinearLayout.LayoutParams(-1,-2).apply{bottomMargin=dp(6)})
-   val bottom=horizontal()
-   lunarStat(bottom,"IDADE DA LUA","≈ "+age.toInt()+" dias")
-   lunarStat(bottom,"PRÓXIMA FASE",lunarNames[(phase.first+1)%8])
-   root.addView(bottom,LinearLayout.LayoutParams(-1,-2).apply{bottomMargin=dp(8)})
+   dial.addView(moon,FrameLayout.LayoutParams(dp(146),dp(146),Gravity.CENTER))
+   instrument.addView(dial,FrameLayout.LayoutParams(-1,dp(294),Gravity.TOP or Gravity.CENTER_HORIZONTAL))
+   root.addView(instrument,LinearLayout.LayoutParams(-1,dp(314)).apply{bottomMargin=dp(8)})
+   val name=text(lunarNames[phase.first],21f,bronze,true).apply{gravity=Gravity.CENTER}
+   root.addView(name,LinearLayout.LayoutParams(-1,-2).apply{bottomMargin=dp(4)})
+   root.addView(text("Idade lunar ≈ "+age.toInt()+" dias    •    Iluminação ≈ "+illumination+"%",12f,cream).apply{gravity=Gravity.CENTER},LinearLayout.LayoutParams(-1,-2).apply{bottomMargin=dp(12)})
+   val divider=View(this).apply{setBackgroundColor(bronze)}
+   root.addView(divider,LinearLayout.LayoutParams(-1,dp(1)).apply{bottomMargin=dp(12)})
+   val navigation=horizontal().apply{gravity=Gravity.CENTER_VERTICAL}
+   val before=text("‹  FASE ANTERIOR",11f,bronze,true).apply{gravity=Gravity.CENTER;setPadding(dp(3),dp(12),dp(3),dp(12))}
+   val after=text("PRÓXIMA FASE  ›",11f,bronze,true).apply{gravity=Gravity.CENTER;setPadding(dp(3),dp(12),dp(3),dp(12))}
+   val left=column().apply{gravity=Gravity.CENTER}
+   left.addView(before)
+   left.addView(text(lunarNames[(phase.first+7)%8],12f,cream).apply{gravity=Gravity.CENTER})
+   val right=column().apply{gravity=Gravity.CENTER}
+   right.addView(after)
+   right.addView(text(lunarNames[(phase.first+1)%8],12f,cream).apply{gravity=Gravity.CENTER})
+   navigation.addView(left,LinearLayout.LayoutParams(0,-2,1f))
+   navigation.addView(View(this).apply{setBackgroundColor(bronze)},LinearLayout.LayoutParams(dp(1),dp(55)))
+   navigation.addView(right,LinearLayout.LayoutParams(0,-2,1f))
+   root.addView(navigation,LinearLayout.LayoutParams(-1,-2).apply{bottomMargin=dp(12)})
    panel(root,8,"nurt_lunar"){p->
-    title(p,"CICLO LUNAR")
+    title(p,"AS OITO FASES")
     val strip=horizontal()
     for(i in 0..7){
-     val slot=column()
+     val slot=column().apply{gravity=Gravity.CENTER}
      val id=resources.getIdentifier(lunarImages[i],"drawable",packageName)
      slot.addView(ImageView(this).apply{
       if(id!=0)setImageResource(id) else setImageDrawable(KhazadMoon())
       scaleType=ImageView.ScaleType.FIT_CENTER
-      alpha=if(i==phase.first)1f else .6f
-     },LinearLayout.LayoutParams(-1,dp(45)))
-     slot.addView(text(if(i==phase.first)"◆" else "·",12f,bronze,i==phase.first))
+      alpha=if(i==phase.first)1f else .58f
+     },LinearLayout.LayoutParams(-1,dp(40)))
+     slot.addView(text(if(i==phase.first)"◆" else "·",12f,bronze,i==phase.first).apply{gravity=Gravity.CENTER})
      strip.addView(slot,LinearLayout.LayoutParams(0,-2,1f))
     }
     p.addView(strip)
-    add(p,"Próxima fase estimada em "+phase.second+" dia(s)",12f,cream)
+    add(p,"Próxima mudança de fase: aproximadamente "+phase.second+" dia(s).",12f,cream)
    }
-   panel(root,8,"nurt_events"){p->
-    title(p,"POSIÇÃO NO CÉU")
-    add(p,"Nascer, pôr, altitude, azimute e distância exigem cálculo astronômico local validado.",13f,cream)
-    add(p,"Fase, iluminação e idade são aproximações matemáticas.",11f,bronze)
-   }
+   root.addView(text("Cálculos lunares aproximados; informações astronômicas locais ainda não disponíveis.",11f,bronze).apply{gravity=Gravity.CENTER},LinearLayout.LayoutParams(-1,-2).apply{topMargin=dp(8);bottomMargin=dp(8)})
   }
+
   if(tab==3){
    val all=ObservanceEngine.catalogue(this,date)
    val fmt=DateTimeFormatter.ofPattern("dd 'de' MMM 'de' yyyy",Locale("pt","BR"))
