@@ -641,6 +641,7 @@ class MainActivity:Activity(){
    }
   }
   if(tab==2){
+   val phase=lunarPhase(date)
    val position=moonHorizontal()
    val age=phase.third
    val fraction=age/29.530588853
