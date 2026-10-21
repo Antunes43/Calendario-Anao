@@ -233,7 +233,10 @@ class MainActivity:Activity(){
   if(!prefs.contains("durin_lat")||!prefs.contains("durin_lon"))return null
   val lat=Math.toRadians(prefs.getFloat("durin_lat",0f).toDouble())
   val lon=prefs.getFloat("durin_lon",0f).toDouble()
-  val jd=System.currentTimeMillis()/86400000.0+2440587.5
+  return moonHorizontalAt(lat,lon,System.currentTimeMillis())
+ }
+ private fun moonHorizontalAt(lat:Double,lon:Double,epochMillis:Long):Pair<Double,Double>{
+  val jd=epochMillis/86400000.0+2440587.5
   val d=jd-2451543.5
   fun norm(v:Double)=((v%360.0)+360.0)%360.0
   val node=Math.toRadians(norm(125.1228-0.0529538083*d))
@@ -808,12 +811,32 @@ class MainActivity:Activity(){
      // Separate celestial-position chart, without invented coordinates.
      box(c,18f,964f,864f,292f)
      label(c,"POSIÇÃO ATUAL",450f,1008f,29f,gold)
-     // Horizon chart: azimuth controls horizontal position; altitude controls height.
-     // The full 360-degree azimuth is projected left-to-right, with cardinal bearings.
+     // Sample the actual lunar ephemeris over the current local day.
      val left=85f;val right=815f;val horizon=1149f;val zenith=1032f
-     ink.style=Paint.Style.STROKE;ink.strokeWidth=2.5f;ink.color=gold
-     val trajectory=Path().apply{moveTo(left,horizon);quadTo(450f,990f,right,horizon)}
-     c.drawPath(trajectory,ink)
+     if(position!=null){
+      val prefs=getPreferences(MODE_PRIVATE)
+      val latitude=Math.toRadians(prefs.getFloat("durin_lat",0f).toDouble())
+      val longitude=prefs.getFloat("durin_lon",0f).toDouble()
+      val midnight=LocalDate.now(ZoneId.systemDefault()).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
+      val trajectory=Path()
+      var drawing=false
+      var previousAz=-1.0
+      for(minute in 0..1440 step 10){
+       val (alt,az)=moonHorizontalAt(latitude,longitude,midnight+minute*60000L)
+       val x=left+(az/360.0).toFloat()*(right-left)
+       val y=horizon-(alt.coerceIn(0.0,90.0)/90.0).toFloat()*(horizon-zenith)
+       if(alt<0.0|| (previousAz>=0.0&&kotlin.math.abs(az-previousAz)>180.0)){
+        drawing=false
+       }
+       if(alt>=0.0){
+        if(!drawing)trajectory.moveTo(x,y) else trajectory.lineTo(x,y)
+        drawing=true
+       }
+       previousAz=az
+      }
+      ink.style=Paint.Style.STROKE;ink.strokeWidth=3f;ink.color=gold
+      c.drawPath(trajectory,ink)
+     }
      ink.color=0xff86623e.toInt();ink.strokeWidth=1.5f
      c.drawLine(left,horizon,right,horizon,ink)
      label(c,"N",90f,1178f,20f,gold)
