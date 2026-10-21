@@ -630,24 +630,28 @@ class MainActivity:Activity(){
      ink.color=color;ink.style=Paint.Style.FILL;ink.textSize=size;ink.typeface=Typeface.create("sans-serif",Typeface.BOLD)
      ink.textAlign=Paint.Align.CENTER;c.drawText(t,x,y,ink)
     }
+    override fun onMeasure(widthMeasureSpec:Int,heightMeasureSpec:Int){
+     val w=MeasureSpec.getSize(widthMeasureSpec)
+     setMeasuredDimension(w,(w*1260f/900f).toInt())
+    }
     override fun onDraw(c:Canvas){
      super.onDraw(c)
-     val sx=width/900f;val sy=height/1260f
-     c.save();c.scale(sx,sy)
+     val scale=width/900f
+     c.save();c.scale(scale,scale)
      ink.style=Paint.Style.FILL;ink.color=0xff090d13.toInt();c.drawRect(0f,0f,900f,1260f,ink)
      label(c,"✦  LUAS  ✦",450f,49f,38f,gold)
      // The six data panels occupy the sides of the central astrolabe.
-     box(c,16f,92f,235f,158f);box(c,649f,92f,235f,158f)
-     box(c,16f,307f,215f,133f);box(c,669f,307f,215f,133f)
-     box(c,16f,492f,215f,130f);box(c,669f,492f,215f,130f)
-     label(c,"FASE ATUAL",133f,134f,20f,gold)
-     label(c,lunarNames[phase.first],133f,177f,19f)
-     label(c,"ILUMINAÇÃO",766f,134f,20f,gold)
-     label(c,"≈ "+illumination+"%",766f,180f,30f)
+     box(c,16f,92f,215f,155f);box(c,669f,92f,215f,155f)
+     box(c,16f,295f,215f,145f);box(c,669f,295f,215f,145f)
+     box(c,16f,485f,215f,145f);box(c,669f,485f,215f,145f)
+     label(c,"FASE ATUAL",122f,134f,20f,gold)
+     label(c,lunarNames[phase.first],122f,177f,19f)
+     label(c,"ILUMINAÇÃO",776f,134f,20f,gold)
+     label(c,"≈ "+illumination+"%",776f,180f,30f)
      label(c,"IDADE",122f,350f,21f,gold)
      label(c,"≈ "+age.toInt()+" dias",122f,394f,24f)
-     label(c,"DISTÂNCIA",775f,350f,21f,gold)
-     label(c,"—",775f,394f,27f)
+     label(c,"DISTÂNCIA",776f,350f,21f,gold)
+     label(c,"—",776f,394f,27f)
      label(c,"NASCER",122f,539f,21f,gold)
      label(c,"—",122f,580f,27f)
      label(c,"PÔR",775f,539f,21f,gold)
@@ -662,17 +666,37 @@ class MainActivity:Activity(){
       c.drawLine(450f+x*194f,364f+y*194f,450f+x*210f,364f+y*210f,ink)
      }
      moonDrawable.setBounds(333,247,567,481);moonDrawable.draw(c)
-     // Phase arc, with eight reserved icon positions.
+     // Eight faceted lunar gems following the arc, with real phase images.
      ink.style=Paint.Style.STROKE;ink.strokeWidth=3f;ink.color=gold
      val arc=RectF(58f,655f,842f,1015f)
      c.drawArc(arc,195f,150f,false,ink)
+     val gems=Array(8){i->
+      val id=resources.getIdentifier(lunarImages[i],"drawable",packageName)
+      if(id!=0)resources.getDrawable(id,theme) else KhazadMoon()
+     }
      for(i in 0..7){
       val x=92f+i*102f
       val y=824f-145f*kotlin.math.sin(i*Math.PI/7).toFloat()
-      ink.style=Paint.Style.FILL;ink.color=0xff222b34.toInt()
-      c.drawCircle(x,y,34f,ink)
+      val rad=34f
+      c.save()
+      val clip=Path().apply{addCircle(x,y,rad-3f,Path.Direction.CW)}
+      c.clipPath(clip)
+      ink.style=Paint.Style.FILL;ink.color=0xff101820.toInt()
+      c.drawCircle(x,y,rad,ink)
+      gems[i].setBounds((x-rad).toInt(),(y-rad).toInt(),(x+rad).toInt(),(y+rad).toInt())
+      gems[i].draw(c)
+      c.restore()
       ink.style=Paint.Style.STROKE;ink.color=if(i==phase.first)0xffffd18a.toInt() else gold
-      ink.strokeWidth=if(i==phase.first)6f else 2f;c.drawCircle(x,y,34f,ink)
+      ink.strokeWidth=if(i==phase.first)6f else 2.5f
+      c.drawCircle(x,y,rad,ink)
+      ink.style=Paint.Style.FILL;ink.color=gold
+      for(j in 0..3){
+       val theta=(j*Math.PI/2).toFloat()
+       val dx=x+kotlin.math.cos(theta)*(rad+7f)
+       val dy=y+kotlin.math.sin(theta)*(rad+7f)
+       val facet=Path().apply{moveTo(dx,dy-8f);lineTo(dx+6f,dy);lineTo(dx,dy+8f);lineTo(dx-6f,dy);close()}
+       c.drawPath(facet,ink)
+      }
      }
      label(c,"LUA NOVA",118f,910f,20f,gold)
      label(c,"LUA CHEIA",450f,862f,22f,gold)
@@ -688,7 +712,7 @@ class MainActivity:Activity(){
      c.restore()
     }
    }
-   root.addView(blueprint,LinearLayout.LayoutParams(-1,dp(670)).apply{bottomMargin=dp(10)})
+   root.addView(blueprint,LinearLayout.LayoutParams(-1,-2).apply{bottomMargin=dp(10)})
    root.addView(text("Prévia de posicionamento: molduras e indicadores são provisórios. Distância, nascer, pôr e posição aguardam cálculos locais.",11f,bronze).apply{gravity=Gravity.CENTER},LinearLayout.LayoutParams(-1,-2).apply{bottomMargin=dp(10)})
   }
 
