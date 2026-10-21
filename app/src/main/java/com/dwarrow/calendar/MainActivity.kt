@@ -665,7 +665,6 @@ class MainActivity:Activity(){
     postLocationRequest()
    }
    val phase=lunarPhase(date)
-   val position=moonHorizontal()
    val age=phase.third
    val fraction=age/29.530588853
    val illumination=((1-kotlin.math.cos(2*Math.PI*fraction))/2*100).toInt()
@@ -673,6 +672,23 @@ class MainActivity:Activity(){
    val moonDrawable=if(moonId!=0)resources.getDrawable(moonId,theme) else KhazadMoon()
    val blueprint=object:View(this){
     val ink=Paint(Paint.ANTI_ALIAS_FLAG)
+    private val refresh=object:Runnable{
+     override fun run(){
+      if(isAttachedToWindow){
+       invalidate()
+       postDelayed(this,60000L)
+      }
+     }
+    }
+    override fun onAttachedToWindow(){
+     super.onAttachedToWindow()
+     removeCallbacks(refresh)
+     post(refresh)
+    }
+    override fun onDetachedFromWindow(){
+     removeCallbacks(refresh)
+     super.onDetachedFromWindow()
+    }
     val gold=0xffc99455.toInt()
     val pale=0xfff0e5d4.toInt()
     fun box(c:Canvas,x:Float,y:Float,w:Float,h:Float,cut:Float=14f,wing:Int=0){
@@ -707,6 +723,7 @@ class MainActivity:Activity(){
     }
     override fun onDraw(c:Canvas){
      super.onDraw(c)
+     val position=moonHorizontal()
      val scale=width/900f
      c.save();c.scale(scale,scale)
      ink.style=Paint.Style.FILL;ink.color=0xff090d13.toInt();c.drawRect(0f,0f,900f,1290f,ink)
@@ -835,7 +852,7 @@ class MainActivity:Activity(){
     }
    }
    root.addView(blueprint,LinearLayout.LayoutParams(-1,-2).apply{bottomMargin=dp(10)})
-   root.addView(text(if(position==null)"Permita a localização para mostrar altitude, azimute e Lua no arco." else if(position.first<0)"Lua abaixo do horizonte (marcador cinza). Posição aproximada; horários ainda indisponíveis." else "Posição lunar aproximada; horários e distância ainda indisponíveis.",11f,bronze).apply{gravity=Gravity.CENTER},LinearLayout.LayoutParams(-1,-2).apply{bottomMargin=dp(10)})
+   root.addView(text("Posição lunar aproximada, atualizada a cada minuto. Horários e distância ainda indisponíveis.",11f,bronze).apply{gravity=Gravity.CENTER},LinearLayout.LayoutParams(-1,-2).apply{bottomMargin=dp(10)})
   }
 
   if(tab==3){
