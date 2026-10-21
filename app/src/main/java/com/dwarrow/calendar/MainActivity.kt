@@ -791,39 +791,42 @@ class MainActivity:Activity(){
      // Separate celestial-position chart, without invented coordinates.
      box(c,18f,964f,864f,292f)
      label(c,"POSIÇÃO ATUAL",450f,1008f,29f,gold)
-     // The arc represents the visible southern sky, east through south to west.
-     val trajectory=Path().apply{moveTo(85f,1149f);quadTo(450f,1000f,815f,1149f)}
-     ink.style=Paint.Style.STROKE;ink.strokeWidth=3f;ink.color=gold;c.drawPath(trajectory,ink)
-     label(c,"L",125f,1177f,24f,gold)
-     label(c,"S",450f,1177f,24f,gold)
-     label(c,"O",775f,1177f,24f,gold)
+     // Horizon chart: azimuth controls horizontal position; altitude controls height.
+     // The full 360-degree azimuth is projected left-to-right, with cardinal bearings.
+     val left=85f;val right=815f;val horizon=1149f;val zenith=1032f
+     ink.style=Paint.Style.STROKE;ink.strokeWidth=2.5f;ink.color=gold
+     val trajectory=Path().apply{moveTo(left,horizon);quadTo(450f,990f,right,horizon)}
+     c.drawPath(trajectory,ink)
+     ink.color=0xff86623e.toInt();ink.strokeWidth=1.5f
+     c.drawLine(left,horizon,right,horizon,ink)
+     label(c,"N",90f,1178f,20f,gold)
+     label(c,"L",270f,1178f,20f,gold)
+     label(c,"S",450f,1178f,20f,gold)
+     label(c,"O",630f,1178f,20f,gold)
+     label(c,"N",810f,1178f,20f,gold)
      if(position!=null){
-      val alt=position.first;val az=position.second
-      // East=90°, south=180°, west=270°. Northern half is outside this arc.
-      val inSouthernSky=true
-      val normalized=((az-90.0)/180.0).coerceIn(0.04,0.96).toFloat()
-      val arcX=85f+730f*normalized
-      val t=(arcX-85f)/730f
-      val arcY=1149f-298f*t*(1f-t)
-      val radius=32f
-      if(inSouthernSky){
-       c.save()
-       val lunarClip=Path().apply{addCircle(arcX,arcY,radius,Path.Direction.CW)}
-       c.clipPath(lunarClip)
-       moonDrawable.setBounds((arcX-radius).toInt(),(arcY-radius).toInt(),
-        (arcX+radius).toInt(),(arcY+radius).toInt())
-       moonDrawable.draw(c)
-       c.restore()
-       ink.style=Paint.Style.STROKE
-       ink.strokeWidth=3f
-       ink.color=if(alt>=0)0xffffd18a.toInt() else 0xff7e8791.toInt()
-       c.drawCircle(arcX,arcY,radius,ink)
-       ink.strokeWidth=2f
-       c.drawLine(arcX,arcY+radius+2f,arcX,1148f,ink)
-      }
+      val alt=position.first
+      val az=position.second
+      val arcX=left+(az/360.0).toFloat()*(right-left)
+      // 0° on the horizon; 90° at the zenith. Negative altitude stays at the
+      // horizon with a dimmed marker, since it is not visible above the horizon.
+      val shownAlt=alt.coerceIn(0.0,90.0).toFloat()
+      val moonY=horizon-(shownAlt/90f)*(horizon-zenith)
+      val radius=34f
+      ink.style=Paint.Style.STROKE;ink.strokeWidth=2f
+      ink.color=if(alt>=0)gold else 0xff75808a.toInt()
+      c.drawLine(arcX,moonY+radius,arcX,horizon,ink)
+      c.save()
+      c.clipPath(Path().apply{addCircle(arcX,moonY,radius,Path.Direction.CW)})
+      moonDrawable.setBounds((arcX-radius).toInt(),(moonY-radius).toInt(),
+       (arcX+radius).toInt(),(moonY+radius).toInt())
+      moonDrawable.draw(c)
+      c.restore()
+      ink.style=Paint.Style.STROKE;ink.strokeWidth=3f
+      ink.color=if(alt>=0)0xffffd18a.toInt() else 0xff75808a.toInt()
+      c.drawCircle(arcX,moonY,radius,ink)
       label(c,String.format(Locale("pt","BR"),"Altitude: %.1f°",alt),305f,1236f,19f)
       label(c,String.format(Locale("pt","BR"),"Azimute: %.1f°",az),625f,1236f,19f)
-      
      }else{
       label(c,"Altitude: —",305f,1236f,19f)
       label(c,"Azimute: —",625f,1236f,19f)
