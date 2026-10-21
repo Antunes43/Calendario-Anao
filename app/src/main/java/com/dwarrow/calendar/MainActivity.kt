@@ -703,13 +703,13 @@ class MainActivity:Activity(){
     }
     override fun onMeasure(widthMeasureSpec:Int,heightMeasureSpec:Int){
      val w=MeasureSpec.getSize(widthMeasureSpec)
-     setMeasuredDimension(w,(w*1260f/900f).toInt())
+     setMeasuredDimension(w,(w*1290f/900f).toInt())
     }
     override fun onDraw(c:Canvas){
      super.onDraw(c)
      val scale=width/900f
      c.save();c.scale(scale,scale)
-     ink.style=Paint.Style.FILL;ink.color=0xff090d13.toInt();c.drawRect(0f,0f,900f,1260f,ink)
+     ink.style=Paint.Style.FILL;ink.color=0xff090d13.toInt();c.drawRect(0f,0f,900f,1290f,ink)
      label(c,"✦  LUAS  ✦",450f,49f,38f,gold)
      // The six data panels occupy the sides of the central astrolabe.
      box(c,16f,92f,225f,165f,22f,-1);box(c,659f,92f,225f,165f,22f,1)
@@ -789,19 +789,19 @@ class MainActivity:Activity(){
      label(c,"FASE ATUAL",450f,907f,17f,gold)
      label(c,"LUA NOVA",782f,910f,20f,gold)
      // Separate celestial-position chart, without invented coordinates.
-     box(c,18f,964f,864f,244f)
+     box(c,18f,964f,864f,292f)
      label(c,"POSIÇÃO ATUAL",450f,1008f,29f,gold)
      // The arc represents the visible southern sky, east through south to west.
      val trajectory=Path().apply{moveTo(85f,1149f);quadTo(450f,1000f,815f,1149f)}
      ink.style=Paint.Style.STROKE;ink.strokeWidth=3f;ink.color=gold;c.drawPath(trajectory,ink)
-     label(c,"L",125f,1180f,24f,gold)
-     label(c,"S",450f,1180f,24f,gold)
-     label(c,"O",775f,1180f,24f,gold)
+     label(c,"L",125f,1177f,24f,gold)
+     label(c,"S",450f,1177f,24f,gold)
+     label(c,"O",775f,1177f,24f,gold)
      if(position!=null){
       val alt=position.first;val az=position.second
       // East=90°, south=180°, west=270°. Northern half is outside this arc.
-      val inSouthernSky=az>=90.0&&az<=270.0
-      val normalized=((az-90.0)/180.0).coerceIn(0.0,1.0).toFloat()
+      val inSouthernSky=true
+      val normalized=((az-90.0)/180.0).coerceIn(0.04,0.96).toFloat()
       val arcX=85f+730f*normalized
       val t=(arcX-85f)/730f
       val arcY=1149f-298f*t*(1f-t)
@@ -821,12 +821,12 @@ class MainActivity:Activity(){
        ink.strokeWidth=2f
        c.drawLine(arcX,arcY+radius+2f,arcX,1148f,ink)
       }
-      label(c,String.format(Locale("pt","BR"),"Altitude: %.1f°",alt),305f,1199f,19f)
-      label(c,String.format(Locale("pt","BR"),"Azimute: %.1f°",az),625f,1199f,19f)
-      if(!inSouthernSky)label(c,"Lua fora do arco sul",450f,1080f,18f,gold)
+      label(c,String.format(Locale("pt","BR"),"Altitude: %.1f°",alt),305f,1236f,19f)
+      label(c,String.format(Locale("pt","BR"),"Azimute: %.1f°",az),625f,1236f,19f)
+      
      }else{
-      label(c,"Altitude: —",305f,1199f,19f)
-      label(c,"Azimute: —",625f,1199f,19f)
+      label(c,"Altitude: —",305f,1236f,19f)
+      label(c,"Azimute: —",625f,1236f,19f)
      }
      c.restore()
     }
