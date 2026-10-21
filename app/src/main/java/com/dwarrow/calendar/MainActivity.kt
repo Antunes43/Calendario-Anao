@@ -617,12 +617,25 @@ class MainActivity:Activity(){
     val ink=Paint(Paint.ANTI_ALIAS_FLAG)
     val gold=0xffc99455.toInt()
     val pale=0xfff0e5d4.toInt()
-    fun box(c:Canvas,x:Float,y:Float,w:Float,h:Float){
-     ink.style=Paint.Style.FILL;ink.color=0xff111820.toInt();c.drawRect(x,y,x+w,y+h,ink)
-     ink.style=Paint.Style.STROKE;ink.strokeWidth=3f;ink.color=gold;c.drawRect(x,y,x+w,y+h,ink)
+    fun box(c:Canvas,x:Float,y:Float,w:Float,h:Float,cut:Float=14f,wing:Int=0){
+     val left=if(wing<0)x-16f else x
+     val right=if(wing>0)x+w+16f else x+w
+     val path=Path().apply{
+      moveTo(x+cut,y);lineTo(right-cut,y)
+      lineTo(right,y+cut);lineTo(right,y+h-cut)
+      lineTo(right-cut,y+h);lineTo(left+cut,y+h)
+      lineTo(left,y+h-cut);lineTo(left,y+cut);close()
+     }
+     ink.style=Paint.Style.FILL;ink.color=0xff111820.toInt();c.drawPath(path,ink)
+     ink.style=Paint.Style.STROKE;ink.strokeWidth=4f;ink.color=gold;c.drawPath(path,ink)
+     ink.strokeWidth=1.5f
+     c.drawPath(Path().apply{
+      moveTo(x+cut+7f,y+9f);lineTo(right-cut-7f,y+9f)
+      moveTo(x+cut+7f,y+h-9f);lineTo(right-cut-7f,y+h-9f)
+     },ink)
      ink.style=Paint.Style.FILL
-     for(dx in listOf(x,x+w))for(dy in listOf(y,y+h)){
-      val q=Path().apply{moveTo(dx,dy-9);lineTo(dx+9,dy);lineTo(dx,dy+9);lineTo(dx-9,dy);close()}
+     for(dx in listOf(left+cut,right-cut))for(dy in listOf(y,y+h)){
+      val q=Path().apply{moveTo(dx,dy-10f);lineTo(dx+9f,dy);lineTo(dx,dy+10f);lineTo(dx-9f,dy);close()}
       c.drawPath(q,ink)
      }
     }
@@ -641,9 +654,9 @@ class MainActivity:Activity(){
      ink.style=Paint.Style.FILL;ink.color=0xff090d13.toInt();c.drawRect(0f,0f,900f,1260f,ink)
      label(c,"✦  LUAS  ✦",450f,49f,38f,gold)
      // The six data panels occupy the sides of the central astrolabe.
-     box(c,16f,92f,215f,155f);box(c,669f,92f,215f,155f)
-     box(c,16f,295f,215f,145f);box(c,669f,295f,215f,145f)
-     box(c,16f,485f,215f,145f);box(c,669f,485f,215f,145f)
+     box(c,16f,92f,225f,165f,22f,-1);box(c,659f,92f,225f,165f,22f,1)
+     box(c,16f,295f,204f,145f,10f,-1);box(c,680f,295f,204f,145f,10f,1)
+     box(c,16f,480f,226f,153f,26f,-1);box(c,658f,480f,226f,153f,26f,1)
      label(c,"FASE ATUAL",122f,134f,20f,gold)
      label(c,lunarNames[phase.first],122f,177f,19f)
      label(c,"ILUMINAÇÃO",776f,134f,20f,gold)
@@ -656,20 +669,35 @@ class MainActivity:Activity(){
      label(c,"—",122f,580f,27f)
      label(c,"PÔR",775f,539f,21f,gold)
      label(c,"—",775f,580f,27f)
-     // Central instrument: ornamental graphic intentionally deferred.
-     ink.style=Paint.Style.STROKE;ink.color=gold;ink.strokeWidth=5f
-     c.drawCircle(450f,364f,211f,ink);ink.strokeWidth=2f
-     c.drawCircle(450f,364f,192f,ink)
-     for(i in 0 until 12){
-      val a=(i*Math.PI/6).toFloat()
-      val x=kotlin.math.cos(a);val y=kotlin.math.sin(a)
-      c.drawLine(450f+x*194f,364f+y*194f,450f+x*210f,364f+y*210f,ink)
+     // Khazad dial with faceted bronze rings, compass mounts and rune-like marks.
+     val cx=450f;val cy=364f
+     for(i in 0..5){
+      ink.style=Paint.Style.STROKE
+      ink.color=if(i%2==0)gold else 0xff7e542f.toInt()
+      ink.strokeWidth=if(i==0||i==3)8f else 2f
+      c.drawCircle(cx,cy,211f-i*13f,ink)
+     }
+     for(i in 0 until 24){
+      val angle=(i*2*Math.PI/24-Math.PI/2).toFloat()
+      val ux=kotlin.math.cos(angle);val uy=kotlin.math.sin(angle)
+      ink.style=Paint.Style.STROKE;ink.color=gold;ink.strokeWidth=if(i%3==0)5f else 2f
+      c.drawLine(cx+ux*177f,cy+uy*177f,cx+ux*199f,cy+uy*199f,ink)
+     }
+     ink.style=Paint.Style.FILL
+     for(i in 0..3){
+      val angle=(i*Math.PI/2-Math.PI/2).toFloat()
+      val x=cx+kotlin.math.cos(angle)*210f
+      val y=cy+kotlin.math.sin(angle)*210f
+      val jewel=Path().apply{moveTo(x,y-22f);lineTo(x+17f,y);lineTo(x,y+22f);lineTo(x-17f,y);close()}
+      ink.color=0xffa46635.toInt();c.drawPath(jewel,ink)
+      ink.style=Paint.Style.STROKE;ink.color=0xffffc77e.toInt();ink.strokeWidth=3f;c.drawPath(jewel,ink);ink.style=Paint.Style.FILL
      }
      moonDrawable.setBounds(333,247,567,481);moonDrawable.draw(c)
      // Eight faceted lunar gems following the arc, with real phase images.
      ink.style=Paint.Style.STROKE;ink.strokeWidth=3f;ink.color=gold
      val arc=RectF(58f,655f,842f,1015f)
      c.drawArc(arc,195f,150f,false,ink)
+     c.drawArc(RectF(58f,675f,842f,1035f),195f,150f,false,ink)
      val gems=Array(8){i->
       val id=resources.getIdentifier(lunarImages[i],"drawable",packageName)
       if(id!=0)resources.getDrawable(id,theme) else KhazadMoon()
@@ -700,6 +728,7 @@ class MainActivity:Activity(){
      }
      label(c,"LUA NOVA",118f,910f,20f,gold)
      label(c,"LUA CHEIA",450f,862f,22f,gold)
+     label(c,"FASE ATUAL",450f,907f,17f,gold)
      label(c,"LUA NOVA",782f,910f,20f,gold)
      // Separate celestial-position chart, without invented coordinates.
      box(c,18f,964f,864f,244f)
@@ -707,13 +736,13 @@ class MainActivity:Activity(){
      val trajectory=Path().apply{moveTo(85f,1149f);quadTo(450f,1000f,815f,1149f)}
      ink.style=Paint.Style.STROKE;ink.strokeWidth=3f;ink.color=gold;c.drawPath(trajectory,ink)
      label(c,"L",125f,1181f,26f,gold);label(c,"S",450f,1181f,26f,gold);label(c,"O",775f,1181f,26f,gold)
-     label(c,"Altitude: —",305f,1242f,19f)
-     label(c,"Azimute: —",625f,1242f,19f)
+     label(c,"Altitude: —",305f,1199f,19f)
+     label(c,"Azimute: —",625f,1199f,19f)
      c.restore()
     }
    }
    root.addView(blueprint,LinearLayout.LayoutParams(-1,-2).apply{bottomMargin=dp(10)})
-   root.addView(text("Prévia de posicionamento: molduras e indicadores são provisórios. Distância, nascer, pôr e posição aguardam cálculos locais.",11f,bronze).apply{gravity=Gravity.CENTER},LinearLayout.LayoutParams(-1,-2).apply{bottomMargin=dp(10)})
+   root.addView(text("Distância, horários e posição aguardam cálculo astronômico para a localização atual.",11f,bronze).apply{gravity=Gravity.CENTER},LinearLayout.LayoutParams(-1,-2).apply{bottomMargin=dp(10)})
   }
 
   if(tab==3){
