@@ -217,6 +217,40 @@ class MainActivity:Activity(){
  private fun locationAllowed():Boolean =
   checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION)==PackageManager.PERMISSION_GRANTED ||
   checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION)==PackageManager.PERMISSION_GRANTED
+
+ private fun moonHorizontal():Pair<Double,Double>? {
+  val prefs=getPreferences(MODE_PRIVATE)
+  if(!prefs.contains("durin_lat")||!prefs.contains("durin_lon"))return null
+  val lat=Math.toRadians(prefs.getFloat("durin_lat",0f).toDouble())
+  val lon=prefs.getFloat("durin_lon",0f).toDouble()
+  val jd=System.currentTimeMillis()/86400000.0+2440587.5
+  val d=jd-2451543.5
+  fun norm(v:Double)=((v%360.0)+360.0)%360.0
+  val node=Math.toRadians(norm(125.1228-0.0529538083*d))
+  val inclination=Math.toRadians(5.1454)
+  val peri=Math.toRadians(norm(318.0634+0.1643573223*d))
+  val anomaly=Math.toRadians(norm(115.3654+13.0649929509*d))
+  val e=0.054900
+  val eccentric=anomaly+e*kotlin.math.sin(anomaly)*(1+e*kotlin.math.cos(anomaly))
+  val xv=60.2666*(kotlin.math.cos(eccentric)-e)
+  val yv=60.2666*kotlin.math.sqrt(1-e*e)*kotlin.math.sin(eccentric)
+  val v=kotlin.math.atan2(yv,xv)
+  val radius=kotlin.math.sqrt(xv*xv+yv*yv)
+  val angle=v+peri
+  val x=radius*(kotlin.math.cos(node)*kotlin.math.cos(angle)-kotlin.math.sin(node)*kotlin.math.sin(angle)*kotlin.math.cos(inclination))
+  val y=radius*(kotlin.math.sin(node)*kotlin.math.cos(angle)+kotlin.math.cos(node)*kotlin.math.sin(angle)*kotlin.math.cos(inclination))
+  val z=radius*kotlin.math.sin(angle)*kotlin.math.sin(inclination)
+  val obliquity=Math.toRadians(23.4393-3.563e-7*d)
+  val ye=y*kotlin.math.cos(obliquity)-z*kotlin.math.sin(obliquity)
+  val ze=y*kotlin.math.sin(obliquity)+z*kotlin.math.cos(obliquity)
+  val ra=kotlin.math.atan2(ye,x)
+  val dec=kotlin.math.atan2(ze,kotlin.math.sqrt(x*x+ye*ye))
+  val sidereal=Math.toRadians(norm(280.46061837+360.98564736629*(jd-2451545.0)+lon))
+  val hour=sidereal-ra
+  val alt=kotlin.math.asin(kotlin.math.sin(lat)*kotlin.math.sin(dec)+kotlin.math.cos(lat)*kotlin.math.cos(dec)*kotlin.math.cos(hour))
+  val az=kotlin.math.atan2(-kotlin.math.sin(hour),kotlin.math.tan(dec)*kotlin.math.cos(lat)-kotlin.math.sin(lat)*kotlin.math.cos(hour))
+  return Pair(Math.toDegrees(alt),norm(Math.toDegrees(az)))
+ }
  private fun savedLocation():String {
   val prefs=getPreferences(MODE_PRIVATE)
   if(!prefs.contains("durin_lat"))return "Nenhuma localização disponível"
@@ -607,7 +641,7 @@ class MainActivity:Activity(){
    }
   }
   if(tab==2){
-   val phase=lunarPhase(date)
+   val position=moonHorizontal()
    val age=phase.third
    val fraction=age/29.530588853
    val illumination=((1-kotlin.math.cos(2*Math.PI*fraction))/2*100).toInt()
@@ -692,7 +726,7 @@ class MainActivity:Activity(){
       ink.color=0xffa46635.toInt();c.drawPath(jewel,ink)
       ink.style=Paint.Style.STROKE;ink.color=0xffffc77e.toInt();ink.strokeWidth=3f;c.drawPath(jewel,ink);ink.style=Paint.Style.FILL
      }
-     moonDrawable.setBounds(333,247,567,481);moonDrawable.draw(c)
+     moonDrawable.setBounds(301,215,599,513);moonDrawable.draw(c)
      // Eight faceted lunar gems following the arc, with real phase images.
      ink.style=Paint.Style.STROKE;ink.strokeWidth=3f;ink.color=gold
      val arc=RectF(58f,655f,842f,1015f)
@@ -736,13 +770,27 @@ class MainActivity:Activity(){
      val trajectory=Path().apply{moveTo(85f,1149f);quadTo(450f,1000f,815f,1149f)}
      ink.style=Paint.Style.STROKE;ink.strokeWidth=3f;ink.color=gold;c.drawPath(trajectory,ink)
      label(c,"L",125f,1181f,26f,gold);label(c,"S",450f,1181f,26f,gold);label(c,"O",775f,1181f,26f,gold)
-     label(c,"Altitude: —",305f,1199f,19f)
-     label(c,"Azimute: —",625f,1199f,19f)
+     if(position!=null){
+      val alt=position.first;val az=position.second
+      val arcX=85f+730f*(az/360.0).toFloat()
+      val arcY=1149f-149f*(1f-((arcX-450f)/365f)*((arcX-450f)/365f))
+      if(alt>0){
+       ink.style=Paint.Style.FILL;ink.color=0xffffd18a.toInt()
+       c.drawCircle(arcX,arcY,15f,ink)
+       ink.style=Paint.Style.STROKE;ink.strokeWidth=2f
+       c.drawLine(arcX,arcY+17f,arcX,1150f,ink)
+      }
+      label(c,String.format(Locale("pt","BR"),"Altitude: %.1f°",alt),305f,1199f,19f)
+      label(c,String.format(Locale("pt","BR"),"Azimute: %.1f°",az),625f,1199f,19f)
+     }else{
+      label(c,"Altitude: —",305f,1199f,19f)
+      label(c,"Azimute: —",625f,1199f,19f)
+     }
      c.restore()
     }
    }
    root.addView(blueprint,LinearLayout.LayoutParams(-1,-2).apply{bottomMargin=dp(10)})
-   root.addView(text("Distância, horários e posição aguardam cálculo astronômico para a localização atual.",11f,bronze).apply{gravity=Gravity.CENTER},LinearLayout.LayoutParams(-1,-2).apply{bottomMargin=dp(10)})
+   root.addView(text(if(position==null)"Ative a localização em Mais para calcular a posição lunar." else "Posição lunar aproximada calculada para a localização salva; distância e horários ainda indisponíveis.",11f,bronze).apply{gravity=Gravity.CENTER},LinearLayout.LayoutParams(-1,-2).apply{bottomMargin=dp(10)})
   }
 
   if(tab==3){
