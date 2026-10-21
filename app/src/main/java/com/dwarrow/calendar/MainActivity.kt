@@ -219,6 +219,16 @@ class MainActivity:Activity(){
   checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION)==PackageManager.PERMISSION_GRANTED
 
  private fun moonHorizontal():Pair<Double,Double>? {
+  // Prefer fresh device fixes; fall back to saved coordinates only when needed.
+  if(locationAllowed())try {
+   val manager=getSystemService(Context.LOCATION_SERVICE) as LocationManager
+   val fix=listOf(LocationManager.GPS_PROVIDER,LocationManager.NETWORK_PROVIDER)
+    .filter{manager.isProviderEnabled(it)}
+    .mapNotNull{manager.getLastKnownLocation(it)}.maxByOrNull{it.time}
+   if(fix!=null)getPreferences(MODE_PRIVATE).edit()
+    .putFloat("durin_lat",fix.latitude.toFloat()).putFloat("durin_lon",fix.longitude.toFloat()).apply()
+  }catch(_:Exception){}
+
   val prefs=getPreferences(MODE_PRIVATE)
   if(!prefs.contains("durin_lat")||!prefs.contains("durin_lon"))return null
   val lat=Math.toRadians(prefs.getFloat("durin_lat",0f).toDouble())
@@ -250,6 +260,16 @@ class MainActivity:Activity(){
   val alt=kotlin.math.asin(kotlin.math.sin(lat)*kotlin.math.sin(dec)+kotlin.math.cos(lat)*kotlin.math.cos(dec)*kotlin.math.cos(hour))
   val az=kotlin.math.atan2(-kotlin.math.sin(hour),kotlin.math.tan(dec)*kotlin.math.cos(lat)-kotlin.math.sin(lat)*kotlin.math.cos(hour))
   return Pair(Math.toDegrees(alt),norm(Math.toDegrees(az)))
+ }
+ private var requestingMoonLocation=false
+ private fun postLocationRequest(){
+  if(requestingMoonLocation)return
+  requestingMoonLocation=true
+  android.os.Handler(android.os.Looper.getMainLooper()).post {
+   if(!isFinishing&&!locationAllowed())requestPermissions(
+    arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION,Manifest.permission.ACCESS_FINE_LOCATION),locationRequestCode)
+   requestingMoonLocation=false
+  }
  }
  private fun savedLocation():String {
   val prefs=getPreferences(MODE_PRIVATE)
@@ -641,6 +661,9 @@ class MainActivity:Activity(){
    }
   }
   if(tab==2){
+   if(!locationAllowed()&&!getPreferences(MODE_PRIVATE).contains("durin_lat")){
+    postLocationRequest()
+   }
    val phase=lunarPhase(date)
    val position=moonHorizontal()
    val age=phase.third
@@ -770,13 +793,13 @@ class MainActivity:Activity(){
      label(c,"POSIÇÃO ATUAL",450f,1008f,29f,gold)
      val trajectory=Path().apply{moveTo(85f,1149f);quadTo(450f,1000f,815f,1149f)}
      ink.style=Paint.Style.STROKE;ink.strokeWidth=3f;ink.color=gold;c.drawPath(trajectory,ink)
-     label(c,"L",125f,1181f,26f,gold);label(c,"S",450f,1181f,26f,gold);label(c,"O",775f,1181f,26f,gold)
+     label(c,"N",125f,1181f,26f,gold);label(c,"S",450f,1181f,26f,gold);label(c,"N",775f,1181f,26f,gold)
      if(position!=null){
       val alt=position.first;val az=position.second
       val arcX=85f+730f*(az/360.0).toFloat()
       val arcY=1149f-149f*(1f-((arcX-450f)/365f)*((arcX-450f)/365f))
-      if(alt>0){
-       ink.style=Paint.Style.FILL;ink.color=0xffffd18a.toInt()
+      {
+       ink.style=Paint.Style.FILL;ink.color=if(alt>=0)0xffffd18a.toInt() else 0xff7e8791.toInt()
        c.drawCircle(arcX,arcY,15f,ink)
        ink.style=Paint.Style.STROKE;ink.strokeWidth=2f
        c.drawLine(arcX,arcY+17f,arcX,1150f,ink)
@@ -791,7 +814,7 @@ class MainActivity:Activity(){
     }
    }
    root.addView(blueprint,LinearLayout.LayoutParams(-1,-2).apply{bottomMargin=dp(10)})
-   root.addView(text(if(position==null)"Ative a localização em Mais para calcular a posição lunar." else "Posição lunar aproximada calculada para a localização salva; distância e horários ainda indisponíveis.",11f,bronze).apply{gravity=Gravity.CENTER},LinearLayout.LayoutParams(-1,-2).apply{bottomMargin=dp(10)})
+   root.addView(text(if(position==null)"Permita a localização para mostrar altitude, azimute e Lua no arco." else if(position.first<0)"Lua abaixo do horizonte (marcador cinza). Posição aproximada; horários ainda indisponíveis." else "Posição lunar aproximada; horários e distância ainda indisponíveis.",11f,bronze).apply{gravity=Gravity.CENTER},LinearLayout.LayoutParams(-1,-2).apply{bottomMargin=dp(10)})
   }
 
   if(tab==3){
