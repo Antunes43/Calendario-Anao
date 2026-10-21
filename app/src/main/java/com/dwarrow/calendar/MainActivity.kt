@@ -378,7 +378,7 @@ class MainActivity:Activity(){
     add(h,"CALENDÁRIO ANÃO",10f,cream,true)
    }
   }
-  if(tab==0||tab==2){
+  if(tab==0){
    panel(root,6,"nurt_lunar"){p->
     val phase=lunarPhase(date)
     val index=phase.first
@@ -606,7 +606,88 @@ class MainActivity:Activity(){
     p.addView(link,LinearLayout.LayoutParams(-1,-2))
    }
   }
-  if(tab==2)panel(root){title(it,"FASES E MESES LUNARES");add(it,"Dados astronômicos em validação. Nenhuma fase ou porcentagem é apresentada como cálculo confirmado.",14f)}
+  if(tab==2){
+   val phase=lunarPhase(date)
+   val age=phase.third
+   val fraction=age/29.530588853
+   val illumination=((1-kotlin.math.cos(2*Math.PI*fraction))/2*100).toInt()
+   title(root,"LUAS")
+   val dial=FrameLayout(this)
+   dial.background=object:Drawable(){
+    val paint=Paint(Paint.ANTI_ALIAS_FLAG)
+    override fun draw(c:Canvas){
+     val b=bounds;val cx=b.exactCenterX();val cy=b.exactCenterY()
+     val radius=kotlin.math.min(b.width(),b.height())*.47f
+     paint.color=0xff0b1118.toInt();paint.style=Paint.Style.FILL;c.drawRect(b,paint)
+     for(i in 0..5){
+      paint.style=Paint.Style.STROKE;paint.strokeWidth=if(i%2==0)5f else 2f
+      paint.color=if(i%2==0)0xffc28b4c.toInt() else 0xff76512e.toInt()
+      c.drawCircle(cx,cy,radius*(1-i*.09f),paint)
+     }
+     for(i in 0 until 48){
+      val a=(i*2*Math.PI/48-Math.PI/2).toFloat()
+      val x=kotlin.math.cos(a);val y=kotlin.math.sin(a)
+      paint.color=0xffd9aa66.toInt();paint.strokeWidth=if(i%4==0)4f else 2f
+      c.drawLine(cx+x*radius*.78f,cy+y*radius*.78f,cx+x*radius*.89f,cy+y*radius*.89f,paint)
+     }
+     paint.style=Paint.Style.FILL
+     for(i in 0..3){
+      val a=(i*Math.PI/2-Math.PI/2).toFloat()
+      val x=cx+kotlin.math.cos(a)*radius*.72f;val y=cy+kotlin.math.sin(a)*radius*.72f
+      val diamond=Path().apply{moveTo(x,y-16f);lineTo(x+11f,y);lineTo(x,y+16f);lineTo(x-11f,y);close()}
+      paint.color=0xffe8b66c.toInt();c.drawPath(diamond,paint)
+     }
+     val a=(fraction*2*Math.PI-Math.PI/2).toFloat()
+     paint.color=0xffffd188.toInt()
+     c.drawCircle(cx+kotlin.math.cos(a)*radius*.67f,cy+kotlin.math.sin(a)*radius*.67f,7f,paint)
+    }
+    override fun setAlpha(alpha:Int){paint.alpha=alpha}
+    override fun setColorFilter(cf:android.graphics.ColorFilter?){paint.colorFilter=cf}
+    @Deprecated("Deprecated in Java") override fun getOpacity():Int=PixelFormat.OPAQUE
+   }
+   val moon=ImageView(this).apply{
+    val id=resources.getIdentifier(lunarImages[phase.first],"drawable",packageName)
+    if(id!=0)setImageResource(id) else setImageDrawable(KhazadMoon())
+    scaleType=ImageView.ScaleType.FIT_CENTER
+   }
+   dial.addView(moon,FrameLayout.LayoutParams(dp(162),dp(162),Gravity.CENTER))
+   root.addView(dial,LinearLayout.LayoutParams(-1,dp(330)).apply{bottomMargin=dp(8)})
+   fun lunarStat(row:LinearLayout,label:String,value:String){
+    val box=column().apply{background=ForgedFrame(themeIndex);setPadding(dp(5),dp(8),dp(5),dp(8))}
+    box.addView(text(label,10f,bronze,true));box.addView(text(value,14f,cream,true))
+    row.addView(box,LinearLayout.LayoutParams(0,dp(82),1f).apply{setMargins(dp(3),0,dp(3),0)})
+   }
+   val top=horizontal()
+   lunarStat(top,"FASE ATUAL",lunarNames[phase.first])
+   lunarStat(top,"ILUMINAÇÃO","≈ "+illumination+"%")
+   root.addView(top,LinearLayout.LayoutParams(-1,-2).apply{bottomMargin=dp(6)})
+   val bottom=horizontal()
+   lunarStat(bottom,"IDADE DA LUA","≈ "+age.toInt()+" dias")
+   lunarStat(bottom,"PRÓXIMA FASE",lunarNames[(phase.first+1)%8])
+   root.addView(bottom,LinearLayout.LayoutParams(-1,-2).apply{bottomMargin=dp(8)})
+   panel(root,8,"nurt_lunar"){p->
+    title(p,"CICLO LUNAR")
+    val strip=horizontal()
+    for(i in 0..7){
+     val slot=column()
+     val id=resources.getIdentifier(lunarImages[i],"drawable",packageName)
+     slot.addView(ImageView(this).apply{
+      if(id!=0)setImageResource(id) else setImageDrawable(KhazadMoon())
+      scaleType=ImageView.ScaleType.FIT_CENTER
+      alpha=if(i==phase.first)1f else .6f
+     },LinearLayout.LayoutParams(-1,dp(45)))
+     slot.addView(text(if(i==phase.first)"◆" else "·",12f,bronze,i==phase.first))
+     strip.addView(slot,LinearLayout.LayoutParams(0,-2,1f))
+    }
+    p.addView(strip)
+    add(p,"Próxima fase estimada em "+phase.second+" dia(s)",12f,cream)
+   }
+   panel(root,8,"nurt_events"){p->
+    title(p,"POSIÇÃO NO CÉU")
+    add(p,"Nascer, pôr, altitude, azimute e distância exigem cálculo astronômico local validado.",13f,cream)
+    add(p,"Fase, iluminação e idade são aproximações matemáticas.",11f,bronze)
+   }
+  }
   if(tab==3){
    val all=ObservanceEngine.catalogue(this,date)
    val fmt=DateTimeFormatter.ofPattern("dd 'de' MMM 'de' yyyy",Locale("pt","BR"))
