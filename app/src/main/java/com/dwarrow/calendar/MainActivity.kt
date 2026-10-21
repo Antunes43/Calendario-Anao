@@ -791,21 +791,39 @@ class MainActivity:Activity(){
      // Separate celestial-position chart, without invented coordinates.
      box(c,18f,964f,864f,244f)
      label(c,"POSIÇÃO ATUAL",450f,1008f,29f,gold)
+     // The arc represents the visible southern sky, east through south to west.
      val trajectory=Path().apply{moveTo(85f,1149f);quadTo(450f,1000f,815f,1149f)}
      ink.style=Paint.Style.STROKE;ink.strokeWidth=3f;ink.color=gold;c.drawPath(trajectory,ink)
-     label(c,"N",125f,1181f,26f,gold);label(c,"S",450f,1181f,26f,gold);label(c,"N",775f,1181f,26f,gold)
+     label(c,"L",125f,1180f,24f,gold)
+     label(c,"S",450f,1180f,24f,gold)
+     label(c,"O",775f,1180f,24f,gold)
      if(position!=null){
       val alt=position.first;val az=position.second
-      val arcX=85f+730f*(az/360.0).toFloat()
-      val arcY=1149f-149f*(1f-((arcX-450f)/365f)*((arcX-450f)/365f))
-      {
-       ink.style=Paint.Style.FILL;ink.color=if(alt>=0)0xffffd18a.toInt() else 0xff7e8791.toInt()
-       c.drawCircle(arcX,arcY,15f,ink)
-       ink.style=Paint.Style.STROKE;ink.strokeWidth=2f
-       c.drawLine(arcX,arcY+17f,arcX,1150f,ink)
+      // East=90°, south=180°, west=270°. Northern half is outside this arc.
+      val inSouthernSky=az>=90.0&&az<=270.0
+      val normalized=((az-90.0)/180.0).coerceIn(0.0,1.0).toFloat()
+      val arcX=85f+730f*normalized
+      val t=(arcX-85f)/730f
+      val arcY=1149f-298f*t*(1f-t)
+      val radius=32f
+      if(inSouthernSky){
+       c.save()
+       val lunarClip=Path().apply{addCircle(arcX,arcY,radius,Path.Direction.CW)}
+       c.clipPath(lunarClip)
+       moonDrawable.setBounds((arcX-radius).toInt(),(arcY-radius).toInt(),
+        (arcX+radius).toInt(),(arcY+radius).toInt())
+       moonDrawable.draw(c)
+       c.restore()
+       ink.style=Paint.Style.STROKE
+       ink.strokeWidth=3f
+       ink.color=if(alt>=0)0xffffd18a.toInt() else 0xff7e8791.toInt()
+       c.drawCircle(arcX,arcY,radius,ink)
+       ink.strokeWidth=2f
+       c.drawLine(arcX,arcY+radius+2f,arcX,1148f,ink)
       }
       label(c,String.format(Locale("pt","BR"),"Altitude: %.1f°",alt),305f,1199f,19f)
       label(c,String.format(Locale("pt","BR"),"Azimute: %.1f°",az),625f,1199f,19f)
+      if(!inSouthernSky)label(c,"Lua fora do arco sul",450f,1080f,18f,gold)
      }else{
       label(c,"Altitude: —",305f,1199f,19f)
       label(c,"Azimute: —",625f,1199f,19f)
