@@ -771,7 +771,6 @@ class MainActivity:Activity(){
      ink.style=Paint.Style.STROKE;ink.strokeWidth=3f;ink.color=gold
      val arc=RectF(58f,655f,842f,1015f)
      c.drawArc(arc,195f,150f,false,ink)
-     c.drawArc(RectF(58f,675f,842f,1035f),195f,150f,false,ink)
      val gems=Array(8){i->
       val id=resources.getIdentifier(lunarImages[i],"drawable",packageName)
       if(id!=0)resources.getDrawable(id,theme) else KhazadMoon()
@@ -807,53 +806,15 @@ class MainActivity:Activity(){
      // Separate celestial-position chart, without invented coordinates.
      box(c,18f,964f,864f,292f)
      label(c,"POSIÇÃO ATUAL",450f,1008f,29f,gold)
-     // Sample the actual lunar ephemeris over the current local day.
+     // Continuous ornamental sky arc; lunar marker position remains computed
+     // independently from Astronomy Engine altitude and azimuth.
      val left=85f;val right=815f;val horizon=1149f;val zenith=1032f
-     if(position!=null){
-      val prefs=getPreferences(MODE_PRIVATE)
-      val latitude=Math.toRadians(prefs.getFloat("durin_lat",0f).toDouble())
-      val longitude=prefs.getFloat("durin_lon",0f).toDouble()
-      val midnight=LocalDate.now(ZoneId.systemDefault()).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
-      // Two visual styles make the visibility boundary explicit: gold above
-      // the horizon, dashed bronze below. Split only at the 0/360 seam.
-      val above=Path()
-      val below=Path()
-      var previous:Pair<Double,Double>?=null
-      fun x(az:Double)=left+(az/360.0).toFloat()*(right-left)
-      fun y(alt:Double)=horizon-(alt.coerceIn(-90.0,90.0)/90.0).toFloat()*(horizon-zenith)
-      // Keep below-horizon paths on the baseline to avoid overlapping labels.
-      fun projectedY(alt:Double)=if(alt<0.0)horizon+9f else y(alt)
-      for(minute in 0..1440 step 5){
-       val current=moonHorizontalAt(latitude,longitude,midnight+minute*60000L)
-       val prior=previous
-       if(prior!=null&&kotlin.math.abs(current.second-prior.second)<180.0){
-        val crossing=(prior.first>=0.0)!=(current.first>=0.0)
-        if(crossing){
-         val t=(-prior.first/(current.first-prior.first)).coerceIn(0.0,1.0)
-         val crossingAz=prior.second+t*(current.second-prior.second)
-         val cx=x(crossingAz)
-         above.moveTo(x(if(prior.first>=0)prior.second else crossingAz),projectedY(if(prior.first>=0)prior.first else 0.0))
-         above.lineTo(x(if(current.first>=0)current.second else crossingAz),projectedY(if(current.first>=0)current.first else 0.0))
-         below.moveTo(x(if(prior.first<0)prior.second else crossingAz),projectedY(if(prior.first<0)prior.first else 0.0))
-         below.lineTo(x(if(current.first<0)current.second else crossingAz),projectedY(if(current.first<0)current.first else 0.0))
-         ink.style=Paint.Style.FILL;ink.color=gold
-         c.drawCircle(cx,horizon,5f,ink)
-        }else{
-         val path=if(current.first>=0.0)above else below
-         path.moveTo(x(prior.second),projectedY(prior.first))
-         path.lineTo(x(current.second),projectedY(current.first))
-        }
-       }
-       previous=current
-      }
-      ink.style=Paint.Style.STROKE;ink.strokeWidth=2f
-      ink.color=0xff765638.toInt()
-      ink.pathEffect=DashPathEffect(floatArrayOf(8f,7f),0f)
-      c.drawPath(below,ink)
-      ink.pathEffect=null
-      ink.strokeWidth=3f;ink.color=gold
-      c.drawPath(above,ink)
-     }
+     ink.style=Paint.Style.STROKE;ink.strokeWidth=3f;ink.color=gold
+     ink.pathEffect=null
+     c.drawPath(Path().apply{
+      moveTo(left,horizon)
+      quadTo(450f,985f,right,horizon)
+     },ink)
      ink.color=0xff86623e.toInt();ink.strokeWidth=1.5f
      c.drawLine(left,horizon,right,horizon,ink)
      label(c,"N",90f,1178f,20f,gold)
@@ -892,7 +853,7 @@ class MainActivity:Activity(){
     }
    }
    root.addView(blueprint,LinearLayout.LayoutParams(-1,-2).apply{bottomMargin=dp(10)})
-   root.addView(text("Trajetória lunar calculada para sua localização. Dourado: acima do horizonte; tracejado: abaixo. Atualização a cada minuto.",11f,bronze).apply{gravity=Gravity.CENTER},LinearLayout.LayoutParams(-1,-2).apply{bottomMargin=dp(10)})
+   root.addView(text("Arco celeste ilustrativo. A posição da Lua é calculada para sua localização e atualizada a cada minuto.",11f,bronze).apply{gravity=Gravity.CENTER},LinearLayout.LayoutParams(-1,-2).apply{bottomMargin=dp(10)})
   }
 
   if(tab==3){
