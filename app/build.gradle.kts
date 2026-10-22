@@ -36,3 +36,7 @@ android {
     }
     kotlinOptions { jvmTarget = "17" }
 }
+
+dependencies {
+    implementation("io.github.cosinekitty:astronomy:2.1.19")
+}
