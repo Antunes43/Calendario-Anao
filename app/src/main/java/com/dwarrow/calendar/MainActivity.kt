@@ -799,7 +799,7 @@ class MainActivity:Activity(){
       ink.strokeWidth=if(i==phase.first)6f else 2.5f
       c.drawCircle(x,y,rad,ink)
       ink.style=Paint.Style.FILL;ink.color=gold
-      for(j in 0..3){
+      if(i==phase.first)for(j in 0..3){
        val theta=(j*Math.PI/2).toFloat()
        val dx=x+kotlin.math.cos(theta)*(rad+7f)
        val dy=y+kotlin.math.sin(theta)*(rad+7f)
@@ -814,9 +814,6 @@ class MainActivity:Activity(){
      // Separate celestial-position chart, without invented coordinates.
      box(c,18f,964f,864f,292f)
      label(c,"POSIÇÃO ATUAL",450f,1008f,29f,gold)
-     label(c,"DISTÂNCIA  "+lunarEvents.first,185f,1041f,16f)
-     label(c,"NASCER  "+lunarEvents.second,450f,1041f,16f)
-     label(c,"PÔR  "+lunarEvents.third,714f,1041f,16f)
      // Continuous ornamental sky arc; lunar marker position remains computed
      // independently from Astronomy Engine altitude and azimuth.
      val left=85f;val right=815f;val horizon=1149f
