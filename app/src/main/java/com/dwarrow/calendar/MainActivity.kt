@@ -769,8 +769,16 @@ class MainActivity:Activity(){
      moonDrawable.setBounds(301,215,599,513);moonDrawable.draw(c)
      // Eight faceted lunar gems following the arc, with real phase images.
      ink.style=Paint.Style.STROKE;ink.strokeWidth=3f;ink.color=gold
-     val arc=RectF(58f,655f,842f,1015f)
-     c.drawArc(arc,195f,150f,false,ink)
+     // Trace through the exact centers of all eight lunar gems.
+     val gemArc=Path().apply{
+      for(step in 0..140){
+       val index=step*7.0/140.0
+       val x=92f+index.toFloat()*102f
+       val y=824f-145f*kotlin.math.sin(index*Math.PI/7).toFloat()
+       if(step==0)moveTo(x,y) else lineTo(x,y)
+      }
+     }
+     c.drawPath(gemArc,ink)
      val gems=Array(8){i->
       val id=resources.getIdentifier(lunarImages[i],"drawable",packageName)
       if(id!=0)resources.getDrawable(id,theme) else KhazadMoon()
@@ -806,9 +814,12 @@ class MainActivity:Activity(){
      // Separate celestial-position chart, without invented coordinates.
      box(c,18f,964f,864f,292f)
      label(c,"POSIÇÃO ATUAL",450f,1008f,29f,gold)
+     label(c,"DISTÂNCIA  "+lunarEvents.first,185f,1041f,16f)
+     label(c,"NASCER  "+lunarEvents.second,450f,1041f,16f)
+     label(c,"PÔR  "+lunarEvents.third,714f,1041f,16f)
      // Continuous ornamental sky arc; lunar marker position remains computed
      // independently from Astronomy Engine altitude and azimuth.
-     val left=85f;val right=815f;val horizon=1149f;val zenith=1032f
+     val left=85f;val right=815f;val horizon=1149f
      ink.style=Paint.Style.STROKE;ink.strokeWidth=3f;ink.color=gold
      ink.pathEffect=null
      c.drawPath(Path().apply{
@@ -828,8 +839,10 @@ class MainActivity:Activity(){
       val arcX=left+(az/360.0).toFloat()*(right-left)
       // 0° on the horizon; 90° at the zenith. Negative altitude stays at the
       // horizon with a dimmed marker, since it is not visible above the horizon.
-      val shownAlt=alt.coerceIn(0.0,90.0).toFloat()
-      val moonY=horizon-(shownAlt/90f)*(horizon-zenith)
+      // The decorative arc and moon share the same quadratic curve.
+      // Actual altitude remains visible as a numerical measurement.
+      val t=((arcX-left)/(right-left)).coerceIn(0f,1f)
+      val moonY=horizon-328f*t*(1f-t)
       val radius=34f
       ink.style=Paint.Style.STROKE;ink.strokeWidth=2f
       ink.color=if(alt>=0)gold else 0xff75808a.toInt()
