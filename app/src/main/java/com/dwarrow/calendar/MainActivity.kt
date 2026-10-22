@@ -20,6 +20,7 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 import org.json.JSONArray
+import io.github.cosinekitty.astronomy.*
 
 private class ForgedFrame(private val mode:Int=0):Drawable(){
  private val p=Paint(3)
@@ -236,33 +237,28 @@ class MainActivity:Activity(){
   return moonHorizontalAt(lat,lon,System.currentTimeMillis())
  }
  private fun moonHorizontalAt(lat:Double,lon:Double,epochMillis:Long):Pair<Double,Double>{
-  val jd=epochMillis/86400000.0+2440587.5
-  val d=jd-2451543.5
-  fun norm(v:Double)=((v%360.0)+360.0)%360.0
-  val node=Math.toRadians(norm(125.1228-0.0529538083*d))
-  val inclination=Math.toRadians(5.1454)
-  val peri=Math.toRadians(norm(318.0634+0.1643573223*d))
-  val anomaly=Math.toRadians(norm(115.3654+13.0649929509*d))
-  val e=0.054900
-  val eccentric=anomaly+e*kotlin.math.sin(anomaly)*(1+e*kotlin.math.cos(anomaly))
-  val xv=60.2666*(kotlin.math.cos(eccentric)-e)
-  val yv=60.2666*kotlin.math.sqrt(1-e*e)*kotlin.math.sin(eccentric)
-  val v=kotlin.math.atan2(yv,xv)
-  val radius=kotlin.math.sqrt(xv*xv+yv*yv)
-  val angle=v+peri
-  val x=radius*(kotlin.math.cos(node)*kotlin.math.cos(angle)-kotlin.math.sin(node)*kotlin.math.sin(angle)*kotlin.math.cos(inclination))
-  val y=radius*(kotlin.math.sin(node)*kotlin.math.cos(angle)+kotlin.math.cos(node)*kotlin.math.sin(angle)*kotlin.math.cos(inclination))
-  val z=radius*kotlin.math.sin(angle)*kotlin.math.sin(inclination)
-  val obliquity=Math.toRadians(23.4393-3.563e-7*d)
-  val ye=y*kotlin.math.cos(obliquity)-z*kotlin.math.sin(obliquity)
-  val ze=y*kotlin.math.sin(obliquity)+z*kotlin.math.cos(obliquity)
-  val ra=kotlin.math.atan2(ye,x)
-  val dec=kotlin.math.atan2(ze,kotlin.math.sqrt(x*x+ye*ye))
-  val sidereal=Math.toRadians(norm(280.46061837+360.98564736629*(jd-2451545.0)+lon))
-  val hour=sidereal-ra
-  val alt=kotlin.math.asin(kotlin.math.sin(lat)*kotlin.math.sin(dec)+kotlin.math.cos(lat)*kotlin.math.cos(dec)*kotlin.math.cos(hour))
-  val az=kotlin.math.atan2(-kotlin.math.sin(hour),kotlin.math.tan(dec)*kotlin.math.cos(lat)-kotlin.math.sin(lat)*kotlin.math.cos(hour))
-  return Pair(Math.toDegrees(alt),norm(Math.toDegrees(az)))
+  val time=Time.fromMillisecondsSince1970(epochMillis)
+  val observer=Observer(Math.toDegrees(lat),lon,0.0)
+  val eq=equator(Body.Moon,time,observer,EquatorEpoch.OfDate,Aberration.Corrected)
+  val horizontal=horizon(time,observer,eq.ra,eq.dec,Refraction.Normal)
+  return Pair(horizontal.altitude,horizontal.azimuth)
+ }
+ private fun moonDailyEvents():Triple<String,String,String>{
+  val prefs=getPreferences(MODE_PRIVATE)
+  if(!prefs.contains("durin_lat")||!prefs.contains("durin_lon"))return Triple("—","—","—")
+  val observer=Observer(prefs.getFloat("durin_lat",0f).toDouble(),prefs.getFloat("durin_lon",0f).toDouble(),0.0)
+  val midnight=LocalDate.now(ZoneId.systemDefault()).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
+  val tomorrow=LocalDate.now(ZoneId.systemDefault()).plusDays(1).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
+  val start=Time.fromMillisecondsSince1970(midnight)
+  val duration=(tomorrow-midnight)/86400000.0
+  fun event(direction:Direction):String{
+   val result=searchRiseSet(Body.Moon,observer,direction,start,duration) ?: return "—"
+   val instant=Instant.ofEpochMilli(result.toMillisecondsSince1970())
+   return DateTimeFormatter.ofPattern("HH:mm").withZone(ZoneId.systemDefault()).format(instant)
+  }
+  val eq=equator(Body.Moon,Time.fromMillisecondsSince1970(System.currentTimeMillis()),observer,EquatorEpoch.OfDate,Aberration.Corrected)
+  val km=eq.dist*149597870.7
+  return Triple(String.format(Locale("pt","BR"),"%,.0f km",km),event(Direction.Rise),event(Direction.Set))
  }
  private var requestingMoonLocation=false
  private fun postLocationRequest(){
@@ -669,8 +665,8 @@ class MainActivity:Activity(){
    }
    val phase=lunarPhase(date)
    val age=phase.third
-   val fraction=age/29.530588853
-   val illumination=((1-kotlin.math.cos(2*Math.PI*fraction))/2*100).toInt()
+   val illumination=(illumination(Body.Moon,Time.fromMillisecondsSince1970(System.currentTimeMillis())).phaseFraction*100).toInt()
+   val lunarEvents=moonDailyEvents()
    val moonId=resources.getIdentifier(lunarImages[phase.first],"drawable",packageName)
    val moonDrawable=if(moonId!=0)resources.getDrawable(moonId,theme) else KhazadMoon()
    val blueprint=object:View(this){
@@ -742,11 +738,11 @@ class MainActivity:Activity(){
      label(c,"IDADE",122f,350f,21f,gold)
      label(c,"≈ "+age.toInt()+" dias",122f,394f,24f)
      label(c,"DISTÂNCIA",776f,350f,21f,gold)
-     label(c,"—",776f,394f,27f)
+     label(c,lunarEvents.first,776f,394f,23f)
      label(c,"NASCER",122f,539f,21f,gold)
-     label(c,"—",122f,580f,27f)
+     label(c,lunarEvents.second,122f,580f,27f)
      label(c,"PÔR",775f,539f,21f,gold)
-     label(c,"—",775f,580f,27f)
+     label(c,lunarEvents.third,775f,580f,27f)
      // Khazad dial with faceted bronze rings, compass mounts and rune-like marks.
      val cx=450f;val cy=364f
      for(i in 0..5){
