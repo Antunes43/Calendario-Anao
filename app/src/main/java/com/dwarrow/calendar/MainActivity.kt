@@ -22,6 +22,51 @@ import java.util.Locale
 import org.json.JSONArray
 import io.github.cosinekitty.astronomy.*
 
+/** Lightweight forged-bronze day frame, drawn natively without bitmap assets. */
+private class DayCellFrame(private val active:Boolean,private val today:Boolean):Drawable(){
+ private val p=Paint(Paint.ANTI_ALIAS_FLAG)
+ override fun draw(canvas:Canvas){
+  val b=bounds;val w=b.width().toFloat();val h=b.height().toFloat()
+  if(w<=0f||h<=0f)return
+  val bronze=if(active)0xffffcf83.toInt() else 0xff986c42.toInt()
+  p.style=Paint.Style.FILL
+  p.color=if(active)0xff593a20.toInt() else 0xff121720.toInt()
+  canvas.drawRect(0f,0f,w,h,p)
+  p.color=if(active)0xff694623.toInt() else 0xff1b232d.toInt()
+  val top=Path().apply{moveTo(0f,0f);lineTo(w,0f);lineTo(w-9f,9f);lineTo(9f,9f);close()}
+  canvas.drawPath(top,p)
+  p.style=Paint.Style.STROKE;p.strokeWidth=if(today)3f else 1.6f
+  p.color=bronze
+  val d=7f
+  val border=Path().apply{
+   moveTo(d,1f);lineTo(w-d,1f);lineTo(w-1f,d);lineTo(w-1f,h-d)
+   lineTo(w-d,h-1f);lineTo(d,h-1f);lineTo(1f,h-d);lineTo(1f,d);close()
+  }
+  canvas.drawPath(border,p)
+  p.strokeWidth=0.8f;p.color=if(active)0xffc29459.toInt() else 0xff594735.toInt()
+  canvas.drawRect(4f,4f,w-4f,h-4f,p)
+  p.style=Paint.Style.FILL;p.color=bronze
+  for(x in listOf(0f,w)){
+   for(y in listOf(0f,h)){
+    val cx=if(x==0f)7f else w-7f
+    val cy=if(y==0f)7f else h-7f
+    val gem=Path().apply{moveTo(cx,cy-3.5f);lineTo(cx+3.5f,cy);lineTo(cx,cy+3.5f);lineTo(cx-3.5f,cy);close()}
+    canvas.drawPath(gem,p)
+   }
+  }
+  if(today){
+   p.color=0xffffd28a.toInt()
+   val mid=w/2f
+   val gem=Path().apply{moveTo(mid-4f,2f);lineTo(mid,6f);lineTo(mid+4f,2f);close()}
+   canvas.drawPath(gem,p)
+  }
+ }
+ override fun setAlpha(alpha:Int){p.alpha=alpha}
+ override fun setColorFilter(colorFilter:android.graphics.ColorFilter?){p.colorFilter=colorFilter}
+ @Deprecated("Deprecated in Java")
+ override fun getOpacity():Int=android.graphics.PixelFormat.TRANSLUCENT
+}
+
 private class ForgedFrame(private val mode:Int=0):Drawable(){
  private val p=Paint(3)
  override fun draw(c:Canvas){
@@ -590,10 +635,7 @@ class MainActivity:Activity(){
        val isToday=on==LocalDate.now(ZoneId.systemDefault())
        val cell=column().apply{
         gravity=Gravity.CENTER
-        background=android.graphics.drawable.GradientDrawable().apply{
-         setColor(if(selected)0xff65401d.toInt() else 0xff131820.toInt())
-         setStroke(dp(if(isToday)2 else 1),if(selected||isToday)bronze else 0xff674b30.toInt())
-        }
+        background=DayCellFrame(selected,isToday)
         if(on!=null){
          addView(text(n.toString()+(if(marked)" •" else ""),14f,if(selected)0xffffd18d.toInt() else cream,selected).apply{
           gravity=Gravity.CENTER
