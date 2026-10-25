@@ -904,6 +904,19 @@ class MainActivity:Activity(){
    root.addView(text("Arco celeste ilustrativo. A posição da Lua é calculada para sua localização e atualizada a cada minuto.",11f,bronze).apply{gravity=Gravity.CENTER},LinearLayout.LayoutParams(-1,-2).apply{bottomMargin=dp(10)})
   }
 
+  fun eventImage(id:String,mini:Boolean):View{
+   val illustrated=setOf("gabashzudnamrag","iklaladranamrag","nurtu_mamahran","khebabnurtamrag")
+   val name=if(id in illustrated)"event_"+id+(if(mini)"_mini" else "") else ""
+   val imageId=if(name.isNotEmpty())resources.getIdentifier(name,"drawable",packageName) else 0
+   return if(imageId!=0) ImageView(this).apply{
+    setImageResource(imageId)
+    scaleType=ImageView.ScaleType.CENTER_CROP
+    contentDescription="Ilustração do evento "+id
+   } else View(this).apply{
+    background=ForgedFrame(themeIndex)
+    contentDescription="Espaço reservado para a ilustração do evento "+id
+   }
+  }
   if(tab==3){
    val all=ObservanceEngine.catalogue(this,date)
    val fmt=DateTimeFormatter.ofPattern("dd 'de' MMM 'de' yyyy",Locale("pt","BR"))
@@ -916,13 +929,7 @@ class MainActivity:Activity(){
      setPadding(0,dp(2),0,dp(2))
     },LinearLayout.LayoutParams(-1,-2))
    }
-   fun ornament(o:ObservanceEngine.Occurrence):View{
-    // Reserved portrait artwork slot: keep this aspect ratio for future event illustrations.
-    return View(this).apply{
-     background=ForgedFrame(themeIndex)
-     contentDescription="Espaço reservado para a ilustração de "+o.entry.optString("name")
-    }
-   }
+   fun ornament(o:ObservanceEngine.Occurrence,mini:Boolean):View=eventImage(o.entry.optString("id"),mini)
    val nextDate=all.filter{it.start.isAfter(date)}.minOfOrNull{it.start}
    fun displayStatus(o:ObservanceEngine.Occurrence):String =
     if(!active(o)&&nextDate!=null&&o.start==nextDate)"PRÓXIMO" else status(o)
@@ -953,7 +960,7 @@ class MainActivity:Activity(){
     panel(root,10,"nurt_events"){card->
      card.gravity=Gravity.START
      card.setPadding(dp(18),dp(18),dp(18),dp(22))
-     val hero=ornament(selected)
+     val hero=ornament(selected,false)
      card.addView(hero,LinearLayout.LayoutParams(-1,dp(155)).apply{bottomMargin=dp(16)})
      line(card,selected.entry.optString("name"),23f,bronze,true)
      line(card,selected.entry.optString("pt"),17f,cream)
@@ -983,7 +990,7 @@ class MainActivity:Activity(){
      panel(root,6,"nurt_events"){card->
       card.setPadding(dp(10),dp(9),dp(10),dp(9))
       val row=horizontal().apply{gravity=Gravity.CENTER_VERTICAL}
-      row.addView(ornament(o),LinearLayout.LayoutParams(dp(66),dp(92)).apply{rightMargin=dp(11)})
+      row.addView(ornament(o,true),LinearLayout.LayoutParams(dp(66),dp(92)).apply{rightMargin=dp(11)})
       val info=column()
       val top=horizontal().apply{gravity=Gravity.CENTER_VERTICAL}
       val name=text(o.entry.optString("name"),16f,bronze,true).apply{
