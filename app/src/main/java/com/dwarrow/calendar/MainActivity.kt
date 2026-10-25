@@ -552,7 +552,14 @@ class MainActivity:Activity(){
      background=ForgedFrame(themeIndex)
      setPadding(dp(5),dp(5),dp(5),dp(5))
     }
-    monthPanel.addView(View(this),LinearLayout.LayoutParams(-1,dp(155)))
+    val monthImages=listOf("month_01_afdehar","month_02_afdush","month_03_afigleb","month_04_afnukhazad","month_05_afnikh","month_06_afmadhdanakh","month_07_afkalm","month_08_afgargablag","month_09_afgalkhabsat","month_10_afkidizabad","month_11_afiz","month_12_afakragyan","month_13_aftharn")
+     val imageName=monthImages.getOrNull(month.number-1).orEmpty()
+     val imageId=resources.getIdentifier(imageName,"drawable",packageName)
+     val imageView=if(imageId!=0) ImageView(this).apply{
+      setImageResource(imageId)
+      scaleType=ImageView.ScaleType.CENTER_CROP
+     } else View(this).apply{background=ForgedFrame(themeIndex)}
+     monthPanel.addView(imageView,LinearLayout.LayoutParams(-1,dp(155)))
     monthPanel.addView(View(this).apply{setBackgroundColor(bronze)},LinearLayout.LayoutParams(-1,dp(1)))
     monthPanel.addView(text(month.start.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))+" – "+month.end.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")),12f,cream).apply{
      gravity=Gravity.CENTER
