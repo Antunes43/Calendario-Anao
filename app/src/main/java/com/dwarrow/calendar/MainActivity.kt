@@ -623,7 +623,19 @@ class MainActivity:Activity(){
      if(events.isEmpty())add(p,"Nenhuma festividade neste mês.",13f,cream)
      events.sortedBy{it.start}.forEach{o->
       val item=horizontal().apply{gravity=Gravity.CENTER_VERTICAL;setPadding(dp(5),dp(5),dp(5),dp(5))}
-      item.addView(View(this).apply{background=ForgedFrame(themeIndex)},LinearLayout.LayoutParams(dp(52),dp(64)).apply{rightMargin=dp(10)})
+      val eventId=o.entry.optString("id")
+      val illustrated=setOf("gabashzudnamrag","iklaladranamrag","nurtu_mamahran","khebabnurtamrag")
+      val imageName=if(eventId in illustrated)"event_"+eventId+"_mini" else ""
+      val imageId=if(imageName.isNotEmpty())resources.getIdentifier(imageName,"drawable",packageName) else 0
+      val thumbnail=if(imageId!=0) ImageView(this).apply{
+       setImageResource(imageId)
+       scaleType=ImageView.ScaleType.CENTER_CROP
+       contentDescription="Ilustração de "+o.entry.optString("name")
+      } else View(this).apply{
+       background=ForgedFrame(themeIndex)
+       contentDescription="Imagem ainda não disponível para "+o.entry.optString("name")
+      }
+      item.addView(thumbnail,LinearLayout.LayoutParams(dp(52),dp(64)).apply{rightMargin=dp(10)})
       val details=column()
       details.addView(text(o.entry.optString("name"),14f,bronze,true))
       details.addView(text(o.entry.optString("pt"),12f,cream))
