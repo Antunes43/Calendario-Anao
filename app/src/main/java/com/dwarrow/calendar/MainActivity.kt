@@ -779,10 +779,30 @@ class MainActivity:Activity(){
       }
      }
      c.drawPath(gemArc,ink)
+     // Normalize each PNG by its visible alpha bounds so differing transparent
+     // margins cannot make one lunar phase look smaller than another.
      val gems=Array(8){i->
       val id=resources.getIdentifier(lunarImages[i],"drawable",packageName)
-      if(id!=0)resources.getDrawable(id,theme) else KhazadMoon()
+      if(id==0)null else BitmapFactory.decodeResource(resources,id)
      }
+     val gemSources=Array(8){i->
+      val bitmap=gems[i]
+      if(bitmap==null)null else {
+       var minX=bitmap.width;var minY=bitmap.height
+       var maxX=-1;var maxY=-1
+       for(py in 0 until bitmap.height)for(px in 0 until bitmap.width){
+        if((bitmap.getPixel(px,py) ushr 24)>32){
+         if(px<minX)minX=px
+         if(px>maxX)maxX=px
+         if(py<minY)minY=py
+         if(py>maxY)maxY=py
+        }
+       }
+       if(maxX<minX)Rect(0,0,bitmap.width,bitmap.height)
+       else Rect(minX,minY,maxX+1,maxY+1)
+      }
+     }
+     val gemPaint=Paint(Paint.ANTI_ALIAS_FLAG or Paint.FILTER_BITMAP_FLAG)
      for(i in 0..7){
       val x=92f+i*102f
       val y=824f-145f*kotlin.math.sin(i*Math.PI/7).toFloat()
@@ -792,8 +812,19 @@ class MainActivity:Activity(){
       c.clipPath(clip)
       ink.style=Paint.Style.FILL;ink.color=0xff101820.toInt()
       c.drawCircle(x,y,rad,ink)
-      gems[i].setBounds((x-rad).toInt(),(y-rad).toInt(),(x+rad).toInt(),(y+rad).toInt())
-      gems[i].draw(c)
+      val bitmap=gems[i]
+      val source=gemSources[i]
+      if(bitmap!=null&&source!=null){
+       // Uniform diameter and common center, preserving each image aspect ratio.
+       val side=kotlin.math.max(source.width(),source.height()).toFloat()
+       val half=rad*source.width()/side
+       val halfY=rad*source.height()/side
+       c.drawBitmap(bitmap,source,RectF(x-half,y-halfY,x+half,y+halfY),gemPaint)
+      }else{
+       val fallback=KhazadMoon()
+       fallback.setBounds((x-rad).toInt(),(y-rad).toInt(),(x+rad).toInt(),(y+rad).toInt())
+       fallback.draw(c)
+      }
       c.restore()
       ink.style=Paint.Style.STROKE;ink.color=if(i==phase.first)0xffffd18a.toInt() else gold
       ink.strokeWidth=if(i==phase.first)6f else 2.5f
