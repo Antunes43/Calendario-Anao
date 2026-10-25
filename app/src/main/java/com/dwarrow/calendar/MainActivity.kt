@@ -631,7 +631,15 @@ class MainActivity:Activity(){
       gravity=Gravity.CENTER_VERTICAL
       setPadding(dp(4),dp(7),dp(4),dp(7))
      }
-     val imageSlot=View(this).apply{
+     val eventId=event.optString("id")
+     val available=setOf("gabashzudnamrag","iklaladranamrag","nurtu_mamahran","khebabnurtamrag")
+     val imageName=if(eventId in available)"event_"+eventId+"_mini" else ""
+     val imageResource=if(imageName.isNotEmpty())resources.getIdentifier(imageName,"drawable",packageName) else 0
+     val imageSlot=if(imageResource!=0) ImageView(this).apply{
+      setImageResource(imageResource)
+      scaleType=ImageView.ScaleType.CENTER_CROP
+      contentDescription="Ilustração de "+event.optString("name")
+     } else View(this).apply{
       background=ForgedFrame(themeIndex)
       contentDescription="Espaço reservado para a imagem de "+event.optString("name")
      }
