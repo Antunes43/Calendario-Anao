@@ -25,41 +25,50 @@ import io.github.cosinekitty.astronomy.*
 /** Lightweight forged-bronze day frame, drawn natively without bitmap assets. */
 private class DayCellFrame(private val active:Boolean,private val today:Boolean):Drawable(){
  private val p=Paint(Paint.ANTI_ALIAS_FLAG)
- override fun draw(canvas:Canvas){
-  val b=bounds;val w=b.width().toFloat();val h=b.height().toFloat()
+ override fun draw(c:Canvas){
+  val b=bounds
+  val w=b.width().toFloat();val h=b.height().toFloat()
   if(w<=0f||h<=0f)return
-  val bronze=if(active)0xffffcf83.toInt() else 0xff986c42.toInt()
-  p.style=Paint.Style.FILL
-  p.color=if(active)0xff593a20.toInt() else 0xff121720.toInt()
-  canvas.drawRect(0f,0f,w,h,p)
-  p.color=if(active)0xff694623.toInt() else 0xff1b232d.toInt()
-  val top=Path().apply{moveTo(0f,0f);lineTo(w,0f);lineTo(w-9f,9f);lineTo(9f,9f);close()}
-  canvas.drawPath(top,p)
-  p.style=Paint.Style.STROKE;p.strokeWidth=if(today)3f else 1.6f
-  p.color=bronze
-  val d=7f
-  val border=Path().apply{
-   moveTo(d,1f);lineTo(w-d,1f);lineTo(w-1f,d);lineTo(w-1f,h-d)
-   lineTo(w-d,h-1f);lineTo(d,h-1f);lineTo(1f,h-d);lineTo(1f,d);close()
+  c.save()
+  c.translate(b.left.toFloat(),b.top.toFloat())
+  c.scale(w/106f,h/142f)
+  val edge=if(active)0xfff2cb83.toInt() else if(today)0xffdfb676.toInt() else 0xff9b754b.toInt()
+  val trim=if(active)0xffb98b50.toInt() else 0xff71563b.toInt()
+  fun line(color:Int,width:Float,vararg xy:Float){
+   p.color=color;p.style=Paint.Style.STROKE;p.strokeWidth=width
+   val path=Path().apply{moveTo(xy[0],xy[1]);var i=2;while(i+1<xy.size){lineTo(xy[i],xy[i+1]);i+=2}}
+   c.drawPath(path,p);p.style=Paint.Style.FILL
   }
-  canvas.drawPath(border,p)
-  p.strokeWidth=0.8f;p.color=if(active)0xffc29459.toInt() else 0xff594735.toInt()
-  canvas.drawRect(4f,4f,w-4f,h-4f,p)
-  p.style=Paint.Style.FILL;p.color=bronze
-  for(x in listOf(0f,w)){
-   for(y in listOf(0f,h)){
-    val cx=if(x==0f)7f else w-7f
-    val cy=if(y==0f)7f else h-7f
-    val gem=Path().apply{moveTo(cx,cy-3.5f);lineTo(cx+3.5f,cy);lineTo(cx,cy+3.5f);lineTo(cx-3.5f,cy);close()}
-    canvas.drawPath(gem,p)
-   }
+  val outer=Path().apply{
+   moveTo(15f,0f);lineTo(91f,0f);lineTo(104f,13f);lineTo(104f,129f)
+   lineTo(91f,142f);lineTo(15f,142f);lineTo(2f,129f);lineTo(2f,13f);close()
   }
+  p.color=if(active)0xff50371f.toInt() else 0xff171d25.toInt()
+  p.style=Paint.Style.FILL;c.drawPath(outer,p)
+  p.style=Paint.Style.STROKE;p.strokeWidth=if(active||today)2.6f else 1.6f;p.color=edge
+  c.drawPath(outer,p);p.style=Paint.Style.FILL
+  line(trim,1f,20f,5f,86f,5f,99f,18f,99f,124f,86f,137f,20f,137f,7f,124f,7f,18f,20f,5f)
+  line(trim,1.8f,26f,9f,80f,9f,91f,20f)
+  line(trim,1.8f,15f,27f,15f,19f,25f,9f)
+  line(trim,1.8f,91f,122f,80f,133f,26f,133f,15f,122f)
+  line(edge,1.6f,32f,3f,40f,11f,66f,11f,74f,3f)
+  line(edge,1.6f,32f,139f,40f,131f,66f,131f,74f,139f)
+  line(trim,1.8f,13f,39f,21f,47f,13f,55f)
+  line(trim,1.8f,93f,39f,85f,47f,93f,55f)
+  line(trim,1.8f,13f,87f,21f,95f,13f,103f)
+  line(trim,1.8f,93f,87f,85f,95f,93f,103f)
+  fun diamond(cx:Float,cy:Float,r:Float,color:Int){
+   p.color=color;p.style=Paint.Style.FILL
+   val path=Path().apply{moveTo(cx,cy-r);lineTo(cx+r*0.7f,cy);lineTo(cx,cy+r);lineTo(cx-r*0.7f,cy);close()}
+   c.drawPath(path,p)
+  }
+  diamond(53f,13f,10f,if(active)0xfff5c979.toInt() else 0xff8c6037.toInt())
+  diamond(53f,129f,10f,0xff765132.toInt())
+  line(trim,1f,28f,99f,78f,99f)
   if(today){
-   p.color=0xffffd28a.toInt()
-   val mid=w/2f
-   val gem=Path().apply{moveTo(mid-4f,2f);lineTo(mid,6f);lineTo(mid+4f,2f);close()}
-   canvas.drawPath(gem,p)
+   diamond(53f,32f,4f,0xffffd28a.toInt())
   }
+  c.restore()
  }
  override fun setAlpha(alpha:Int){p.alpha=alpha}
  override fun setColorFilter(colorFilter:android.graphics.ColorFilter?){p.colorFilter=colorFilter}
