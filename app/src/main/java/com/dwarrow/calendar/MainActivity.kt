@@ -64,7 +64,6 @@ private class DayCellFrame(private val active:Boolean,private val today:Boolean)
   }
   diamond(53f,13f,10f,if(active)0xfff5c979.toInt() else 0xff8c6037.toInt())
   diamond(53f,129f,10f,0xff765132.toInt())
-  line(trim,1f,28f,99f,78f,99f)
   if(today){
    diamond(53f,32f,4f,0xffffd28a.toInt())
   }
