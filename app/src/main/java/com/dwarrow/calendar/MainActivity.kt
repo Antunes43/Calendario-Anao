@@ -546,6 +546,14 @@ class MainActivity:Activity(){
     nav.addView(heading,LinearLayout.LayoutParams(0,-2,2.7f))
     nav.addView(monthArrow("Próximo ›",false),LinearLayout.LayoutParams(0,dp(44),1.2f))
     navPanel.addView(nav,LinearLayout.LayoutParams(-1,-2))
+    val todayButton=text("HOJE · Voltar à data atual",13f,bronze,true).apply{
+     gravity=Gravity.CENTER
+     background=android.graphics.drawable.GradientDrawable().apply{
+      setColor(0xff131820.toInt());setStroke(dp(1),bronze);setCornerRadius(dp(5).toFloat())
+     }
+     setOnClickListener{date=LocalDate.now(ZoneId.systemDefault());draw()}
+    }
+    navPanel.addView(todayButton,LinearLayout.LayoutParams(-1,dp(38)).apply{topMargin=dp(8)})
     root.addView(navPanel,LinearLayout.LayoutParams(-1,-2).apply{bottomMargin=dp(10)})
     // Single framed panel: artwork and Gregorian dates share one border and divider.
     val monthPanel=column().apply{
@@ -579,10 +587,22 @@ class MainActivity:Activity(){
        val on=if(n in 1..month.length)month.start.plusDays((n-1).toLong()) else null
        val selected=on==date
        val marked=on!=null&&ObservanceEngine.active(this,on).isNotEmpty()
-       val cell=text(if(on==null)" " else n.toString()+(if(marked)" •" else ""),13f,if(selected)0xffffd18d.toInt() else cream,selected).apply{
+       val isToday=on==LocalDate.now(ZoneId.systemDefault())
+       val cell=column().apply{
         gravity=Gravity.CENTER
-        background=android.graphics.drawable.GradientDrawable().apply{setColor(if(selected)0xff65401d.toInt() else 0xff131820.toInt());setStroke(dp(1),if(selected)bronze else 0xff674b30.toInt())}
-        if(on!=null)setOnClickListener{date=on;draw()}
+        background=android.graphics.drawable.GradientDrawable().apply{
+         setColor(if(selected)0xff65401d.toInt() else 0xff131820.toInt())
+         setStroke(dp(if(isToday)2 else 1),if(selected||isToday)bronze else 0xff674b30.toInt())
+        }
+        if(on!=null){
+         addView(text(n.toString()+(if(marked)" •" else ""),14f,if(selected)0xffffd18d.toInt() else cream,selected).apply{
+          gravity=Gravity.CENTER
+         })
+         addView(text(on.format(DateTimeFormatter.ofPattern("dd/MM",Locale("pt","BR"))),10f,if(selected)0xffffd18d.toInt() else bronze).apply{
+          gravity=Gravity.CENTER
+         })
+         setOnClickListener{date=on;draw()}
+        }
        }
        row.addView(cell,LinearLayout.LayoutParams(0,dp(58),1f).apply{setMargins(dp(2),dp(3),dp(2),dp(3))})
       }
