@@ -447,6 +447,32 @@ class MainActivity:Activity(){
  private val observances by lazy {
   JSONArray(assets.open("observances.json").bufferedReader().use { it.readText() })
  }
+ private val lunarGemCache:List<Pair<Bitmap,Rect>?> by lazy {
+  (0..7).map { index ->
+   val id=resources.getIdentifier(lunarImages[index],"drawable",packageName)
+   if(id==0)null else {
+    val bounds=BitmapFactory.Options().apply{inJustDecodeBounds=true}
+    BitmapFactory.decodeResource(resources,id,bounds)
+    var sample=1
+    while(bounds.outWidth/sample>256||bounds.outHeight/sample>256)sample*=2
+    val options=BitmapFactory.Options().apply{inSampleSize=sample}
+    val bitmap=BitmapFactory.decodeResource(resources,id,options)
+    if(bitmap==null)null else {
+     var minX=bitmap.width;var minY=bitmap.height;var maxX=-1;var maxY=-1
+     for(y in 0 until bitmap.height)for(x in 0 until bitmap.width){
+      if((bitmap.getPixel(x,y) ushr 24)>32){
+       if(x<minX)minX=x
+       if(x>maxX)maxX=x
+       if(y<minY)minY=y
+       if(y>maxY)maxY=y
+      }
+     }
+     val source=if(maxX<minX)Rect(0,0,bitmap.width,bitmap.height) else Rect(minX,minY,maxX+1,maxY+1)
+     Pair(bitmap,source)
+    }
+   }
+  }
+ }
  private fun draw(){
   val day=CalendarEngine.lookup(this,date)
   val greg=date.format(DateTimeFormatter.ofPattern("d 'de' MMMM 'de' yyyy",Locale("pt","BR")))
@@ -768,6 +794,10 @@ class MainActivity:Activity(){
    val moonDrawable=if(moonId!=0)resources.getDrawable(moonId,theme) else KhazadMoon()
    val blueprint=object:View(this){
     val ink=Paint(Paint.ANTI_ALIAS_FLAG)
+    private var cachedPosition:Pair<Double,Double>?=null
+    private var positionMinute=Long.MIN_VALUE
+    private val gems=lunarGemCache
+    private val gemPaint=Paint(Paint.ANTI_ALIAS_FLAG or Paint.FILTER_BITMAP_FLAG)
     private val refresh=object:Runnable{
      override fun run(){
       if(isAttachedToWindow){
@@ -819,7 +849,12 @@ class MainActivity:Activity(){
     }
     override fun onDraw(c:Canvas){
      super.onDraw(c)
-     val position=moonHorizontal()
+     val minute=System.currentTimeMillis()/60000L
+     if(positionMinute!=minute){
+      cachedPosition=moonHorizontal()
+      positionMinute=minute
+     }
+     val position=cachedPosition
      val scale=width/900f
      c.save();c.scale(scale,scale)
      ink.style=Paint.Style.FILL;ink.color=0xff090d13.toInt();c.drawRect(0f,0f,900f,1290f,ink)
@@ -876,30 +911,6 @@ class MainActivity:Activity(){
       }
      }
      c.drawPath(gemArc,ink)
-     // Normalize each PNG by its visible alpha bounds so differing transparent
-     // margins cannot make one lunar phase look smaller than another.
-     val gems=Array(8){i->
-      val id=resources.getIdentifier(lunarImages[i],"drawable",packageName)
-      if(id==0)null else BitmapFactory.decodeResource(resources,id)
-     }
-     val gemSources=Array(8){i->
-      val bitmap=gems[i]
-      if(bitmap==null)null else {
-       var minX=bitmap.width;var minY=bitmap.height
-       var maxX=-1;var maxY=-1
-       for(py in 0 until bitmap.height)for(px in 0 until bitmap.width){
-        if((bitmap.getPixel(px,py) ushr 24)>32){
-         if(px<minX)minX=px
-         if(px>maxX)maxX=px
-         if(py<minY)minY=py
-         if(py>maxY)maxY=py
-        }
-       }
-       if(maxX<minX)Rect(0,0,bitmap.width,bitmap.height)
-       else Rect(minX,minY,maxX+1,maxY+1)
-      }
-     }
-     val gemPaint=Paint(Paint.ANTI_ALIAS_FLAG or Paint.FILTER_BITMAP_FLAG)
      for(i in 0..7){
       val x=92f+i*102f
       val y=824f-145f*kotlin.math.sin(i*Math.PI/7).toFloat()
@@ -909,8 +920,8 @@ class MainActivity:Activity(){
       c.clipPath(clip)
       ink.style=Paint.Style.FILL;ink.color=0xff101820.toInt()
       c.drawCircle(x,y,rad,ink)
-      val bitmap=gems[i]
-      val source=gemSources[i]
+      val bitmap=gems[i]?.first
+      val source=gems[i]?.second
       if(bitmap!=null&&source!=null){
        // Uniform diameter and common center, preserving each image aspect ratio.
        val side=kotlin.math.max(source.width(),source.height()).toFloat()
