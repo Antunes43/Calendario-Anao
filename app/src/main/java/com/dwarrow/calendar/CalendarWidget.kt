@@ -47,7 +47,7 @@ abstract class BaseCalendarWidget(private val style:Int):AppWidgetProvider(){
    "Ibriznurt"->"domingo";else->""
   }
   for(id in ids){
-   val layoutId=if(style==0)R.layout.widget_khazad else R.layout.widget
+   val layoutId=R.layout.widget_khazad
    val v=RemoteViews(context.packageName,layoutId)
    val accent=when(style){1->0xffd2a47d.toInt();2->0xffdfc995.toInt();else->0xffd8a35f.toInt()}
    v.setTextColor(R.id.widgetDate,accent)
@@ -71,8 +71,8 @@ abstract class BaseCalendarWidget(private val style:Int):AppWidgetProvider(){
    v.setTextViewText(R.id.widgetWeekPt,weekday)
    v.setTextViewText(R.id.widgetGregorian,today.format(java.time.format.DateTimeFormatter.ofPattern("d 'de' MMMM 'de' yyyy",java.util.Locale("pt","BR"))))
    v.setImageViewResource(R.id.widgetSeasonIcon,icon)
-   v.setTextViewText(R.id.widgetSeasonPt,season.getOrNull(1) ?: "")
-   v.setTextViewText(R.id.widgetSeasonKh,seasonName)
+   v.setTextViewText(R.id.widgetSeasonPt,seasonName)
+   v.setTextViewText(R.id.widgetSeasonKh,season.getOrNull(1) ?: "")
    val open=PendingIntent.getActivity(context,0,Intent(context,MainActivity::class.java),PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
    v.setOnClickPendingIntent(R.id.widgetRoot,open)
    manager.updateAppWidget(id,v)
